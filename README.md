@@ -7,7 +7,7 @@
 <pre><code>#BacherlorPro# 
 export BACH_ROOT=MYPROJECTFO/  
 export URCON_ROOT=MYPROJECTFO/URControl/src/  
-export CONTPROC_ROOT=MYPROJECTFO/ContProc/src/  
+export VISION_ROOT=MYPROJECTFO/Vision/src/  
 export SDHCON_ROOT=MYPROJECTFO/SDHControl/src/  
 export TIAFC_ROOT=MYPROJECTFO/TIAFC/src/
 export COORDS_ROOT=MYPROJECTFO/Coords/src/</code></pre>
