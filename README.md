@@ -18,6 +18,6 @@ In your CmakeLists.txt, besides your other includes etc. (such as RobWork) add t
 <pre><code>INCLUDE_DIRECTORIES($ENV{BACH_ROOT})
 INCLUDE_DIRECTORIES($ENV{URCON_ROOT})</code></pre>
 
-You shold always include `$ENV{BACH_ROOT}` as a minimun, and then your desired libraries. You can then add the libraries:
+You shold always include `$ENV{BACH_ROOT}` as a minimum, and then your desired libraries. You can now add your desired libraries like this:
 
 <pre><code>add_library(URControl $ENV{URCON_ROOT}/URControl.cpp)</code></pre>
