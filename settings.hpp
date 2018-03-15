@@ -7,26 +7,35 @@
 //===========
 #define TIAFC_MODE		1	// 0 = normal, 1 = debug
 
-#define CAMERA			1	// 0 = default camera
-#define FRAMES_TO_GET		42	// min 7, according to initial tests
+//camera settings (taking an image):
+#define CAMERA			0	// 0 = default camera
+#define FRAMES_TO_GET		14	// min 7, according to initial tests
 
-#define CROP_TOP		  113
+//crop settings (taking an image):
+#define CROP_TOP		113
 #define CROP_BOTTOM		330
-#define CROP_LEFT		  200
+#define CROP_LEFT		200
 #define CROP_RIGHT		635
 
+//for the Canny edge-detector (finding contours):
 #define CANNY_THRES		100	// 0 <= THRESHOLD <= 255
 
-//==============
-//   ContProc
-//==============
-#define CONTPROC_MODE		1	// 0 = normal, 1 = debug
+//============
+//   Vision
+//============
+#define VISION_MODE		1	// 0 = normal, 1 = debug
 
-#define CALC_FACTOR		1000
+//for calibration (pixel-coords to real-coords):
+#define CALC_FACTOR		1000	//determines precision in intermediate results and calculations
 #define REAL_WIDTH		48	//mm
 #define REAL_HEIGHT		48	//mm
-#define GLOB_X_DIR		1
-#define GLOB_Y_DIR		-1
+#define GLOB_X_DIR		1	//global x-direction in relation to the cameras x-direction
+#define GLOB_Y_DIR		-1	//global y-direction in relation to the cameras y-direction
+
+//for the Hough-transform line detector (grasp regs):
+#define MIN_POINTS_IN_LINE	10
+#define MIN_LINE_LENGTH		10
+#define MAX_LINE_GAP		3
 
 //===============
 //   URControl
