@@ -1,5 +1,5 @@
 # BachelorPro
-# How to prepare this project for use on your (ubuntu) machine:
+## How to prepare this project for use on your (ubuntu) machine:
 1. Make sure you have RobWork, OpenCV, SDH-library and PEAKCAN-driver installed and working.
 2. Create a project folder, named whatever you like.
 3. Add the following to your ~/.bashrc:
@@ -12,7 +12,7 @@ export SDHCON_ROOT=MYPROJECTFO/SDHControl/src/
 export TIAFC_ROOT=MYPROJECTFO/TIAFC/src/
 export COORDS_ROOT=MYPROJECTFO/Coords/src/</code></pre>
 
-# How to use this project to create new tests and applications:
+## How to use this project to create new tests and applications:
 In your CmakeLists.txt, besides your other includes etc. (such as RobWork) add the project directories as follows:
 
 <pre><code>INCLUDE_DIRECTORIES($ENV{BACH_ROOT})
