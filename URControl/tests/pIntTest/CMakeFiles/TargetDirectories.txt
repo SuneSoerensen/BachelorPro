@@ -1,0 +1,3 @@
+/home/sune/Dropbox/6. Semester studiegruppe/s's bachelorkode/urControl/pIntTest/CMakeFiles/edit_cache.dir
+/home/sune/Dropbox/6. Semester studiegruppe/s's bachelorkode/urControl/pIntTest/CMakeFiles/rebuild_cache.dir
+/home/sune/Dropbox/6. Semester studiegruppe/s's bachelorkode/urControl/pIntTest/CMakeFiles/pIntTest.dir
