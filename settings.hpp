@@ -52,7 +52,7 @@
 #define UR_MAX_Y		-0.285
 #define UR_MIN_Y		-0.785
 #define UR_MAX_Z		0.700
-#define UR_MIN_Z		0.283
+#define UR_MIN_Z		0.305
 #define R_SQUARED		0.8*0.8
 
 #define REAL_TO_UR_OFFSET_X	-108.7
