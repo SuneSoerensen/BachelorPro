@@ -12,10 +12,6 @@
 #define FRAMES_TO_GET		14	// min 7, according to initial tests
 
 //crop settings (taking an image):
-#define CROP_TOP		113
-#define CROP_BOTTOM		330
-#define CROP_LEFT		200
-#define CROP_RIGHT		635
 
 //for the Canny edge-detector (finding contours):
 #define CANNY_THRES		100	// 0 <= THRESHOLD <= 255
