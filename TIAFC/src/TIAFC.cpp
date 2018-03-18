@@ -1,4 +1,5 @@
 #include "TIAFC.hpp"
+#include <iostream>
 
 
 
@@ -17,6 +18,8 @@ void TIAFC::TakeImage(Mat &aCropImage)
 	{
 		cap.read(frame);
 	}
+
+	/*DEBUG*/frame = imread("test_img.jpg");
 
 	//check crop
 	if (CROP_TOP < 0 || CROP_TOP > CROP_BOTTOM)
@@ -39,7 +42,7 @@ void TIAFC::TakeImage(Mat &aCropImage)
 	}
 }
 
-void TIAFC::FindContour(Mat &aCropImage, Mat &aContourImage, vector<Coords> &aContour)
+void TIAFC::FindContour(Mat &aCropImage, Mat &aContourImage, vector<Coords> &aContourList, vector<vector<int> > &aContourMatrix)
 {
 	if (!aCropImage.data) //check if empty
 		throw("[TIAFC::FindContour()]: No image!");
@@ -69,6 +72,7 @@ void TIAFC::FindContour(Mat &aCropImage, Mat &aContourImage, vector<Coords> &aCo
 	bool firstTime = true;
 	Coords firstPoint;
 	int pointCount = 0;
+
 	for (int i = 0; i < edgeImage.rows; i++)
 	{
 		for (int j = 0; j < edgeImage.cols; j++)
@@ -84,12 +88,20 @@ void TIAFC::FindContour(Mat &aCropImage, Mat &aContourImage, vector<Coords> &aCo
 		}
 	}
 
-	if(pointCount == 0) //check that a contour was found
+	if(pointCount < 1) //check that a contour was found
 		throw("[TIAFC::FindContour()]: No contour detected!");
 
-	aContour.resize(pointCount); //init result
+	//init contour
+	aContourList.resize(pointCount);
+	aContourList[0] = firstPoint;
 
-	//copy points
+	aContourMatrix.resize(aContourImage.cols);
+	for (int i = 0; i < aContourImage.cols; i++)
+	{
+		aContourMatrix[i] = vector<int>(aContourImage.rows, 0);
+	}
+	aContourMatrix[firstPoint.x][firstPoint.y] = 1;
+
 	/*pointCount = 0;
 	for (int i = 0; i < edgeImage.rows; i++)
 	{
@@ -97,25 +109,48 @@ void TIAFC::FindContour(Mat &aCropImage, Mat &aContourImage, vector<Coords> &aCo
 		{
 			if (edgeImage.at<uchar>(i, j) == 255)
 			{
-				aContour[pointCount].Set(j, i);
+				aContourList[pointCount].Set(j, i);
 				pointCount++;
 			}
 		}
 	}*/
 
-	Coords prevPoint = firstPoint;
-	Coords currPoint = FindNextNeighbour(aContourImage, firstPoint);
-	int index = 0;
-
-	while (index < pointCount)
+	//copy points to contour
+	int index = 1;
+	while (index < pointCount) //while we haven't found all points
 	{
-		
+		//find next point
+		aContourList[index] = FindNextNeighbour(aContourImage, aContourMatrix, aContourList[index - 1]);
+		aContourMatrix[aContourList[index].x][aContourList[index].y] = index;
+
+		index++;
 	}
 }
 
-Coords TIAFC::FindNextNeighbour(Mat &aContourImage, Coords aPrevPoint)
+Coords TIAFC::FindNextNeighbour(Mat &aContourImage, vector<vector<int> > &aContourMatrix, Coords aCurrPoint)
 {
-	
+	Coords res(-42);
+
+	//relative coordinates:
+	int xVals[8] = {1, 0, -1, 0, 1, -1, -1, 1}; //this EXACT sequence is very important!!!
+	int yVals[8] = {0, -1, 0, 1, -1, -1, 1, 1};
+
+	for ( int i = 0; i < 8; i++) //run through all neighbours
+	{
+		if (aContourImage.at<uchar>(aCurrPoint.y + yVals[i], aCurrPoint.x + xVals[i]) == 255) //if part of the contour
+		{
+			if (aContourMatrix[aCurrPoint.x + xVals[i]][aCurrPoint.y + yVals[i]] == 0) //if not one of the previous points
+			{
+				res.Set(aCurrPoint.x + xVals[i], aCurrPoint.y + yVals[i]);
+				break;
+			}
+		}
+	}
+
+	if(res.Eq(-42)) //check that a neighbour was found
+		throw("[TIAFC::FindNextNeighbour()]: Contour is not closed!");
+
+	return res;
 }
 
 TIAFC::TIAFC()
@@ -125,3 +160,4 @@ TIAFC::TIAFC()
 TIAFC::~TIAFC()
 {
 }
+

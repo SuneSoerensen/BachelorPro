@@ -15,10 +15,10 @@ class TIAFC //Take Image And Find Contour
 {
 public:
 	static void TakeImage(Mat &aCropImage);
-	static void FindContour(Mat &aCropImage, Mat &aContourImage, vector<Coords> &aContour);
+	static void FindContour(Mat &aCropImage, Mat &aContourImage, vector<Coords> &aContourList, vector<vector<int> > &aContourMatrix);
 
 private:
-	static Coords FindNextNeighbour(Mat &aContourImage, Coords aPrevPoint);
+	static Coords FindNextNeighbour(Mat &aContourImage, vector<vector<int> > &aContourMatrix, Coords aCurrPoint);
 
 	TIAFC();
 	~TIAFC();
