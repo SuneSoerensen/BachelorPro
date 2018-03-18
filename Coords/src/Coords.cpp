@@ -17,6 +17,12 @@ Coords::Coords(int anX, int aY)
 	y = aY;
 }
 
+Coords::Coords(int aScalar)
+{
+	x = aScalar;
+	y = aScalar;
+}
+
 //====================
 //   "set"-function
 //====================
@@ -26,9 +32,45 @@ void Coords::Set(int anX, int aY)
 	y = aY;
 }
 
+void Coords::Set(int aScalar)
+{
+	x = aScalar;
+	y = aScalar;
+}
+
 //=====================
 //   math-functions
 //=====================
+bool Coords::Eq(Coords aCoords)
+{
+	bool res = false;
+
+	if (x == aCoords.x && y == aCoords.y)
+		res = true;
+
+	return res;
+}
+
+bool Coords::Eq(int aScalar)
+{
+	bool res = false;
+
+	if (x == aScalar && y == aScalar)
+		res = true;
+
+	return res;
+}
+
+double Coords::Length()
+{
+	return sqrt(pow(x, 2) + pow(y, 2));
+}
+
+int Coords::Dot(Coords aCoords)
+{
+	return x*aCoords.x + y*aCoords.y;
+}
+
 //-------------
 // With Coords
 //-------------

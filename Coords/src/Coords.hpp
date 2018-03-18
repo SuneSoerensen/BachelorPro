@@ -1,4 +1,5 @@
 #pragma once
+#include <cmath>
 
 using namespace std;
 
@@ -12,15 +13,23 @@ public:
 	//==================
 	Coords();
 	Coords(int anX, int aY);
+	Coords(int aScalar);
 
 	//====================
 	//   "set"-function
 	//====================
 	void Set(int anX, int aY);
+	void Set(int aScalar);
 
 	//=====================
 	//   math-functions
 	//=====================
+	bool Eq(Coords aCoords);
+	bool Eq(int aScalar);
+
+	double Length();
+	int Dot(Coords aCoords);
+
 	//-------------
 	// With Coords
 	//-------------
