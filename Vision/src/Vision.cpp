@@ -11,37 +11,37 @@ Coords Vision::GetObjCoords()
 {
 	//get new data
 	TIAFC::TakeImage(cropImage);
-	TIAFC::FindContour(cropImage, contourImage, contour);
+	TIAFC::FindContour(cropImage, contourImage, contourList, contourMatrix);
 
 	//return the objects COM in real coordinates
-	return GetRealCoords(FindCOM(contour, contourImage));
+	return GetRealCoords(FindCOM(contourList, contourImage));
 }
 
 void Vision::Calib()
 {
 	//get new data
 	TIAFC::TakeImage(cropImage);
-	TIAFC::FindContour(cropImage, contourImage, contour);
+	TIAFC::FindContour(cropImage, contourImage, contourList, contourMatrix);
 
 	//calculate the offset
-	offset = FindCOM(contour, contourImage).Mul(-1);
+	offset = FindCOM(contourList, contourImage).Mul(-1);
 
 	//find height and width of calibration object
-	Coords min = contour[0];
-	Coords max = contour[0];
-	for (int i = 1; i < contour.size(); i++)
+	Coords min = contourList[0];
+	Coords max = contourList[0];
+	for (int i = 1; i < contourList.size(); i++)
 	{
-		if (contour[i].x < min.x)
-			min.x = contour[i].x;
+		if (contourList[i].x < min.x)
+			min.x = contourList[i].x;
 
-		if (contour[i].x > max.x)
-			max.x = contour[i].x;
+		if (contourList[i].x > max.x)
+			max.x = contourList[i].x;
 
-		if (contour[i].y < min.y)
-			min.y = contour[i].y;
+		if (contourList[i].y < min.y)
+			min.y = contourList[i].y;
 
-		if (contour[i].y > max.y)
-			max.y = contour[i].y;
+		if (contourList[i].y > max.y)
+			max.y = contourList[i].y;
 	}
 
 	//calculate the scale factor
@@ -54,17 +54,17 @@ Vision::~Vision()
 {
 }
 
-Coords Vision::FindCOM(vector<Coords> &aContour, Mat &aContourImage)
+Coords Vision::FindCOM(vector<Coords> &aContourList, Mat &aContourImage)
 {
 	//calculate sum of all x- and y-coordinates
 	Coords sum(0, 0);
-	for (int i = 0; i < aContour.size(); i++)
+	for (int i = 0; i < aContourList.size(); i++)
 	{
-		sum = sum.Add(aContour[i]);
+		sum = sum.Add(aContourList[i]);
 	}
 
 	//divide by number of points to find average
-	Coords res = sum.Div(aContour.size());
+	Coords res = sum.Div(aContourList.size());
 
 	if (VISION_MODE) //DEBUG
 	{
@@ -96,28 +96,41 @@ Coords Vision::FindCOM(vector<Coords> &aContour, Mat &aContourImage)
 	return res;
 }
 
-void Vision::FindGraspRegs(vector<vector<Coords> > &aListOfLines, Mat &aContourImage)
+void Vision::FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aContourImage, vector<vector<int> > &aContourMatrix)
 {
 	//use Hough-transform to find straight lines
 	vector<Vec4i> lines;
 	HoughLinesP(aContourImage, lines, 1, CV_PI/180, MIN_POINTS_IN_LINE, MIN_LINE_LENGTH, MAX_LINE_GAP );
 
-	if (lines.size() == 0)
+	if (lines.size() == 0) //check that lines were found
 		throw("[Vision::FindGraspRegs()]: Couldn't find any grasp regions!");
 
-	aListOfLines.resize(lines.size());
+	//copy found lines to the list of grasping regions
+	aGraspRegsList.resize(lines.size());
 	for (int i = 0; i < lines.size(); i++)
 	{
-		aListOfLines[i].resize(2);
-		aListOfLines[i][0].Set(lines[i][0], lines[i][1]);
-		aListOfLines[i][1].Set(lines[i][2], lines[i][3]);
+		aGraspRegsList[i].resize(2);
+
+		if (aContourMatrix[lines[i][0]][lines[i][1]] < aContourMatrix[lines[i][2]][lines[i][3]]) //make sure the order is correct
+		{
+			aGraspRegsList[i][0].Set(lines[i][0], lines[i][1]);
+			aGraspRegsList[i][1].Set(lines[i][2], lines[i][3]);
+		}
+		else
+		{
+			aGraspRegsList[i][0].Set(lines[i][2], lines[i][3]);
+			aGraspRegsList[i][1].Set(lines[i][0], lines[i][1]);
+		}
 	}
 
 	if (VISION_MODE) //DEBUG
 	{
+		//make output image
 		Mat graspRegsImage;
 		aContourImage.copyTo(graspRegsImage);
 		cvtColor(graspRegsImage, graspRegsImage, COLOR_GRAY2BGR);
+
+		//draw the found lines
 		for( int i = 0; i < lines.size(); i++ )
 		{
 			Point startP = Point(lines[i][0], lines[i][1]);
@@ -125,8 +138,32 @@ void Vision::FindGraspRegs(vector<vector<Coords> > &aListOfLines, Mat &aContourI
 			line( graspRegsImage, startP, endP, Scalar(0,0,255), 1, LINE_AA);
 		}
 
+		//save to image
 		imwrite("Vision_graspRegs.jpg", graspRegsImage);
 	}
+}
+
+void Vision::CalcNormVecs(vector<vector<Coords> > &aGraspRegsList, vector<Coords> &aNormVecsList)
+{
+	//init result
+	aNormVecsList.resize(aGraspRegsList.size());
+
+	//calc direction-vectors
+	for (int i = 0; i < aGraspRegsList.size(); i++)
+	{
+		aNormVecsList[i] = aGraspRegsList[i][1].Sub(aGraspRegsList[i][0]); //r = p_end - p_start
+	}
+
+	//calc normal-vectors
+	for (int i = 0; i < aNormVecsList.size(); i++)
+	{
+		aNormVecsList[i].Set(aNormVecsList[i].y, -aNormVecsList[i].x); //n = (y, -x), r = (x, y)
+	}
+}
+
+double Vision::CalcAngle(Coords vecA, Coords vecB)
+{
+	return acos(vecA.Dot(vecB) / (vecA.Length()*vecB.Length()));
 }
 
 Coords Vision::GetRealCoords(Coords coordsInPixels)
