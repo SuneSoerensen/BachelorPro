@@ -50,6 +50,11 @@ void Vision::Calib()
 	scaleFactor = globScale.Div(locScale); //(mm*CALC_FACTOR)/pixels
 }
 
+void Vision::RunFindGraspPoints()
+{
+	AnalytGrasp::FindGraspPoints(graspPointsList, contourImage, contourList, contourMatrix);
+}
+
 Vision::~Vision()
 {
 }
@@ -94,76 +99,6 @@ Coords Vision::FindCOM(vector<Coords> &aContourList, Mat &aContourImage)
 	}
 
 	return res;
-}
-
-void Vision::FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aContourImage, vector<vector<int> > &aContourMatrix)
-{
-	//use Hough-transform to find straight lines
-	vector<Vec4i> lines;
-	HoughLinesP(aContourImage, lines, 1, CV_PI/180, MIN_POINTS_IN_LINE, MIN_LINE_LENGTH, MAX_LINE_GAP );
-
-	if (lines.size() == 0) //check that lines were found
-		throw("[Vision::FindGraspRegs()]: Couldn't find any grasp regions!");
-
-	//copy found lines to the list of grasping regions
-	aGraspRegsList.resize(lines.size());
-	for (int i = 0; i < lines.size(); i++)
-	{
-		aGraspRegsList[i].resize(2);
-
-		if (aContourMatrix[lines[i][0]][lines[i][1]] < aContourMatrix[lines[i][2]][lines[i][3]]) //make sure the order is correct
-		{
-			aGraspRegsList[i][0].Set(lines[i][0], lines[i][1]);
-			aGraspRegsList[i][1].Set(lines[i][2], lines[i][3]);
-		}
-		else
-		{
-			aGraspRegsList[i][0].Set(lines[i][2], lines[i][3]);
-			aGraspRegsList[i][1].Set(lines[i][0], lines[i][1]);
-		}
-	}
-
-	if (VISION_MODE) //DEBUG
-	{
-		//make output image
-		Mat graspRegsImage;
-		aContourImage.copyTo(graspRegsImage);
-		cvtColor(graspRegsImage, graspRegsImage, COLOR_GRAY2BGR);
-
-		//draw the found lines
-		for( int i = 0; i < lines.size(); i++ )
-		{
-			Point startP = Point(lines[i][0], lines[i][1]);
-			Point endP = Point(lines[i][2], lines[i][3]);
-			line( graspRegsImage, startP, endP, Scalar(0,0,255), 1, LINE_AA);
-		}
-
-		//save to image
-		imwrite("Vision_graspRegs.jpg", graspRegsImage);
-	}
-}
-
-void Vision::CalcNormVecs(vector<vector<Coords> > &aGraspRegsList, vector<Coords> &aNormVecsList)
-{
-	//init result
-	aNormVecsList.resize(aGraspRegsList.size());
-
-	//calc direction-vectors
-	for (int i = 0; i < aGraspRegsList.size(); i++)
-	{
-		aNormVecsList[i] = aGraspRegsList[i][1].Sub(aGraspRegsList[i][0]); //r = p_end - p_start
-	}
-
-	//calc normal-vectors
-	for (int i = 0; i < aNormVecsList.size(); i++)
-	{
-		aNormVecsList[i].Set(aNormVecsList[i].y, -aNormVecsList[i].x); //n = (y, -x), r = (x, y)
-	}
-}
-
-double Vision::CalcAngle(Coords vecA, Coords vecB)
-{
-	return acos(vecA.Dot(vecB) / (vecA.Length()*vecB.Length()));
 }
 
 Coords Vision::GetRealCoords(Coords coordsInPixels)

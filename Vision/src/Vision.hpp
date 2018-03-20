@@ -1,5 +1,6 @@
 #pragma once
 #include "TIAFC.hpp"
+#include "AnalytGrasp.hpp"
 
 using namespace std;
 
@@ -13,14 +14,12 @@ public:
 	Coords GetObjCoords();
 	void Calib();
 
+	/*DEBUG*/void RunFindGraspPoints();
+
 	~Vision();
 
 //private:
 	static Coords FindCOM(vector<Coords> &aContourList, Mat &aContourImage);
-	static void FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aContourImage, vector<vector<int> > &aContourMatrix);
-	static void CalcNormVecs(vector<vector<Coords> > &aGraspRegsList, vector<Coords> &aNormVecsList);
-	static double CalcAngle(Coords vecA, Coords vecB);
-	//static void FindPossGrasps(vector<vector<int> > &aPossGraspsList, vector<Coords> &aNormVecsList);
 
 	Coords GetRealCoords(Coords coordsInPixels);
 
@@ -32,13 +31,11 @@ public:
 
 	//finding the contour
 	Mat contourImage;
-	vector<Coords> contourList;
-	vector<vector<int> > contourMatrix;
+	vector<Coords> contourList; //list of points in contour
+	vector<vector<int> > contourMatrix; //relates coordinates of contour points to indices in the list (indices are offset by +1!!!)
 
 	//grasping
-	vector<vector<Coords> > graspRegsList;
-	vector<Coords> normVecsList;
-	//vector<vector<int> > possGraspsList
+	vector<Coords> graspPointsList;
 
 	//calibration
 	Coords offset;
