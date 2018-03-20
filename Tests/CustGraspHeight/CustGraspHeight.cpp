@@ -32,11 +32,7 @@ int main()
 
     URControl ur(ip, port);
     ur.connect();
-  }
-  catch(const char e[])
-  {
-    cout << e << endl;
-  }
+
 
   cout << "Enter distance for finger A: ";
   cin >> distA;
@@ -49,28 +45,23 @@ int main()
   {
     cout << "Moving arm to init" << endl;
     ur.moveToInit();
+    ur.moveRel(0.0,20.0,0.0);
     cout << "Moving hand to init" << endl;
-    sdh.goToInit();
+    hand.goToInit();
     cout << "Enter a grasping height offset: ";
     cin >> howMuchLower;
     cout << "Enter relative z-coordinate for arm: ";
     cin >> armRelZ;
 
-    try
-    {
       cout << "Moving arm down" << endl;
       ur.moveRel(0.0, 0.0, armRelZ);
       cout << "Grasping" << endl;
       hand.grasp(distA, distB, distC, howMuchLower);
-      cout << "Moving arm up to init + 100mm" << endl;
-      ur.moveRel(0.0, 0.0, -(armRelZ+100));
+      cout << "Moving arm up to init" << endl;
+      ur.moveRel(0.0, 0.0, -(armRelZ));
       cout << "Fully stopping hand" << endl;
       hand.fullStop();
-    }
-    catch(const char e[])
-    {
-      cout << e << endl;
-    }
+
 
     cout << "Do you wish to repeat? (y/n): ";
     cin >> wishToCont;
@@ -81,6 +72,11 @@ int main()
       break;
     }
   }
+}
+catch(const char e[])
+{
+  cout << e << endl;
+}
 
 
   return 0;
