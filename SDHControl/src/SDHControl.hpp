@@ -61,10 +61,14 @@ public:
 
     void goToQ(Q aQ);
     void goToInit();
+    void fullStop();
 
     bool isConnected();
 
-    void grasp(double distA, double distB, double distC); //NOTE: Only concentric for now!!
+    void grasp(double distA, double distB, double distC);
+
+    //Debug/test functions:
+    void grasp(double distA, double distB, double distC, double howMuchLower); //Finds max height and goes 'howMuchLower'mm down and check validity
 
     vector<double> calcFingerAngle(double x, double y);
 
