@@ -24,14 +24,14 @@ int main()
 
 
 
-  cout << "Welcome to CustGrasp.cpp" << endl;
+  cout << "Welcome to CustGraspHeight.cpp" << endl;
 
   try
   {
-    //SDHControl hand("/dev/pcanusb32");
+    SDHControl hand("/dev/pcanusb32");
 
-    //URControl ur(ip, port);
-    //ur.connect();
+    URControl ur(ip, port);
+    ur.connect();
   }
   catch(const char e[])
   {
@@ -48,9 +48,9 @@ int main()
   while(true)
   {
     cout << "Moving arm to init" << endl;
-    //ur.moveToInit();
+    ur.moveToInit();
     cout << "Moving hand to init" << endl;
-    //sdh.goToInit();
+    sdh.goToInit();
     cout << "Enter a grasping height offset: ";
     cin >> howMuchLower;
     cout << "Enter relative z-coordinate for arm: ";
@@ -59,13 +59,13 @@ int main()
     try
     {
       cout << "Moving arm down" << endl;
-      //ur.moveRel(0.0, 0.0, armRelZ);
+      ur.moveRel(0.0, 0.0, armRelZ);
       cout << "Grasping" << endl;
-      //hand.grasp(distA, distB, distC, howMuchLower);
+      hand.grasp(distA, distB, distC, howMuchLower);
       cout << "Moving arm up to init + 100mm" << endl;
-      //ur.moveRel(0.0, 0.0, -(armRelZ+100));
+      ur.moveRel(0.0, 0.0, -(armRelZ+100));
       cout << "Fully stopping hand" << endl;
-      //hand.fullStop();
+      hand.fullStop();
     }
     catch(const char e[])
     {
