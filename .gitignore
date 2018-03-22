@@ -1,0 +1,7 @@
+#Ignore CMake-genereated files and folders:
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+bin/
+CMakeFiles/
