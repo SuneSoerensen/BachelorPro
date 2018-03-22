@@ -6,7 +6,6 @@
 #define deg2rad 0.0174532925
 #define rad2deg 57.2957795
 
-
 //===========
 //   TIAFC
 //===========
@@ -14,16 +13,18 @@
 
 //camera settings (taking an image):
 #define CAMERA			0	// 0 = default camera
+#define CAM_RES_WIDTH		1280
+#define CAM_RES_HEIGHT		720
 #define FRAMES_TO_GET		14	// min 7, according to initial tests
 
 //crop settings (taking an image):
-#define CROP_TOP		113
-#define CROP_BOTTOM		330
-#define CROP_LEFT		200
-#define CROP_RIGHT		635
+#define CROP_TOP		150
+#define CROP_BOTTOM		600
+#define CROP_LEFT		400
+#define CROP_RIGHT		1000
 
 //for the Canny edge-detector (finding contours):
-#define CANNY_THRES		100	// 0 <= THRESHOLD <= 255
+#define CANNY_THRES		150	// 0 <= THRESHOLD <= 255
 
 //============
 //   Vision
@@ -38,9 +39,17 @@
 #define GLOB_Y_DIR		-1	//global y-direction in relation to the cameras y-direction
 
 //for the Hough-transform line detector (grasp regs):
-#define MIN_POINTS_IN_LINE	10
-#define MIN_LINE_LENGTH		10
-#define MAX_LINE_GAP		3
+#define MIN_POINTS_IN_LINE	40
+#define MIN_LINE_LENGTH		40
+#define MAX_LINE_GAP		5
+
+//=================
+//   AnalytGrasp
+//=================
+#define ANALYT_GRASP_MODE	1	// 0 = normal, 1 = debug
+
+#define MAX_THREE_FING_ANG	2.35 //radians (~135 deg)
+#define MAX_DEV_ANG		0.17 //radians (~10 deg)
 
 //===============
 //   URControl
@@ -76,3 +85,4 @@
 
 #define SDH_ANGLE_THRESH 10.0*deg2rad
 #define SDH_MAX_ABS_ANGLE 90.0*deg2rad
+
