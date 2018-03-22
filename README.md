@@ -10,7 +10,10 @@ export URCON_ROOT=MYPROJECTFO/URControl/src/
 export VISION_ROOT=MYPROJECTFO/Vision/src/  
 export SDHCON_ROOT=MYPROJECTFO/SDHControl/src/  
 export TIAFC_ROOT=MYPROJECTFO/TIAFC/src/
-export COORDS_ROOT=MYPROJECTFO/Coords/src/</code></pre>
+export COORDS_ROOT=MYPROJECTFO/Coords/src/
+export ANALYT_ROOT=MYPROJECTFO/AnalytGrasp/src/</code></pre>
+
+Replace 'MYPROJECTFO' with the path to your project folder.
 
 ## How to use this project to create new tests and applications:
 In your CmakeLists.txt, besides your other includes etc. (such as RobWork) add the project directories as follows:
