@@ -1,4 +1,0 @@
-/home/sune/BachelorPro/URControl/tests/URControlTest/CMakeFiles/edit_cache.dir
-/home/sune/BachelorPro/URControl/tests/URControlTest/CMakeFiles/rebuild_cache.dir
-/home/sune/BachelorPro/URControl/tests/URControlTest/CMakeFiles/URControlTest.dir
-/home/sune/BachelorPro/URControl/tests/URControlTest/CMakeFiles/URControl.dir
