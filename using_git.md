@@ -10,4 +10,4 @@
 3. Now, when you have edited something, use the following command to add your changes: `git commit -a -m"My commit message"`
 4. Now you can push your changes with: `git push origin`
 
-**__NOTE__**: if you forget/skip the first step, you will likely get errors when trying to push!
+**_NOTE_**: if you forget/skip the first step, you will likely get errors when trying to push!
