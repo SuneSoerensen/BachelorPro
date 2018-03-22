@@ -12,6 +12,10 @@ void TIAFC::TakeImage(Mat &aCropImage)
 	if (!cap.isOpened()) //check that camera was opened
 		throw("[TIAFC::TakeImage()]: Couldn't open camera!");
 
+	//set camera resoluton
+	cap.set(CV_CAP_PROP_FRAME_WIDTH, CAM_RES_WIDTH);
+	cap.set(CV_CAP_PROP_FRAME_HEIGHT, CAM_RES_HEIGHT);
+
 	//get frame
 	Mat frame;
 	for (int i = 0; i < FRAMES_TO_GET ; i++)
@@ -19,7 +23,7 @@ void TIAFC::TakeImage(Mat &aCropImage)
 		cap.read(frame);
 	}
 
-	/*DEBUG*/frame = imread("test_img.jpg");
+	/*DEBUG*/frame = imread("test_img_5.jpg");
 
 	//check crop
 	if (CROP_TOP < 0 || CROP_TOP > CROP_BOTTOM)
