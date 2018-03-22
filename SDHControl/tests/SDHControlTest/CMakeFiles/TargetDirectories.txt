@@ -1,4 +1,0 @@
-/home/sune/BachelorPro/SDHControl/tests/SDHControlTest/CMakeFiles/edit_cache.dir
-/home/sune/BachelorPro/SDHControl/tests/SDHControlTest/CMakeFiles/rebuild_cache.dir
-/home/sune/BachelorPro/SDHControl/tests/SDHControlTest/CMakeFiles/SDHControlTest.dir
-/home/sune/BachelorPro/SDHControl/tests/SDHControlTest/CMakeFiles/SDHControl.dir

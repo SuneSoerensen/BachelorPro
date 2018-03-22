@@ -1,5 +1,0 @@
-/home/sune/BachelorPro/Tests/CustGraspHeight/CMakeFiles/SDHControl.dir
-/home/sune/BachelorPro/Tests/CustGraspHeight/CMakeFiles/edit_cache.dir
-/home/sune/BachelorPro/Tests/CustGraspHeight/CMakeFiles/URControl.dir
-/home/sune/BachelorPro/Tests/CustGraspHeight/CMakeFiles/CustGraspHeight.dir
-/home/sune/BachelorPro/Tests/CustGraspHeight/CMakeFiles/rebuild_cache.dir

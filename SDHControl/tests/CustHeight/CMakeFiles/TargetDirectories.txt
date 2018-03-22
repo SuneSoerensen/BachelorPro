@@ -1,4 +1,0 @@
-/home/sune/BachelorPro/SDHControl/tests/CustHeight/CMakeFiles/edit_cache.dir
-/home/sune/BachelorPro/SDHControl/tests/CustHeight/CMakeFiles/rebuild_cache.dir
-/home/sune/BachelorPro/SDHControl/tests/CustHeight/CMakeFiles/CustHeight.dir
-/home/sune/BachelorPro/SDHControl/tests/CustHeight/CMakeFiles/SDHControl.dir
