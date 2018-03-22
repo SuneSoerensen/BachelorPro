@@ -16,7 +16,8 @@ export COORDS_ROOT=MYPROJECTFO/Coords/src/</code></pre>
 In your CmakeLists.txt, besides your other includes etc. (such as RobWork) add the project directories as follows:
 
 <pre><code>INCLUDE_DIRECTORIES($ENV{BACH_ROOT})
-INCLUDE_DIRECTORIES($ENV{URCON_ROOT})</code></pre>
+INCLUDE_DIRECTORIES($ENV{URCON_ROOT})
+...and so on for all directories...</code></pre>
 
 You shold always include `$ENV{BACH_ROOT}` as a minimum, and then your desired libraries. You can now add your desired libraries like this:
 
