@@ -3,8 +3,6 @@
 
 1. Open a terminal and navigate to the folder where you want to clone the repo. to. Alternatively, right-click and select "Open in terminal".
 2. Enter: `git clone https://github.com/SuneSoerensen/BachelorPro`
-<<<<<<< HEAD
 3. Now, when you have edited something, use the following command to add your changes: `git commit -a -m"My commit message"`
 =======
 4. Now you can push your changes with: `git push origin`
->>>>>>> 368a03b4337540ea5ee8c9df369ca62d20ad7aa1
