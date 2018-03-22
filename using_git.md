@@ -6,7 +6,7 @@
 
 ## How to use it the next time (and the following)
 1. Get the newest edition from github with the command: `git pull origin`
-2. Do your editing,creating new files, etc. OBS: do not just delete non-ignored files! Se section about deleting below.
+2. Do your editing,creating new files, etc. **OBS**: do not just delete non-ignored files! Se section about deleting below.
 3. Now, when you have edited something, use the following command to add your changes: `git commit -a -m"My commit message"`
 4. Now you can push your changes with: `git push origin`
 
