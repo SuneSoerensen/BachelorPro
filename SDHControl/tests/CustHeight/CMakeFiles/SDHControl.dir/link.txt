@@ -1,0 +1,2 @@
+/usr/bin/ar qc libs/libSDHControl.a  CMakeFiles/SDHControl.dir/home/sune/BachelorPro/SDHControl/src/SDHControl.cpp.o
+/usr/bin/ranlib libs/libSDHControl.a
