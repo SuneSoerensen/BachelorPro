@@ -95,7 +95,7 @@ Coords Vision::FindCOM(vector<Coords> &aContourList, Mat &aContourImage)
 		}
 
 		//save image
-		imwrite("Vision_centOfMass.jpg", centOfMassImage);
+		imwrite("DebugFiles/Vision_centOfMass.jpg", centOfMassImage);
 	}
 
 	return res;

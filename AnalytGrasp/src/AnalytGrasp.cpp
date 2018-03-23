@@ -75,7 +75,7 @@ void AnalytGrasp::FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aC
 		}
 
 		//save to image
-		imwrite("AnalytGrasp_graspRegs.jpg", graspRegsImage);
+		imwrite("DebugFiles/AnalytGrasp_graspRegs.jpg", graspRegsImage);
 
 		//draw all the lines individually:
 		for( int i = 0; i < lines.size(); i++ )
@@ -87,7 +87,7 @@ void AnalytGrasp::FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aC
 			Point endP = Point(lines[i][2], lines[i][3]);
 			line( graspRegsImage, startP, endP, Scalar(0,0,255), 1, LINE_AA);
 
-			imwrite("AnalytGrasp_graspReg_" + to_string(i) + ".jpg", graspRegsImage);
+			imwrite("DebugFiles/AnalytGrasp_graspReg_" + to_string(i) + ".jpg", graspRegsImage);
 		}
 	}
 }

@@ -23,7 +23,7 @@ void TIAFC::TakeImage(Mat &aCropImage)
 		cap.read(frame);
 	}
 
-	/*DEBUG*/frame = imread("test_img_5.jpg");
+	/*DEBUG*/frame = imread("TestImg/1.jpg");
 
 	//check crop
 	if (CROP_TOP < 0 || CROP_TOP > CROP_BOTTOM)
@@ -41,8 +41,8 @@ void TIAFC::TakeImage(Mat &aCropImage)
 
 	if (TIAFC_MODE) //DEBUG
 	{
-		imwrite("TIAFC_imgproc_1(image).jpg", frame);
-		imwrite("TIAFC_imgproc_2(crop).jpg", aCropImage);
+		imwrite("DebugFiles/TIAFC_imgproc_1(image).jpg", frame);
+		imwrite("DebugFiles/TIAFC_imgproc_2(crop).jpg", aCropImage);
 	}
 }
 
@@ -55,19 +55,19 @@ void TIAFC::FindContour(Mat &aCropImage, Mat &aContourImage, vector<Coords> &aCo
 	Mat greyscaleImage;
 	cvtColor(aCropImage, greyscaleImage, COLOR_BGR2GRAY);
 	if (TIAFC_MODE) //DEBUG
-		imwrite("TIAFC_imgproc_3(greyscale).jpg", greyscaleImage);
+		imwrite("DebugFiles/TIAFC_imgproc_3(greyscale).jpg", greyscaleImage);
 
 	//blur
 	Mat blurImage;
 	blur(greyscaleImage, blurImage, Size(3,3));
 	if (TIAFC_MODE) //DEBUG
-		imwrite("TIAFC_imgproc_4(blur).jpg", blurImage);
+		imwrite("DebugFiles/TIAFC_imgproc_4(blur).jpg", blurImage);
 
 	//detect contours
 	Mat edgeImage;
 	Canny(blurImage, edgeImage, CANNY_THRES, CANNY_THRES*2);
 	if (TIAFC_MODE) //DEBUG
-		imwrite("TIAFC_imgproc_5(edge).jpg", edgeImage);
+		imwrite("DebugFiles/TIAFC_imgproc_5(edge).jpg", edgeImage);
 
 	//save
 	edgeImage.copyTo(aContourImage);
