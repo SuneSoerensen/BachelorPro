@@ -17,7 +17,7 @@ void AnalytGrasp::FindGraspPoints(vector<Coords> &aGraspPointsList, Mat &aContou
 	if (possGraspsList.size() == 0) //check that possible sets of grasp regions were found
 		throw("[AnalytGrasp::FindGraspPoints()]: Couldn't find any sets of grasp regions!");
 
-	cout << "Possible grasps:" << endl;
+	cout << "[AnalytGrasp::FindGraspPoints()]: Possible grasps:" << endl;
 	for (int i = 0; i < possGraspsList.size(); i++)
 	{
 		for (int j = 0; j < possGraspsList[i].size(); j++)
@@ -28,6 +28,7 @@ void AnalytGrasp::FindGraspPoints(vector<Coords> &aGraspPointsList, Mat &aContou
 		}
 		cout << endl;
 	}
+	cout << endl;
 }
 
 void AnalytGrasp::FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aContourImage, vector<vector<int> > &aContourMatrix)
@@ -60,7 +61,6 @@ void AnalytGrasp::FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aC
 	if (ANALYT_GRASP_MODE) //DEBUG
 	{
 		//draw all the lines:
-
 		//make output image
 		Mat graspRegsImage;
 		aContourImage.copyTo(graspRegsImage);

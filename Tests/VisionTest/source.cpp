@@ -10,14 +10,24 @@ int main()
 {
 	try
 	{
+		cout << "================" << endl;
+		cout << "   VisionTest" << endl;
+		cout << "================" << endl;
+		cout << endl;
+
 		Vision test;
 		string run = "y";
 		string mode;
 
 		while (run == "y")
 		{
-			cout << "select ''Calib'', ''GetCoords'' or ''AnalytGrasp'' (1, 2, 3): ";
+			cout << "select between:" << endl;
+			cout << "(1): Calib()" << endl;
+			cout << "(2): GetObjCoords()" << endl;
+			cout << "(3): FindGraspPoints()" << endl;
+			cout << "type input: ";
 			cin >> mode;
+			cout << endl;
 
 			if (mode == "1")
 			{
@@ -27,6 +37,7 @@ int main()
 			{
 				Coords objCoords = test.GetObjCoords();
 				cout << "real coords: " << objCoords.x << ";" << objCoords.y << endl;
+				cout << endl;
 			}
 			if (mode == "3")
 			{
@@ -34,8 +45,12 @@ int main()
 			}
 
 			cout << "Do again?" << endl;
-			cout << "(y / n): ";
+			cout << "select between:" << endl;
+			cout << "(y): yes" << endl;
+			cout << "(whatever): no" << endl;
+			cout << "type input: ";
 			cin >> run;
+			cout << endl;
 		}
 	}
 	catch (const char errMess[])
