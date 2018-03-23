@@ -39,9 +39,9 @@
 #define GLOB_Y_DIR		-1	//global y-direction in relation to the cameras y-direction
 
 //for the Hough-transform line detector (grasp regs):
-#define MIN_POINTS_IN_LINE	40
-#define MIN_LINE_LENGTH		40
-#define MAX_LINE_GAP		5
+#define MIN_POINTS_IN_LINE	10
+#define MIN_LINE_LENGTH		10
+#define MAX_LINE_GAP		3
 
 //=================
 //   AnalytGrasp

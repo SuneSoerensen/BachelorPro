@@ -23,7 +23,7 @@ void TIAFC::TakeImage(Mat &aCropImage)
 		cap.read(frame);
 	}
 
-	/*DEBUG*/frame = imread("TestImg/1.jpg");
+	/*DEBUG*/frame = imread("TestImg/4.jpg");
 
 	//check crop
 	if (CROP_TOP < 0 || CROP_TOP > CROP_BOTTOM)
@@ -135,9 +135,9 @@ Coords TIAFC::FindNextNeighbour(Mat &aContourImage, vector<vector<int> > &aConto
 {
 	Coords res(-42);
 
-	//relative coordinates:
-	int xVals[8] = {1, 0, -1, 0, 1, -1, -1, 1}; //this EXACT sequence is very important!!!
-	int yVals[8] = {0, -1, 0, 1, -1, -1, 1, 1};
+	//relative coordinates (this EXACT sequence is very important!!!):
+	int xVals[24] = {/*1. ring*/ 1, 0, -1, 0, 1, -1, -1, 1, /*2. ring*/ 2, 0, -2, 0, 2, 1, -1, -2, -2, -1, 1, 2, 2, -2, -2, 2};
+	int yVals[24] = {/*1. ring*/ 0, -1, 0, 1, -1, -1, 1, 1, /*2. ring*/ 0, -2, 0, 2, -1, -2, -2, -1, 1, 2, 2, 1, -2, -2, 2, 2};
 
 	for ( int i = 0; i < 8; i++) //run through all neighbours
 	{
