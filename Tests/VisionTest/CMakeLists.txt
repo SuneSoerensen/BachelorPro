@@ -1,13 +1,20 @@
 cmake_minimum_required(VERSION 2.8)
-project( the_project )
+project( VisionTest )
 set( CMAKE_CXX_STANDARD 14)
 
 find_package( OpenCV REQUIRED )
 include_directories( ${OpenCV_INCLUDE_DIRS} )
-add_library( TIAFC TIAFC.cpp)
-add_library( Vision Vision.cpp)
-add_library( Coords Coords.cpp)
-add_library( AnalytGrasp AnalytGrasp.cpp)
+
+include_directories( $ENV{BACH_ROOT} )
+include_directories( $ENV{TIAFC_ROOT} )
+include_directories( $ENV{COORDS_ROOT} )
+include_directories( $ENV{ANALYT_ROOT} )
+include_directories( $ENV{VISION_ROOT} )
+
+add_library( TIAFC $ENV{TIAFC_ROOT}/TIAFC.cpp)
+add_library( Vision $ENV{VISION_ROOT}/Vision.cpp)
+add_library( Coords $ENV{COORDS_ROOT}/Coords.cpp)
+add_library( AnalytGrasp $ENV{ANALYT_ROOT}/AnalytGrasp.cpp)
 
 add_executable( source source.cpp )
 
