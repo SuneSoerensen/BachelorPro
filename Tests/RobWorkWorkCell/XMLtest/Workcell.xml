@@ -1,0 +1,15 @@
+<WorkCell name="SimpleSimScene">
+
+ <Frame name="Camera" refframe="WORLD" type="Movable">
+  <RPY /> <Pos>0 0.0 1.0</Pos>
+ </Frame>
+
+ <Frame name="UR-6-85-5-A" refframe="WORLD" />
+ <Include file="UR-6-85-5-A/UR.wc.xml" />
+
+ <Frame name="handBase" refframe="UR-6-85-5-A.TCP" />
+ <Include file="SchunkHand/SchunkHand_udep.xml" />
+
+  <CollisionSetup file="CollisionSetup.xml" />
+
+ </WorkCell>
