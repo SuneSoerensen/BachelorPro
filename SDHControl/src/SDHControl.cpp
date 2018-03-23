@@ -139,13 +139,13 @@ bool SDHControl::isThereAnan(double a,double b,double c,double d,double e,double
   return (isnan(a) || isnan(b) || isnan(c) || isnan(d) || isnan(e) || isnan(f));
 }
 
-bool areThereInvalidAngles(Q aQ)
+bool SDHControl::areThereInvalidAngles(Q aQ)
 {
   //Note that joint #2 (between finger A and C) can only be between 90 and 0 degrees!
   return (abs(aQ[0]) > SDH_MAX_ABS_ANGLE || abs(aQ[1]) > SDH_MAX_ABS_ANGLE || aQ[2] > SDH_MAX_ABS_ANGLE || aQ[2] < 0 || abs(aQ[3]) > SDH_MAX_ABS_ANGLE || abs(aQ[4]) > SDH_MAX_ABS_ANGLE || abs(aQ[5]) > SDH_MAX_ABS_ANGLE || abs(aQ[5]) > SDH_MAX_ABS_ANGLE);
 }
 
-bool areThereInvalidAngles(vector<double> anglesA, vector<double> anglesB, vector<double> anglesC)
+bool SDHControl::areThereInvalidAngles(vector<double> anglesA, vector<double> anglesB, vector<double> anglesC)
 {
   return (abs(anglesA[0]) > SDH_MAX_ABS_ANGLE || abs(anglesA[1]) > SDH_MAX_ABS_ANGLE || abs(anglesB[0]) > SDH_MAX_ABS_ANGLE || abs(anglesB[1]) > SDH_MAX_ABS_ANGLE || abs(anglesC[0]) > SDH_MAX_ABS_ANGLE || abs(anglesC[1]) > SDH_MAX_ABS_ANGLE);
 }
