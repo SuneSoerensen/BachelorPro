@@ -20,7 +20,7 @@
 //crop settings (taking an image):
 #define CROP_TOP		150
 #define CROP_BOTTOM		600
-#define CROP_LEFT		400
+#define CROP_LEFT		450
 #define CROP_RIGHT		1000
 
 //for the Canny edge-detector (finding contours):
@@ -39,8 +39,8 @@
 #define GLOB_Y_DIR		-1	//global y-direction in relation to the cameras y-direction
 
 //for the Hough-transform line detector (grasp regs):
-#define MIN_POINTS_IN_LINE	10
-#define MIN_LINE_LENGTH		10
+#define MIN_POINTS_IN_LINE	10 //for curvy objects: short lines (f.ex. 10-15) and large gap (f.ex. 3-5)
+#define MIN_LINE_LENGTH		10 //for edgy objects: long lines (f.ex. 40+) and small gap (f.ex. 0-2)
 #define MAX_LINE_GAP		3
 
 //=================

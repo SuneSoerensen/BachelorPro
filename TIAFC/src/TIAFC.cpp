@@ -18,12 +18,12 @@ void TIAFC::TakeImage(Mat &aCropImage)
 
 	//get frame
 	Mat frame;
-	for (int i = 0; i < FRAMES_TO_GET ; i++)
+	/*for (int i = 0; i < FRAMES_TO_GET ; i++) //comment this out when the following debug is commented in
 	{
 		cap.read(frame);
-	}
+	}*/
 
-	/*DEBUG*/frame = imread("TestImg/4.jpg");
+	/*DEBUG*/frame = imread("TestImg/mou2.jpg");
 
 	//check crop
 	if (CROP_TOP < 0 || CROP_TOP > CROP_BOTTOM)
@@ -106,6 +106,8 @@ void TIAFC::FindContour(Mat &aCropImage, Mat &aContourImage, vector<Coords> &aCo
 	}
 	aContourMatrix[firstPoint.x][firstPoint.y] = 1;
 
+	//this was the old way of copying points!!!
+	//it should not be needed anymore, but is not deleted just in case
 	/*pointCount = 0;
 	for (int i = 0; i < edgeImage.rows; i++)
 	{
@@ -139,7 +141,7 @@ Coords TIAFC::FindNextNeighbour(Mat &aContourImage, vector<vector<int> > &aConto
 	int xVals[24] = {/*1. ring*/ 1, 0, -1, 0, 1, -1, -1, 1, /*2. ring*/ 2, 0, -2, 0, 2, 1, -1, -2, -2, -1, 1, 2, 2, -2, -2, 2};
 	int yVals[24] = {/*1. ring*/ 0, -1, 0, 1, -1, -1, 1, 1, /*2. ring*/ 0, -2, 0, 2, -1, -2, -2, -1, 1, 2, 2, 1, -2, -2, 2, 2};
 
-	for ( int i = 0; i < 8; i++) //run through all neighbours
+	for ( int i = 0; i < 24; i++) //run through all neighbours
 	{
 		if (aContourImage.at<uchar>(aCurrPoint.y + yVals[i], aCurrPoint.x + xVals[i]) == 255) //if part of the contour
 		{

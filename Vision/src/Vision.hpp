@@ -18,7 +18,7 @@ public:
 
 	~Vision();
 
-//private:
+private:
 	static Coords FindCOM(vector<Coords> &aContourList, Mat &aContourImage);
 
 	Coords GetRealCoords(Coords coordsInPixels);
