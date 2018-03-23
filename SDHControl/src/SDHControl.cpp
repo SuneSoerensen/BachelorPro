@@ -9,6 +9,10 @@
 #include "SDHControl.hpp"
 #include <iostream>
 
+/**************
+*   Public
+**************/
+
 SDHControl::SDHControl()
 {
 }
@@ -22,16 +26,17 @@ SDHControl::SDHControl(string canDev)
     throw("[SDHControl::SDHControl]: Could not connect to hardware!");
 
   connected = true;
-
-  goToInit();
 }
 
 void SDHControl::goToQ(Q aQ)
 {
   if(connected)
-    sdh->moveCmd(aQ, true);
+    if(!areThereInvalidAngles(aQ))
+      sdh->moveCmd(aQ, true);
+    else
+      throw("[SDHControl::goToQ]: One or more input angles are invalid!");
   else
-    throw("[SDHControl::goToQ]: SDH is not connected!.");
+    throw("[SDHControl::goToQ]: SDH is not connected!");
 }
 
 void SDHControl::goToInit()
@@ -39,7 +44,7 @@ void SDHControl::goToInit()
   if(connected)
     sdh->moveCmd(initQ, true);
   else
-    throw("[SDHControl::goToInit]: SDH is not connected!.");
+    throw("[SDHControl::goToInit]: SDH is not connected!");
 }
 
 void SDHControl::fullStop()
@@ -47,7 +52,7 @@ void SDHControl::fullStop()
   if(connected)
     sdh->emergencyStop();
   else
-    throw("[SDHControl::fullStop]: SDH is not connected!.");
+    throw("[SDHControl::fullStop]: SDH is not connected!");
 }
 
 bool SDHControl::isConnected()
@@ -57,7 +62,7 @@ bool SDHControl::isConnected()
 
 void SDHControl::grasp(double distA, double distB, double distC)
 {
-  //Distances are given relative to center of SDH, so substract offset:
+  //Distances are given relative to center of hand, so substract offset (dist. from center of hand):
   double xA = distA-FINGEROFFSET;
   double xB = distB-FINGEROFFSET;
   double xC = distC-FINGEROFFSET;
@@ -76,7 +81,7 @@ void SDHControl::grasp(double distA, double distB, double distC)
   anglesB = calcFingerAngle(xB, 400.0);
   anglesC = calcFingerAngle(xC, 400.0);
 
-  //Find biggest distance from SDH base, where all fingers kan reach a the given dists.:
+  //Find biggest distance from SDH base, where all checks in checkSolution() are satisfied:
   double y;
   for(y = 0; checkSolution(anglesA, anglesB, anglesC); y += GRASPFINDSTEPSIZE)
   {
@@ -98,7 +103,7 @@ void SDHControl::grasp(double distA, double distB, double distC)
 
   if(SDHCONTROL_MODE)
   {
-    cout << "Found solution! y = " << y << endl;
+    cout << "Found solution! height = " << y << endl;
     cout << "Finger A: angles = (" << anglesA[0]*rad2deg << ";" << anglesA[1]*rad2deg << ") pos = (" << xA << ";" << y << ")" << endl;
     cout << "Finger B: angles = (" << anglesB[0]*rad2deg << ";" << anglesB[1]*rad2deg << ") pos = (" << xB << ";" << y << ")" << endl;
     cout << "Finger C: angles = (" << anglesC[0]*rad2deg << ";" << anglesC[1]*rad2deg << ") pos = (" << xC << ";" << y << ")" << endl;
@@ -108,12 +113,13 @@ void SDHControl::grasp(double distA, double distB, double distC)
   if(SDHCONTROL_MODE)
     cout << "Going to configuration: " << Q(7, anglesB[0], anglesB[1], 45*deg2rad, anglesA[0],anglesA[1], anglesC[0], anglesC[1]) << endl;
 
-  if(connected)
     goToQ(Q(7, anglesB[0], anglesB[1], 45*deg2rad, anglesA[0],anglesA[1], anglesC[0], anglesC[1]));
-  else
-    throw("[SDHControl::grasp]: SDH is not connected!.");
 }
 
+
+/**************
+*   Private
+**************/
 vector<double> SDHControl::calcFingerAngle(double x, double y)
 {
   vector<double> res(2);
@@ -133,9 +139,15 @@ bool SDHControl::isThereAnan(double a,double b,double c,double d,double e,double
   return (isnan(a) || isnan(b) || isnan(c) || isnan(d) || isnan(e) || isnan(f));
 }
 
-bool SDHControl::areThereInvalidAngles(double a,double b,double c,double d,double e,double f)
+bool areThereInvalidAngles(Q aQ)
 {
-  return (abs(a) > SDH_MAX_ABS_ANGLE || abs(b) > SDH_MAX_ABS_ANGLE || abs(c) > SDH_MAX_ABS_ANGLE || abs(d) > SDH_MAX_ABS_ANGLE || abs(e) > SDH_MAX_ABS_ANGLE || abs(f) > SDH_MAX_ABS_ANGLE);
+  //Note that joint #2 (between finger A and C) can only be between 90 and 0 degrees!
+  return (abs(aQ[0]) > SDH_MAX_ABS_ANGLE || abs(aQ[1]) > SDH_MAX_ABS_ANGLE || aQ[2] > SDH_MAX_ABS_ANGLE || aQ[2] < 0 || abs(aQ[3]) > SDH_MAX_ABS_ANGLE || abs(aQ[4]) > SDH_MAX_ABS_ANGLE || abs(aQ[5]) > SDH_MAX_ABS_ANGLE || abs(aQ[5]) > SDH_MAX_ABS_ANGLE);
+}
+
+bool areThereInvalidAngles(vector<double> anglesA, vector<double> anglesB, vector<double> anglesC)
+{
+  return (abs(anglesA[0]) > SDH_MAX_ABS_ANGLE || abs(anglesA[1]) > SDH_MAX_ABS_ANGLE || abs(anglesB[0]) > SDH_MAX_ABS_ANGLE || abs(anglesB[1]) > SDH_MAX_ABS_ANGLE || abs(anglesC[0]) > SDH_MAX_ABS_ANGLE || abs(anglesC[1]) > SDH_MAX_ABS_ANGLE);
 }
 
 bool SDHControl::isNotWithinThresh(double diffA, double diffB, double diffC)
@@ -153,7 +165,7 @@ bool SDHControl::checkSolution(vector<double> anglesA, vector<double> anglesB, v
   if(isThereAnan(anglesA[0], anglesA[1], anglesB[0], anglesB[1], anglesC[0], anglesC[1]))
     res = true;
 
-  if(areThereInvalidAngles(anglesA[0], anglesA[1], anglesB[0], anglesB[1], anglesC[0] , anglesC[1]))
+  if(areThereInvalidAngles(anglesA, anglesB, anglesC))
     res = true;
 
   return res;
