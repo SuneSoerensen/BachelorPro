@@ -18,7 +18,7 @@ int main()
 
   try
   {
-    SDHControl hand("/dev/pcanusb32");
+    SDHControl hand(0);
     cout << "Going to init." << endl;
     hand.goToInit();
 
