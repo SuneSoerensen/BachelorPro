@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PropertyMap>
  <Property>
+  <Name>cfgfile</Name>
+  <Value>
+   <String>/home/sune/BachelorPro/SDHControl/tests/CustHeight/robwork-release-0.7.0.cfg.xml</String>
+  </Value>
+ </Property>
+ <Property>
   <Name>plugins</Name>
   <Description>List of plugins or plugin locations</Description>
   <Value>

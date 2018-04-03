@@ -23,7 +23,19 @@ SDHControl::SDHControl(string canDev)
   sdh->connect( canDev, 1000000 );
 
   if(!sdh->isConnected())
-    throw("[SDHControl::SDHControl]: Could not connect to hardware!");
+    throw("[SDHControl::SDHControl]: Could not connect to hardware (CAN)!");
+
+  connected = true;
+}
+
+SDHControl::SDHControl(int port /*, int baudrate, double timeout*/)
+{
+  sdh = new SDHDriver();
+  unsigned long baudrate = 115200;
+  sdh->connect(port, baudrate, 0.5, "/dev/ttyUSB%d");
+
+  if(!sdh->isConnected())
+    throw("[SDHControl::SDHControl]: Could not connect to hardware (RS232)!");
 
   connected = true;
 }

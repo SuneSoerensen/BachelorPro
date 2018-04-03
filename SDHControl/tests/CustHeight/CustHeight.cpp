@@ -14,7 +14,7 @@ int main()
 
   try
   {
-    SDHControl hand("/dev/pcanusb32");
+    SDHControl hand(0);
 
     while (true)
     {

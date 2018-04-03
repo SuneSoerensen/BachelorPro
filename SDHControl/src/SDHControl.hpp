@@ -33,8 +33,11 @@ class SDHControl
 public:
     SDHControl();
 
-    //Constructor. Connects automatically:
+    //Constructor. Connects automatically via CAN:
     SDHControl(string canDev);
+
+    //Constructor. Connects automatically via RS232:
+    SDHControl(int port/*, int baudrate, double timeout*/);
 
     //Go to any valid configuration:
     void goToQ(Q aQ);
