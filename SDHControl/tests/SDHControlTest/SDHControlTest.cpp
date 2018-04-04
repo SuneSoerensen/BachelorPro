@@ -18,7 +18,7 @@ int main()
 
   try
   {
-    SDHControl hand(0);
+    SDHControl hand(0, 115200, 0.5);
     cout << "Going to init." << endl;
     hand.goToInit();
 
@@ -27,7 +27,7 @@ int main()
     cin >> dummy;
 
     cout << "Grasping" << endl;
-    hand.grasp(A, B, C);
+    hand.grasp(A, B, C, 45*deg2rad);
   }
   catch(const char e[])
   {
