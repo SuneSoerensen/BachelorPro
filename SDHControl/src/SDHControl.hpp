@@ -54,16 +54,14 @@ public:
     //Grasp, based on distance for each finger and an angle between finger a and c:
     void grasp(double distA, double distB, double distC, double anAngle);
 
-<<<<<<< HEAD
     vector<double> calcFingerAngle(double x, double y);
 
     vector<double> calcFingerDist(double angleBase, double angleTop);
     bool controlGrasp(double goalDistA, double goalDistB, double goalDistC);
     bool controlGraspPlacment(double goalDistA, double goalDistB, double goalDistC,double CurrDistA, double CurrDistB, double CurrDistC);
-=======
+
     //Two-finger grasp (finger B moves to init and joint #2 is 90deg):
     void grasp(double distA, double distC);
->>>>>>> 692e37eeb2f2bdfb8df42107446d346feb4f6c0c
 
     ~SDHControl();
 
@@ -89,13 +87,8 @@ public:
     //Uses all above checks to verify if input angles are a valid configuration:
     bool checkSolution(vector<double> anglesA, vector<double> anglesB, vector<double> anglesC);
 
-<<<<<<< HEAD
-    // For controlling the Grasp
-
-=======
     //Same as above, but for two-finger grasps:
     bool checkSolution(vector<double> anglesA, vector<double> anglesC);
->>>>>>> 692e37eeb2f2bdfb8df42107446d346feb4f6c0c
 };
 
 

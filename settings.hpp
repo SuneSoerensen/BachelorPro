@@ -86,3 +86,5 @@
 #define SDH_ANGLE_THRESH 10.0*deg2rad
 #define SDH_MAX_ABS_ANGLE 90.0*deg2rad
 
+#define SDH_PRECISION 1.0 //mm
+#define SDH_DIST_INTO_OBJECT 4.0 //mm for each finger
