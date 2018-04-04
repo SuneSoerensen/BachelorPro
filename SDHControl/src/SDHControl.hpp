@@ -54,6 +54,12 @@ public:
     //Grasp, based on distance for each finger (NOTE: joint #2 (btwn. finger A and C) is currently always 45 deg):
     void grasp(double distA, double distB, double distC, double anAngle);
 
+    vector<double> calcFingerAngle(double x, double y);
+
+    vector<double> calcFingerDist(double angleBase, double angleTop);
+    bool controlGrasp(double goalDistA, double goalDistB, double goalDistC);
+    bool controlGraspPlacment(double goalDistA, double goalDistB, double goalDistC,double CurrDistA, double CurrDistB, double CurrDistC);
+
     ~SDHControl();
 
   private:
@@ -67,7 +73,7 @@ public:
     bool connected = false;
 
     //Inverse kinematics for a finger (output is {finger_base, finger_tip}):
-    vector<double> calcFingerAngle(double x, double y);
+
 
     //Misc. checks (NOTE: all returns TRUE if input is not applicable for finger):
     bool isThereAnan(double a,double b,double c,double d,double e,double f); //NOTE: doesn't check joint #2!
@@ -77,6 +83,9 @@ public:
 
     //Uses all above checks to verify if input angles are a valid configuration:
     bool checkSolution(vector<double> anglesA, vector<double> anglesB, vector<double> anglesC);
+
+    // For controlling the Grasp
+
 };
 
 

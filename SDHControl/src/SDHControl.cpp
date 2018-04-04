@@ -182,3 +182,125 @@ bool SDHControl::checkSolution(vector<double> anglesA, vector<double> anglesB, v
 
   return res;
 }
+
+// for controlling Grasp
+
+vector<double> SDHControl::calcFingerDist(double angleBase, double angleTop)
+{
+  vector<double> res(2);
+
+  res[0]= -(sin(angleBase)*LENGTH1 + cos(180*deg2rad-(angleBase+angleTop+(90*deg2rad)))*LENGTH2)+FINGEROFFSET;
+  res[1]= cos(angleBase)*LENGTH1 + sin(180*deg2rad-(angleBase+angleTop+(90*deg2rad)))*LENGTH2;
+  return res;
+}
+
+bool SDHControl::controlGrasp(double goalDistA, double goalDistB, double goalDistC)
+{
+  bool res = false;
+  Q currQ = Q(7);
+  currQ = sdh->getQ(); // get the confiquration of the hand
+  vector<double> currDistA;
+  vector<double> currDistB;
+  vector<double> currDistC;
+
+  currDistA = calcFingerDist(currQ[3],currQ[4]);
+  currDistB = calcFingerDist(currQ[0],currQ[1]);
+  currDistC = calcFingerDist(currQ[5],currQ[6]);
+
+  if(0.1<abs(goalDistA-currDistA[0])&&0.1<abs(goalDistB-currDistB[0])&&0.1<abs(goalDistC-currDistC[0]))
+  {
+    // the grasp did not reach the goal, therfore it is gripping and object
+    res = true;
+  }
+
+
+  if(0.1>abs(goalDistA-currDistA[0]) && res == false)
+  {
+    std::cout << "!grip failed finger A to close" << '\n';
+  }
+
+  if(0.1>abs(goalDistB-currDistB[0]) && res == false)
+  {
+    std::cout << "!grip failed finger B to close" << '\n';
+  }
+
+  if(0.1>abs(goalDistC-currDistC[0]) && res == false)
+  {
+    std::cout << "!grip failed finger C to close" << '\n';
+  }
+
+
+  if(res == true)
+  {
+    // check for controlGraspPlacment
+    res = controlGraspPlacment(goalDistA,goalDistB,goalDistC,currDistA[0],currDistB[0],currDistC[0]);
+  }
+
+  return res;
+}
+
+bool SDHControl::controlGraspPlacment(double goalDistA, double goalDistB, double goalDistC, double CurrDistA, double CurrDistB, double CurrDistC)
+{
+  bool res = false;
+
+
+  double diffDistA = goalDistA - CurrDistA;
+  double diffDistB = goalDistB - CurrDistB;
+  double diffDistC = goalDistC - CurrDistC;
+
+  bool diffAB = true;
+  bool diffAC = true;
+  bool diffCB = true;
+
+  //check if the placment has been passe therfor wrong;
+  if (diffDistA<0);
+  {
+    res = false;
+    std::cout << "!gripPlacmentWrong finger A has passed the goal postion" << '\n';
+  }
+
+  if (diffDistB<0);
+  {
+    res = false;
+    std::cout << "!gripPlacmentWrong finger B has passed the goal postion" << '\n';
+  }
+
+  if (diffDistC<0);
+  {
+    res = false;
+    std::cout << "!gripPlacmentWrong finger C has passed the goal postion" << '\n';
+  }
+
+  //check if fingers are in position
+  if (0.1<abs(diffDistA-diffDistB)) //check if the diffrence of A B are close
+  {
+    std::cout << "!gripPlacmentWrong too large diff of finger A and B diff" << '\n';
+    diffAB = false;
+  }
+
+  if(0.1<abs(diffDistA-diffDistC)) //check if the diffrence of A C are close
+  {
+    std::cout << "!gripPlacmentWrong too large diff of finger A and C diff" << '\n';
+    diffAB = false;
+  }
+
+  if (0.1<abs(diffDistB-diffDistC)) //check if the diffrence of C B are close
+  {
+    std::cout << "!gripPlacmentWrong too large diff of finger C and B diff" << '\n';
+    diffAB = false;
+  }
+
+  if(diffAB && diffAC && diffCB)
+  {
+    res = true;
+  }
+  else
+  {
+    // TODO code for cecking cuurent configuration
+    std::cout << "!gripPlacmentWrong not the expect grip" << '\n';
+  }
+
+  return res;
+
+
+}
