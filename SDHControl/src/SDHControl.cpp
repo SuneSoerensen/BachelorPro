@@ -28,11 +28,10 @@ SDHControl::SDHControl(string canDev)
   connected = true;
 }
 
-SDHControl::SDHControl(int port /*, int baudrate, double timeout*/)
+SDHControl::SDHControl(int port, unsigned long baudrate, double timeout)
 {
   sdh = new SDHDriver();
-  unsigned long baudrate = 115200;
-  sdh->connect(port, baudrate, 0.5, "/dev/ttyUSB%d");
+  sdh->connect(port, baudrate, timeout, "/dev/ttyUSB%d");
 
   if(!sdh->isConnected())
     throw("[SDHControl::SDHControl]: Could not connect to hardware (RS232)!");
@@ -101,7 +100,7 @@ void SDHControl::grasp(double distA, double distB, double distC, double anAngle)
     anglesB = calcFingerAngle(xB, y);
     anglesC = calcFingerAngle(xC, y);
 
-    if(y > 155.0)
+    if(y > GRASPDISTLIM)
     {
       throw("[SDHControl::grasp]: No solution was found (height exceeded 155.0mm)!");
     }
@@ -126,6 +125,51 @@ void SDHControl::grasp(double distA, double distB, double distC, double anAngle)
     cout << "Going to configuration: " << Q(7, anglesB[0], anglesB[1], 45*deg2rad, anglesA[0],anglesA[1], anglesC[0], anglesC[1]) << endl;
 
     goToQ(Q(7, anglesB[0], anglesB[1], anAngle, anglesA[0],anglesA[1], anglesC[0], anglesC[1]));
+}
+
+void SDHControl::grasp(double distA, double distC)
+{
+  //Distances are given relative to center of hand, so substract offset (dist. from center of hand):
+  double xA = distA-FINGEROFFSET;
+  double xC = distC-FINGEROFFSET;
+
+  //Then, check if one or more distances are too large:
+  if(xA > GRASPDISTLIM || xC > GRASPDISTLIM)
+    throw("[SDHControl::grasp]: Grasp points are too far away! Check define GRASPDISTLIM in settings to see the limit.");
+
+    //Result vectors:
+    vector<double> anglesA;
+    vector<double> anglesC;
+
+    //To make sure that for-loop is run first time, insert invalid y's:
+    anglesA = calcFingerAngle(xA, 400.0);
+    anglesC = calcFingerAngle(xC, 400.0);
+
+    //Find biggest distance from SDH base, where all checks in checkSolution() are satisfied:
+    double y;
+    for(y = 0; checkSolution(anglesA, anglesC); y += GRASPFINDSTEPSIZE)
+    {
+      anglesA = calcFingerAngle(xA, y);
+      anglesC = calcFingerAngle(xC, y);
+
+      if(y > GRASPDISTLIM)
+      {
+        throw("[SDHControl::grasp]: No solution was found (height exceeded 155.0mm)!");
+      }
+    }
+
+    if(SDHCONTROL_MODE)
+    {
+      cout << "Found solution! height = " << y << endl;
+      cout << "Finger A: angles = (" << anglesA[0]*rad2deg << ";" << anglesA[1]*rad2deg << ") pos = (" << xA << ";" << y << ")" << endl;
+      cout << "Finger C: angles = (" << anglesC[0]*rad2deg << ";" << anglesC[1]*rad2deg << ") pos = (" << xC << ";" << y << ")" << endl;
+    }
+
+    //Finally, move to found config.:
+    if(SDHCONTROL_MODE)
+      cout << "Going to configuration: " << Q(7, initQ[0], initQ[1], 90.0*deg2rad, anglesA[0],anglesA[1], anglesC[0], anglesC[1]) << endl;
+
+      goToQ(Q(7, initQ[0], initQ[1], 90.0*deg2rad, anglesA[0],anglesA[1], anglesC[0], anglesC[1]));
 }
 
 
@@ -183,6 +227,7 @@ bool SDHControl::checkSolution(vector<double> anglesA, vector<double> anglesB, v
   return res;
 }
 
+<<<<<<< HEAD
 // for controlling Grasp
 
 vector<double> SDHControl::calcFingerDist(double angleBase, double angleTop)
@@ -303,4 +348,20 @@ bool SDHControl::controlGraspPlacment(double goalDistA, double goalDistB, double
   return res;
 
 
+=======
+bool SDHControl::checkSolution(vector<double> anglesA, vector<double> anglesC)
+{
+  bool res = false;
+
+  if(isNotWithinThresh(-(90*deg2rad-anglesA[0])+ anglesA[1], SDH_ANGLE_THRESH, -(90*deg2rad-anglesC[0])+ anglesC[1]))
+    res = true;
+
+  if(isThereAnan(anglesA[0], anglesA[1], 0, 0, anglesC[0], anglesC[1]))
+    res = true;
+
+  if(areThereInvalidAngles(anglesA, vector<double>{0,0}, anglesC))
+    res = true;
+
+  return res;
+>>>>>>> 692e37eeb2f2bdfb8df42107446d346feb4f6c0c
 }
