@@ -72,7 +72,7 @@ bool SDHControl::isConnected()
   return connected;
 }
 
-void SDHControl::grasp(double distA, double distB, double distC)
+void SDHControl::grasp(double distA, double distB, double distC, double anAngle)
 {
   //Distances are given relative to center of hand, so substract offset (dist. from center of hand):
   double xA = distA-FINGEROFFSET;
@@ -125,7 +125,7 @@ void SDHControl::grasp(double distA, double distB, double distC)
   if(SDHCONTROL_MODE)
     cout << "Going to configuration: " << Q(7, anglesB[0], anglesB[1], 45*deg2rad, anglesA[0],anglesA[1], anglesC[0], anglesC[1]) << endl;
 
-    goToQ(Q(7, anglesB[0], anglesB[1], 45*deg2rad, anglesA[0],anglesA[1], anglesC[0], anglesC[1]));
+    goToQ(Q(7, anglesB[0], anglesB[1], anAngle, anglesA[0],anglesA[1], anglesC[0], anglesC[1]));
 }
 
 

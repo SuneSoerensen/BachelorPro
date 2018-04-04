@@ -52,7 +52,7 @@ public:
     bool isConnected();
 
     //Grasp, based on distance for each finger (NOTE: joint #2 (btwn. finger A and C) is currently always 45 deg):
-    void grasp(double distA, double distB, double distC);
+    void grasp(double distA, double distB, double distC, double anAngle);
 
     ~SDHControl();
 
