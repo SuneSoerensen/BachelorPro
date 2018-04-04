@@ -19,12 +19,15 @@
 
 //crop settings (taking an image):
 #define CROP_TOP		150
-#define CROP_BOTTOM		600
-#define CROP_LEFT		450
-#define CROP_RIGHT		1000
+#define CROP_BOTTOM		500
+#define CROP_LEFT		500
+#define CROP_RIGHT		950
 
 //for the Canny edge-detector (finding contours):
-#define CANNY_THRES		150	// 0 <= THRESHOLD <= 255
+#define CANNY_THRES		50	// 0 <= THRESHOLD <= 255
+
+//for removing too small contours:
+#define MIN_POINTS_IN_CONTS	70
 
 //============
 //   Vision

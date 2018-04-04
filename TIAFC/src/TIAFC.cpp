@@ -23,7 +23,7 @@ void TIAFC::TakeImage(Mat &aCropImage)
 		cap.read(frame);
 	}*/
 
-	/*DEBUG*/frame = imread("TestImg/mou2.jpg");
+	/*DEBUG*/frame = imread("TestImg/vandkande.jpg");
 
 	//check crop
 	if (CROP_TOP < 0 || CROP_TOP > CROP_BOTTOM)
@@ -41,8 +41,8 @@ void TIAFC::TakeImage(Mat &aCropImage)
 
 	if (TIAFC_MODE) //DEBUG
 	{
-		imwrite("DebugFiles/TIAFC_imgproc_1(image).jpg", frame);
-		imwrite("DebugFiles/TIAFC_imgproc_2(crop).jpg", aCropImage);
+		imwrite("DebugFiles/TIAFC_img_proc_1(image).jpg", frame);
+		imwrite("DebugFiles/TIAFC_img_proc_2(crop).jpg", aCropImage);
 	}
 }
 
@@ -55,38 +55,63 @@ void TIAFC::FindContour(Mat &aCropImage, Mat &aContourImage, vector<Coords> &aCo
 	Mat greyscaleImage;
 	cvtColor(aCropImage, greyscaleImage, COLOR_BGR2GRAY);
 	if (TIAFC_MODE) //DEBUG
-		imwrite("DebugFiles/TIAFC_imgproc_3(greyscale).jpg", greyscaleImage);
+		imwrite("DebugFiles/TIAFC_img_proc_3(greyscale).jpg", greyscaleImage);
 
 	//blur
 	Mat blurImage;
 	blur(greyscaleImage, blurImage, Size(3,3));
 	if (TIAFC_MODE) //DEBUG
-		imwrite("DebugFiles/TIAFC_imgproc_4(blur).jpg", blurImage);
+		imwrite("DebugFiles/TIAFC_img_proc_4(blur).jpg", blurImage);
 
 	//detect contours
 	Mat edgeImage;
 	Canny(blurImage, edgeImage, CANNY_THRES, CANNY_THRES*2);
 	if (TIAFC_MODE) //DEBUG
-		imwrite("DebugFiles/TIAFC_imgproc_5(edge).jpg", edgeImage);
+		imwrite("DebugFiles/TIAFC_img_proc_5(edge).jpg", edgeImage);
 
 	//save
-	edgeImage.copyTo(aContourImage);
+	//edgeImage.copyTo(aContourImage);
+
+	//find contours
+	vector<vector<Point> > contours;
+	findContours( edgeImage, contours, RETR_TREE, CHAIN_APPROX_SIMPLE);
+
+	//init "aContourImage"
+	Mat blank(aCropImage.rows, aCropImage.cols, CV_8UC1, Scalar(0, 0, 0));
+	blank.copyTo(aContourImage);
+
+	//save sufficiently large contours
+	for (int i = 0; i < contours.size(); i++) //for all contours
+	{
+		if (contours[i].size() >= MIN_POINTS_IN_CONTS) //if the contour is large enough
+		{
+			drawContours( aContourImage, contours, i, 255, 1, LINE_8);
+
+			/*for (int j = 0; j < contours[i].size(); j++) //run through all the points in the contour
+			{
+				aContourImage.at<uchar>(contours[i][j]) = 255; //set the point
+			}*/
+		}
+	}
+
+	if (TIAFC_MODE) //DEBUG
+		imwrite("DebugFiles/TIAFC_img_proc_6(mod_edge).jpg", aContourImage);
 
 	//find number of points and first point
-	bool firstTime = true;
-	Coords firstPoint;
+	//bool firstTime = true;
+	//Coords firstPoint;
 	int pointCount = 0;
 
-	for (int i = 0; i < edgeImage.rows; i++)
+	for (int i = 0; i < aContourImage.rows; i++)
 	{
-		for (int j = 0; j < edgeImage.cols; j++)
+		for (int j = 0; j < aContourImage.cols; j++)
 		{
-			if (edgeImage.at<uchar>(i, j) == 255)
+			if (aContourImage.at<uchar>(i, j) == 255)
 			{
-				if (firstTime)
+				/*if (firstTime)
 				{
 					firstPoint.Set(j, i);
-				}
+				}*/
 				pointCount++;
 			}
 		}
@@ -97,14 +122,14 @@ void TIAFC::FindContour(Mat &aCropImage, Mat &aContourImage, vector<Coords> &aCo
 
 	//init contour
 	aContourList.resize(pointCount);
-	aContourList[0] = firstPoint;
+	//aContourList[0] = firstPoint;
 
 	aContourMatrix.resize(aContourImage.cols);
 	for (int i = 0; i < aContourImage.cols; i++)
 	{
 		aContourMatrix[i] = vector<int>(aContourImage.rows, 0);
 	}
-	aContourMatrix[firstPoint.x][firstPoint.y] = 1;
+	//aContourMatrix[firstPoint.x][firstPoint.y] = 1;
 
 	//this was the old way of copying points!!!
 	//it should not be needed anymore, but is not deleted just in case
@@ -122,7 +147,7 @@ void TIAFC::FindContour(Mat &aCropImage, Mat &aContourImage, vector<Coords> &aCo
 	}*/
 
 	//copy points to contour
-	int index = 1;
+	/*int index = 01;
 	while (index < pointCount) //while we haven't found all points
 	{
 		//find next point
@@ -130,6 +155,21 @@ void TIAFC::FindContour(Mat &aCropImage, Mat &aContourImage, vector<Coords> &aCo
 		aContourMatrix[aContourList[index].x][aContourList[index].y] = index;
 
 		index++;
+	}*/
+
+	int index = 0;
+	for (int i = 0; i < aContourImage.rows; i++)
+	{
+		for (int j = 0; j < aContourImage.cols; j++)
+		{
+			if (aContourImage.at<uchar>(i, j) == 255)
+			{
+				aContourList[index].Set(j, i);
+				index++;
+				if (index >= pointCount)
+					break;
+			}
+		}
 	}
 }
 
