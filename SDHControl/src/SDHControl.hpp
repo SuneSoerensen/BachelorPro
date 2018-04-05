@@ -52,31 +52,35 @@ public:
     bool isConnected();
 
     //Grasp, based on distance for each finger and an angle between finger a and c:
-    void grasp(double distA, double distB, double distC, double anAngle);
-
-    vector<double> calcFingerAngle(double x, double y);
-
-    vector<double> calcFingerDist(double angleBase, double angleTop);
-    bool controlGrasp(double goalDistA, double goalDistB, double goalDistC);
-    bool controlGraspPlacment(double goalDistA, double goalDistB, double goalDistC,double CurrDistA, double CurrDistB, double CurrDistC);
+    void grasp(double fingerAX, double fingerAY, double fingerBX, double fingerBY, double fingerCX, double fingerCY);
 
     //Two-finger grasp (finger B moves to init and joint #2 is 90deg):
-    void grasp(double distA, double distC);
+    //void grasp(double distA, double distC);
+
+    //Adjust velocity for SDH joints:
+    void adjustVel(double joint0, double joint1, double joint2, double joint3, double joint4, double joint5, double joint6);
 
     ~SDHControl();
 
-  private:
+private:
     //Pointer to SDHDriver-object:
     SDHDriver *sdh;
 
     //Init-configuration:
-    Q initQ = Q(7, -80*deg2rad, 80*deg2rad, 45*deg2rad, -80*deg2rad, 80*deg2rad, -80*deg2rad, 80*deg2rad);
+    Q initQ = Q(7, -80*deg2rad, 80*deg2rad, 60*deg2rad, -80*deg2rad, 80*deg2rad, -80*deg2rad, 80*deg2rad);
 
     //Reflects whether connected to hand or not:
     bool connected = false;
 
-    //Inverse kinematics for a finger (output is {finger_base, finger_tip}):
+    //Sides of the triangle to control grasp {AB, BC, CA}:
+    double goalSides[3] = {0.0, 0.0, 0.0};
 
+    //Calculate fingertip-pos and finger angle in the plane, for finger A and C:
+    //Output: {dist, angle}
+    vector<double> calcFingertipPos(double visDist, double anAngle);
+
+    //Inverse kinematics for a finger (output is {finger_base, finger_tip}):
+    vector<double> calcFingerAngle(double x, double y);
 
     //Misc. checks (NOTE: all returns TRUE if input is not applicable for finger):
     bool isThereAnan(double a,double b,double c,double d,double e,double f); //NOTE: doesn't check joint #2!
@@ -86,6 +90,10 @@ public:
 
     //Uses all above checks to verify if input angles are a valid configuration:
     bool checkSolution(vector<double> anglesA, vector<double> anglesB, vector<double> anglesC);
+
+    vector<double> calcFingerDist(double angleBase, double angleTop);
+    bool controlGrasp(double goalDistA, double goalDistB, double goalDistC);
+    bool controlGraspPlacment(double angleAC, double currDistA, double currDistB, double currDistC);
 
     //Same as above, but for two-finger grasps:
     bool checkSolution(vector<double> anglesA, vector<double> anglesC);

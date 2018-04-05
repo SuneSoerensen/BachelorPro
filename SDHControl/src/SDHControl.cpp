@@ -71,12 +71,37 @@ bool SDHControl::isConnected()
   return connected;
 }
 
-void SDHControl::grasp(double distA, double distB, double distC, double anAngle)
+void SDHControl::grasp(double fingerAX, double fingerAY, double fingerBX, double fingerBY, double fingerCX, double fingerCY)
 {
-  //Distances are given relative to center of hand, so substract offset (dist. from center of hand):
-  double xA = distA-FINGEROFFSET-SDH_DIST_INTO_OBJECT;
-  double xB = distB-FINGEROFFSET-SDH_DIST_INTO_OBJECT;
-  double xC = distC-FINGEROFFSET-SDH_DIST_INTO_OBJECT;
+  //Calculate sides for goal-triangle:
+  goalSides[0] = sqrt(pow((fingerAX-fingerBX),2) + pow((fingerAY-fingerBY),2));
+  goalSides[1] = sqrt(pow((fingerBX-fingerCX),2) + pow((fingerBY-fingerCY),2));
+  goalSides[2] = sqrt(pow((fingerCX-fingerAX),2) + pow((fingerCY-fingerAY),2));
+
+  //Calculate distances from hand-center to finger-contact-points and substract length to ensure that points are inside the object:
+  double distA = sqrt(fingerAX*fingerAX + fingerAY*fingerAY) - SDH_DIST_INTO_OBJECT;
+  double distB = sqrt(fingerBX*fingerBX + fingerBY*fingerBY) - SDH_DIST_INTO_OBJECT;
+  double distC = sqrt(fingerCX*fingerCX + fingerCY*fingerCY) - SDH_DIST_INTO_OBJECT;
+
+  if(SDHCONTROL_MODE)
+  {
+    cout << "distA: " << distA << " ; " << "distB: " << distB << " ; distC: " << distC << endl;
+  }
+
+  double angleAC = abs(atan2(fingerAY, fingerAX))*2.0;
+
+  if(SDHCONTROL_MODE)
+    cout << "angleAC (deg): " << angleAC*rad2deg << endl;
+
+  vector<double> fingertipPosA = calcFingertipPos(distA, angleAC);
+  vector<double> fingertipPosC = calcFingertipPos(distC, angleAC);
+
+  double xA = fingertipPosA[0];
+  double xB = distB-FINGEROFFSET; //Distances are given relative to center of hand, so substract offset (dist. from center of hand)
+  double xC = fingertipPosC[0];
+
+  if(SDHCONTROL_MODE)
+    cout << "xA: " << xA << "; xB: " << xB << " ; xC: " << xC << endl;
 
   //Then, check if one or more distances are too large:
   if(xA > GRASPDISTLIM || xB > GRASPDISTLIM || xC > GRASPDISTLIM)
@@ -94,7 +119,7 @@ void SDHControl::grasp(double distA, double distB, double distC, double anAngle)
 
   //Find biggest distance from SDH base, where all checks in checkSolution() are satisfied:
   double y;
-  for(y = 0; checkSolution(anglesA, anglesB, anglesC); y += GRASPFINDSTEPSIZE)
+  for(y = 0.0; checkSolution(anglesA, anglesB, anglesC); y += GRASPFINDSTEPSIZE)
   {
     anglesA = calcFingerAngle(xA, y);
     anglesB = calcFingerAngle(xB, y);
@@ -122,60 +147,48 @@ void SDHControl::grasp(double distA, double distB, double distC, double anAngle)
 
   //Finally, move to found config.:
   if(SDHCONTROL_MODE)
-    cout << "Going to configuration: " << Q(7, anglesB[0], anglesB[1], 45*deg2rad, anglesA[0],anglesA[1], anglesC[0], anglesC[1]) << endl;
+    cout << "Going to configuration: " << Q(7, anglesB[0]*rad2deg, anglesB[1]*rad2deg, fingertipPosA[1]*rad2deg, anglesA[0]*rad2deg, anglesA[1]*rad2deg, anglesC[0]*rad2deg, anglesC[1]*rad2deg) << endl;
 
-    goToQ(Q(7, anglesB[0], anglesB[1], anAngle, anglesA[0],anglesA[1], anglesC[0], anglesC[1]));
+    goToQ(Q(7, anglesB[0], anglesB[1], fingertipPosA[1], anglesA[0],anglesA[1], anglesC[0], anglesC[1]));
+
+  controlGrasp(xA, xB, xC);
 }
 
-void SDHControl::grasp(double distA, double distC)
+void SDHControl::adjustVel(double joint0, double joint1, double joint2, double joint3, double joint4, double joint5, double joint6)
 {
-  //Distances are given relative to center of hand, so substract offset (dist. from center of hand):
-  double xA = distA-FINGEROFFSET-SDH_DIST_INTO_OBJECT;
-  double xC = distC-FINGEROFFSET-SDH_DIST_INTO_OBJECT;
 
-  //Then, check if one or more distances are too large:
-  if(xA > GRASPDISTLIM || xC > GRASPDISTLIM)
-    throw("[SDHControl::grasp]: Grasp points are too far away! Check define GRASPDISTLIM in settings to see the limit.");
+  Q velLim = sdh->getVelLimits();
 
-    //Result vectors:
-    vector<double> anglesA;
-    vector<double> anglesC;
+  velLim[0] *= joint0;
+  velLim[1] *= joint1;
+  velLim[2] *= joint2;
+  velLim[3] *= joint3;
+  velLim[4] *= joint4;
+  velLim[5] *= joint5;
+  velLim[6] *= joint6;
 
-    //To make sure that for-loop is run first time, insert invalid y's:
-    anglesA = calcFingerAngle(xA, 400.0);
-    anglesC = calcFingerAngle(xC, 400.0);
-
-    //Find biggest distance from SDH base, where all checks in checkSolution() are satisfied:
-    double y;
-    for(y = 0; checkSolution(anglesA, anglesC); y += GRASPFINDSTEPSIZE)
-    {
-      anglesA = calcFingerAngle(xA, y);
-      anglesC = calcFingerAngle(xC, y);
-
-      if(y > GRASPDISTLIM)
-      {
-        throw("[SDHControl::grasp]: No solution was found (height exceeded 155.0mm)!");
-      }
-    }
-
-    if(SDHCONTROL_MODE)
-    {
-      cout << "Found solution! height = " << y << endl;
-      cout << "Finger A: angles = (" << anglesA[0]*rad2deg << ";" << anglesA[1]*rad2deg << ") pos = (" << xA << ";" << y << ")" << endl;
-      cout << "Finger C: angles = (" << anglesC[0]*rad2deg << ";" << anglesC[1]*rad2deg << ") pos = (" << xC << ";" << y << ")" << endl;
-    }
-
-    //Finally, move to found config.:
-    if(SDHCONTROL_MODE)
-      cout << "Going to configuration: " << Q(7, initQ[0], initQ[1], 90.0*deg2rad, anglesA[0],anglesA[1], anglesC[0], anglesC[1]) << endl;
-
-      goToQ(Q(7, initQ[0], initQ[1], 90.0*deg2rad, anglesA[0],anglesA[1], anglesC[0], anglesC[1]));
+  sdh->setTargetQVel(velLim);
 }
 
+SDHControl::~SDHControl()
+{
+}
 
 /**************
 *   Private
 **************/
+vector<double> SDHControl::calcFingertipPos(double visDist, double anAngle)
+{
+  vector<double> res(2);
+  double theta = (anAngle) - (60*deg2rad);
+  double graspDist = sqrt((visDist*visDist)+(FINGEROFFSET*FINGEROFFSET)-(2*visDist*FINGEROFFSET*cos(theta)));
+
+  res[0] = graspDist;
+  res[1] = 60*deg2rad+theta;
+
+  return res;
+}
+
 vector<double> SDHControl::calcFingerAngle(double x, double y)
 {
   vector<double> res(2);
@@ -186,9 +199,6 @@ vector<double> SDHControl::calcFingerAngle(double x, double y)
   return res;
 }
 
-SDHControl::~SDHControl()
-{
-}
 
 bool SDHControl::isThereAnan(double a,double b,double c,double d,double e,double f)
 {
@@ -233,7 +243,7 @@ vector<double> SDHControl::calcFingerDist(double angleBase, double angleTop)
 {
   vector<double> res(2);
 
-  res[0]= -(sin(angleBase)*LENGTH1 + cos(180*deg2rad-(angleBase+angleTop+(90*deg2rad)))*LENGTH2)+FINGEROFFSET;
+  res[0]= -(sin(angleBase)*LENGTH1 + cos(180*deg2rad-(angleBase+angleTop+(90*deg2rad)))*LENGTH2);
   res[1]= cos(angleBase)*LENGTH1 + sin(180*deg2rad-(angleBase+angleTop+(90*deg2rad)))*LENGTH2;
   return res;
 }
@@ -251,113 +261,81 @@ bool SDHControl::controlGrasp(double goalDistA, double goalDistB, double goalDis
   currDistB = calcFingerDist(currQ[0],currQ[1]);
   currDistC = calcFingerDist(currQ[5],currQ[6]);
 
-  //Check if the grasp has NOT reached the goal:
-  if(SDH_PRECISION < abs(goalDistA-currDistA[0])&& SDH_PRECISION < abs(goalDistB-currDistB[0])&& SDH_PRECISION < abs(goalDistC-currDistC[0]))
+  //Check if the grasp is successful
+  if(SDH_PRECISION < abs(goalDistA-currDistA[0]) || SDH_PRECISION < abs(goalDistB-currDistB[0]) || SDH_PRECISION < abs(goalDistC-currDistC[0]))
   {
     res = true;
   }
 
 
-  if(SDH_PRECISION > abs(currDistA[0]-goalDistA) && res == false)
+  if(SDHCONTROL_MODE)
   {
-    std::cout << "!grip failed finger A to close" << '\n';
+    if(SDH_PRECISION > abs(currDistA[0]-goalDistA))
+    {
+      std::cout << "finger A close to goal" << endl;
+    }
+
+    if(SDH_PRECISION > abs(currDistB[0]-goalDistB))
+    {
+      std::cout << "finger B close to goal" << endl;
+    }
+
+    if(SDH_PRECISION > abs(currDistC[0]-goalDistC))
+    {
+      std::cout << "finger C close to goal" << endl;
+    }
   }
 
-  if(SDH_PRECISION > abs(currDistB[0]-goalDistB) && res == false)
-  {
-    std::cout << "!grip failed finger B to close" << '\n';
-  }
 
-  if(SDH_PRECISION > abs(currDistC[0]-goalDistC) && res == false)
+  if(/*res == true*/true)
   {
-    std::cout << "!grip failed finger C to close" << '\n';
-  }
-
-
-  if(res == true)
-  {
-    // check for controlGraspPlacment
-    res = controlGraspPlacment(goalDistA,goalDistB,goalDistC,currDistA[0],currDistB[0],currDistC[0]);
+    //check for controlGraspPlacment:
+    res = controlGraspPlacment(currQ[2], currDistA[0], currDistB[0], currDistC[0]);
   }
 
   return res;
 }
 
-bool SDHControl::controlGraspPlacment(double goalDistA, double goalDistB, double goalDistC, double CurrDistA, double CurrDistB, double CurrDistC)
+bool SDHControl::controlGraspPlacment(double angleAC, double currDistA, double currDistB, double currDistC)
 {
-  bool res = false;
+  bool res = true;
 
+  double xA = SDH_FINGER_BASE_OFF_X + cos(angleAC - (90*deg2rad))*currDistA;
+  double yA = SDH_FINGER_BASE_OFF_Y - sin(angleAC - (90*deg2rad))*currDistA;
 
-  double diffDistA = goalDistA - CurrDistA;
-  double diffDistB = goalDistB - CurrDistB;
-  double diffDistC = goalDistC - CurrDistC;
+  double xB = 0.0;
+  double yB = -(FINGEROFFSET + currDistB);
 
-  //check if the placment has been passe therfore wrong;
-  if (diffDistA > 0)
+  double xC = -SDH_FINGER_BASE_OFF_X - cos(angleAC - (90*deg2rad))*currDistC;
+  double yC = SDH_FINGER_BASE_OFF_Y - sin(angleAC - (90*deg2rad))*currDistC;
+
+  if(SDHCONTROL_MODE)
   {
-    res = false;
-    cout << "!gripPlacmentWrong finger A has passed the goal postion" << '\n';
+    cout << "xA: " << xA << "; yA: " << yA << endl << "xB: " << xB << "; yB: " << yB << endl << "xC: " << xC << "; yC: " << yC << endl;
+    cout << "angleAC (deg): " << angleAC*rad2deg << endl;
+    cout << "currDistA: " << currDistA << " ; currDistB: " << currDistB << " ; currDistC: " << currDistC << endl;
   }
 
-  if (diffDistB > 0)
+  double currentSides[3];
+
+  currentSides[0] = sqrt(pow((xA-xB),2) + pow((yA-yB),2));
+  currentSides[1] = sqrt(pow((xB-xC),2) + pow((yB-yC),2));
+  currentSides[2] = sqrt(pow((xC-xA),2) + pow((yC-yA),2));
+
+  for(int i = 0; i < 3; i++)
   {
-    res = false;
-    cout << "!gripPlacmentWrong finger B has passed the goal postion" << '\n';
+    if(abs(currentSides[i]-goalSides[i]) > SDH_PRECISION)
+    {
+      cout << "goal-current side no." << i << " is too big (grasp is not as expected)!" << endl;
+
+      if(SDHCONTROL_MODE)
+        cout << "side" << i << ". Goal = " << goalSides[i] << ". Current = " << currentSides[i] <<  ". Diff = " << abs(currentSides[i]-goalSides[i]) << endl;
+
+      res = false;
+    }
   }
 
-  if (diffDistC > 0)
-  {
-    res = false;
-    cout << "!gripPlacmentWrong finger C has passed the goal postion" << '\n';
-  }
-
-  //check if fingers are in position
-  if (SDH_PRECISION < abs(diffDistA-SDH_DIST_INTO_OBJECT))
-  {
-    cout << "!gripPlacmentWrong too large diff of finger A" << '\n';
-    if(SDHCONTROL_MODE)
-      cout << "diffDistA: " << diffDistA << "; SDH_DIST_INTO_OBJECT: " << SDH_DIST_INTO_OBJECT << endl;
-    res = false;
-  }
-
-  if(SDH_PRECISION < abs(diffDistB-SDH_DIST_INTO_OBJECT))
-  {
-    cout << "!gripPlacmentWrong too large diff of finger B" << '\n';
-    if(SDHCONTROL_MODE)
-      cout << "diffDistB: " << diffDistB << "; SDH_DIST_INTO_OBJECT: " << SDH_DIST_INTO_OBJECT << endl;
-    res = false;
-  }
-
-  if (SDH_PRECISION < abs(diffDistC-SDH_DIST_INTO_OBJECT)) //check if the diffrence of C B are close
-  {
-    cout << "!gripPlacmentWrong too large diff of finger C" << '\n';
-    if(SDHCONTROL_MODE)
-      cout << "diffDistB: " << diffDistC << "; SDH_DIST_INTO_OBJECT: " << SDH_DIST_INTO_OBJECT << endl;
-    res = false;
-  }
-
-  if(!res)
-  {
-    // TODO code for cecking current configuration..
-    std::cout << "!gripPlacmentWrong not the expected grip" << '\n';
-  }
-
-  return res;
-}
-
-
-bool SDHControl::checkSolution(vector<double> anglesA, vector<double> anglesC)
-{
-  bool res = false;
-
-  if(isNotWithinThresh(-(90*deg2rad-anglesA[0])+ anglesA[1], SDH_ANGLE_THRESH, -(90*deg2rad-anglesC[0])+ anglesC[1]))
-    res = true;
-
-  if(isThereAnan(anglesA[0], anglesA[1], 0, 0, anglesC[0], anglesC[1]))
-    res = true;
-
-  if(areThereInvalidAngles(anglesA, vector<double>{0,0}, anglesC))
-    res = true;
+  //TODO: Check if current grip could be valid
 
   return res;
 }

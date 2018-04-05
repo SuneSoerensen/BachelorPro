@@ -81,7 +81,7 @@
 #define SDHCONTROL_MODE 1 //0=standard 1=debug
 #define GRASPSTARTHEIGHT 160 //5mm further than range of fingers
 #define GRASPFINDSTEPSIZE 0.001 //Stepsize for finding finger-config
-#define GRASPDISTLIM 155 //Max distance from finger-base to grasp-point
+#define GRASPDISTLIM 155.0 //Max distance from finger-base to grasp-point
 #define FINGEROFFSET 38.105 //Distance from center of SDH to base of fingers
 #define LENGTH1 86.5 //Length of finger from base to middle-joint
 #define LENGTH2 68.5 //length of finger from middle-joint to tip
@@ -89,5 +89,8 @@
 #define SDH_ANGLE_THRESH 10.0*deg2rad
 #define SDH_MAX_ABS_ANGLE 90.0*deg2rad
 
-#define SDH_PRECISION 1.0 //mm
-#define SDH_DIST_INTO_OBJECT 4.0 //mm for each finger
+#define SDH_PRECISION 10.0 //mm
+#define SDH_DIST_INTO_OBJECT 0 //mm for each finger
+
+#define SDH_FINGER_BASE_OFF_X 33.0 //mm
+#define SDH_FINGER_BASE_OFF_Y 19.0525 //mm
