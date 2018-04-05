@@ -71,12 +71,29 @@ bool SDHControl::isConnected()
   return connected;
 }
 
-void SDHControl::grasp(double distA, double distB, double distC, double anAngle)
+void SDHControl::grasp(double fingerAX, double fingerAY, double fingerBX, double fingerBY, double fingerCX, double fingerCY)
 {
-  //Distances are given relative to center of hand, so substract offset (dist. from center of hand):
-  double xA = distA-FINGEROFFSET-SDH_DIST_INTO_OBJECT;
-  double xB = distB-FINGEROFFSET-SDH_DIST_INTO_OBJECT;
-  double xC = distC-FINGEROFFSET-SDH_DIST_INTO_OBJECT;
+  //Calculate distances from hand-center to finger-contact-points and substract length to ensure that points are inside the object:
+  double distA = sqrt(fingerAX*fingerAX + fingerAY*fingerAY) - SDH_DIST_INTO_OBJECT;
+  double distB = sqrt(fingerBX*fingerBX + fingerBY*fingerBY) - SDH_DIST_INTO_OBJECT;
+  double distC = sqrt(fingerCX*fingerCX + fingerCY*fingerCY) - SDH_DIST_INTO_OBJECT;
+
+  if(SDHCONTROL_MODE)
+  {
+    cout << "distA: " << distA << " ; " << "distB: " << distB << "distC: " << distC << endl;
+  }
+
+  double angleAC = abs(atan2(fingerAY, fingerAX))*2.0;
+
+  if(SDHCONTROL_MODE)
+    cout << "angleAC (deg): " << angleAC*rad2deg << endl;
+
+  vector<double> fingertipPosA = calcFingertipPos(distA, angleAC);
+  vector<double> fingertipPosC = calcFingertipPos(distC, angleAC);
+
+  double xA = fingertipPosA[0];
+  double xB = distB-FINGEROFFSET; //Distances are given relative to center of hand, so substract offset (dist. from center of hand)
+  double xC = fingertipPosC[0];
 
   //Then, check if one or more distances are too large:
   if(xA > GRASPDISTLIM || xB > GRASPDISTLIM || xC > GRASPDISTLIM)
@@ -122,9 +139,9 @@ void SDHControl::grasp(double distA, double distB, double distC, double anAngle)
 
   //Finally, move to found config.:
   if(SDHCONTROL_MODE)
-    cout << "Going to configuration: " << Q(7, anglesB[0], anglesB[1], 45*deg2rad, anglesA[0],anglesA[1], anglesC[0], anglesC[1]) << endl;
+    cout << "Going to configuration: " << Q(7, anglesB[0], anglesB[1], fingertipPosA[1], anglesA[0],anglesA[1], anglesC[0], anglesC[1]) << endl;
 
-    goToQ(Q(7, anglesB[0], anglesB[1], anAngle, anglesA[0],anglesA[1], anglesC[0], anglesC[1]));
+    goToQ(Q(7, anglesB[0], anglesB[1], fingertipPosA[1], anglesA[0],anglesA[1], anglesC[0], anglesC[1]));
 }
 
 void SDHControl::grasp(double distA, double distC)
@@ -172,10 +189,25 @@ void SDHControl::grasp(double distA, double distC)
       goToQ(Q(7, initQ[0], initQ[1], 90.0*deg2rad, anglesA[0],anglesA[1], anglesC[0], anglesC[1]));
 }
 
+SDHControl::~SDHControl()
+{
+}
 
 /**************
 *   Private
 **************/
+vector<double> SDHControl::calcFingertipPos(double visDist, double anAngle)
+{
+  vector<double> res(2);
+  double theta = (anAngle/2.0)-(60*deg2rad);
+  double graspDist = sqrt((visDist*visDist)+(FINGEROFFSET*FINGEROFFSET)-(2*visDist*FINGEROFFSET*cos(theta)));
+
+  res[0] = graspDist;
+  res[1] = 60*deg2rad+theta;
+
+  return res;
+}
+
 vector<double> SDHControl::calcFingerAngle(double x, double y)
 {
   vector<double> res(2);
@@ -186,9 +218,6 @@ vector<double> SDHControl::calcFingerAngle(double x, double y)
   return res;
 }
 
-SDHControl::~SDHControl()
-{
-}
 
 bool SDHControl::isThereAnan(double a,double b,double c,double d,double e,double f)
 {
