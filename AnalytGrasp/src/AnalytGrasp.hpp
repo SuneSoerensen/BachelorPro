@@ -23,6 +23,7 @@ private:
 	static double CalcAngle(Coords vecA, Coords vecB);
 	static void ThreeFingAngCheck(vector<vector<int> > &aPossGraspsList, vector<Coords> &aNormVecsList);
 	static void TwoFingAngCheck(vector<vector<int> > &aPossGraspsList, vector<Coords> &aNormVecsList);
+	//finger names!!!
 
 	AnalytGrasp();
 	~AnalytGrasp();

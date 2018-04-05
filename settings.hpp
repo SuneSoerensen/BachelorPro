@@ -23,11 +23,11 @@
 #define CROP_LEFT		500
 #define CROP_RIGHT		950
 
+//for thresholding:
+#define THRESHOLDING_THRES	110 	//should be between the intensities of the background and the object
+
 //for the Canny edge-detector (finding contours):
 #define CANNY_THRES		50	// 0 <= THRESHOLD <= 255
-
-//for removing too small contours:
-#define MIN_POINTS_IN_CONTS	70
 
 //============
 //   Vision
