@@ -55,7 +55,10 @@ public:
     void grasp(double fingerAX, double fingerAY, double fingerBX, double fingerBY, double fingerCX, double fingerCY);
 
     //Two-finger grasp (finger B moves to init and joint #2 is 90deg):
-    void grasp(double distA, double distC);
+    //void grasp(double distA, double distC);
+
+    //Adjust velocity for SDH joints:
+    void adjustVel(double joint0, double joint1, double joint2, double joint3, double joint4, double joint5, double joint6);
 
     ~SDHControl();
 
@@ -68,6 +71,9 @@ private:
 
     //Reflects whether connected to hand or not:
     bool connected = false;
+
+    //Sides of the triangle to control grasp {AB, BC, CA}:
+    double goalSides[3] = {0.0, 0.0, 0.0};
 
     //Calculate fingertip-pos and finger angle in the plane, for finger A and C:
     //Output: {dist, angle}
@@ -87,7 +93,7 @@ private:
 
     vector<double> calcFingerDist(double angleBase, double angleTop);
     bool controlGrasp(double goalDistA, double goalDistB, double goalDistC);
-    bool controlGraspPlacment(double goalDistA, double goalDistB, double goalDistC,double CurrDistA, double CurrDistB, double CurrDistC);
+    bool controlGraspPlacment(double angleAC, double currDistA, double currDistB, double currDistC);
 
     //Same as above, but for two-finger grasps:
     bool checkSolution(vector<double> anglesA, vector<double> anglesC);
