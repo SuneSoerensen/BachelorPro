@@ -25,9 +25,7 @@
 
 //for thresholding:
 #define THRESHOLDING_THRES	110 	//should be between the intensities of the background and the object
-
-//for the Canny edge-detector (finding contours):
-#define CANNY_THRES		50	// 0 <= THRESHOLD <= 255
+#define THRESHOLDING_MODE	0	//0 = light object on dark background, 1 = dark object on light background
 
 //============
 //   Vision
@@ -42,8 +40,10 @@
 #define GLOB_Y_DIR		-1	//global y-direction in relation to the cameras y-direction
 
 //for the Hough-transform line detector (grasp regs):
-#define MIN_POINTS_IN_LINE	10 //for curvy objects: short lines (f.ex. 10-15) and large gap (f.ex. 3-5)
-#define MIN_LINE_LENGTH		10 //for edgy objects: long lines (f.ex. 40+) and small gap (f.ex. 0-2)
+//(for curvy objects: short lines (f.ex. 10-15) and large gap (f.ex. 3-5))
+//(for edgy objects: long lines (f.ex. 40+) and small gap (f.ex. 0-2))
+#define MIN_POINTS_IN_LINE	10
+#define MIN_LINE_LENGTH		10
 #define MAX_LINE_GAP		3
 
 //=================

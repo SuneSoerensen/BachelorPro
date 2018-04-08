@@ -18,7 +18,8 @@ public:
 	static void FindContour(Mat &aCropImage, Mat &aContourImage, vector<Coords> &aContourList, vector<vector<int> > &aContourMatrix);
 
 private:
-	static Coords FindNextNeighbour(Mat &aContourImage, vector<vector<int> > &aContourMatrix, Coords aCurrPoint);
+	static Coords FindNextNeighbour(Mat &aThresImage, vector<vector<int> > &aContourMatrix, Coords aCurrPoint);
+	static bool HasBlackNeighbour(Mat &aThresImage, Coords aCurrPoint);
 
 	TIAFC();
 	~TIAFC();
