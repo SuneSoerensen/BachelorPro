@@ -8,6 +8,7 @@
 
 #include "SDHControl.hpp"
 #include <iostream>
+#include <unistd.h>
 
 /**************
 *   Public
@@ -39,11 +40,24 @@ SDHControl::SDHControl(int port, unsigned long baudrate, double timeout)
   connected = true;
 }
 
+void SDHControl::goToPreQ(Q aQ)
+{
+  Q firstQ = aQ;
+  for(int i = 0; i < 7; i++)
+  {
+    if(i != 2)
+      firstQ[i] -= SDH_ANGLE_DIFF_FIRST*deg2rad;
+  }
+  goToQ(firstQ);
+}
+
 void SDHControl::goToQ(Q aQ)
 {
   if(connected)
     if(!areThereInvalidAngles(aQ))
+    {
       sdh->moveCmd(aQ, true);
+    }
     else
       throw("[SDHControl::goToQ]: One or more input angles are invalid!");
   else
@@ -88,7 +102,7 @@ void SDHControl::grasp(double fingerAX, double fingerAY, double fingerBX, double
     cout << "distA: " << distA << " ; " << "distB: " << distB << " ; distC: " << distC << endl;
   }
 
-  double angleAC = abs(atan2(fingerAY, fingerAX))*2.0;
+  double angleAC = abs(atan2(fingerAX, fingerAY));
 
   if(SDHCONTROL_MODE)
     cout << "angleAC (deg): " << angleAC*rad2deg << endl;
@@ -101,7 +115,7 @@ void SDHControl::grasp(double fingerAX, double fingerAY, double fingerBX, double
   double xC = fingertipPosC[0];
 
   if(SDHCONTROL_MODE)
-    cout << "xA: " << xA << "; xB: " << xB << " ; xC: " << xC << endl;
+    cout << "finger A base-to-tip: " << xA << "; finger B base-to-tip: " << xB << " ; finger C base-to-tip: " << xC << endl;
 
   //Then, check if one or more distances are too large:
   if(xA > GRASPDISTLIM || xB > GRASPDISTLIM || xC > GRASPDISTLIM)
@@ -149,7 +163,15 @@ void SDHControl::grasp(double fingerAX, double fingerAY, double fingerBX, double
   if(SDHCONTROL_MODE)
     cout << "Going to configuration: " << Q(7, anglesB[0]*rad2deg, anglesB[1]*rad2deg, fingertipPosA[1]*rad2deg, anglesA[0]*rad2deg, anglesA[1]*rad2deg, anglesC[0]*rad2deg, anglesC[1]*rad2deg) << endl;
 
+    //First, go to pos near target:
+
+    goToPreQ(Q(7, anglesB[0], anglesB[1], fingertipPosA[1], anglesA[0],anglesA[1], anglesC[0], anglesC[1]));
+
+    //fullStop();
+
+    //Then, go to target:
     goToQ(Q(7, anglesB[0], anglesB[1], fingertipPosA[1], anglesA[0],anglesA[1], anglesC[0], anglesC[1]));
+    fullStop();
 
   controlGrasp(xA, xB, xC);
 }
@@ -158,6 +180,11 @@ void SDHControl::adjustVel(double joint0, double joint1, double joint2, double j
 {
 
   Q velLim = sdh->getVelLimits();
+
+  for(int i = 0; i < velLim.size(); i++)
+    velLim[i] *= 1.19;
+
+  //Q velLim(7, temp);
 
   velLim[0] *= joint0;
   velLim[1] *= joint1;
@@ -183,8 +210,14 @@ vector<double> SDHControl::calcFingertipPos(double visDist, double anAngle)
   double theta = (anAngle) - (60*deg2rad);
   double graspDist = sqrt((visDist*visDist)+(FINGEROFFSET*FINGEROFFSET)-(2*visDist*FINGEROFFSET*cos(theta)));
 
+  if(SDHCONTROL_MODE)
+    cout << "[calcFingerDist]: theta (deg): " << theta*rad2deg << endl;
+
+  if(theta <= (-28.0*deg2rad) /*&& theta > -SDH_PRECISION*/) //If fingers are parrallel (or very close to)
+    theta = -60.0*deg2rad;
+
   res[0] = graspDist;
-  res[1] = 60*deg2rad+theta;
+  res[1] = theta+(60*deg2rad);
 
   return res;
 }
@@ -256,6 +289,9 @@ bool SDHControl::controlGrasp(double goalDistA, double goalDistB, double goalDis
   vector<double> currDistA;
   vector<double> currDistB;
   vector<double> currDistC;
+
+  if(SDHCONTROL_MODE)
+    cout << "Current configuration: " << currQ << endl;
 
   currDistA = calcFingerDist(currQ[3],currQ[4]);
   currDistB = calcFingerDist(currQ[0],currQ[1]);

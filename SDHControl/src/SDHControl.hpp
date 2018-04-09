@@ -39,6 +39,8 @@ public:
     //Constructor. Connects automatically via RS232:
     SDHControl(int port, unsigned long baudrate, double timeout);
 
+    void goToPreQ(Q aQ);
+
     //Go to any valid configuration:
     void goToQ(Q aQ);
 
