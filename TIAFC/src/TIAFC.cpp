@@ -158,7 +158,7 @@ Coords TIAFC::FindNextNeighbour(Mat &aThresImage, vector<vector<int> > &aContour
 	}
 
 	//if we couldn't find any unvisited neighbours
-	for ( int i = 0; i < 24; i++) //run through all neighbours
+	for ( int i = 0; i < 8; i++) //run through all neighbours
 	{
 		if (aThresImage.at<uchar>(aCurrPoint.y + yVals[i], aCurrPoint.x + xVals[i]) == 255) //if part of the object
 		{

@@ -117,40 +117,36 @@ double AnalytGrasp::CalcAngle(Coords vecA, Coords vecB)
 
 void AnalytGrasp::ThreeFingAngCheck(vector<vector<int> > &aPossGraspsList, vector<Coords> &aNormVecsList)
 {
-	double angAB, angBC, angCA;
+	double angAC, angBC, angBA;
 	double minAng, maxAng;
 
-	for (int a = 0; a < aNormVecsList.size(); a++)
+	for (int a = 0; a < aNormVecsList.size(); a++) //for all normal vectors
 	{
 		for (int b = 0; b < aNormVecsList.size(); b++)
 		{
-			if (b != a)
+			if (b != a) //find another one, which is not the first
 			{
 				for (int c = 0; c < aNormVecsList.size(); c++)
 				{
-					if (c != b && c != a)
+					if (c != b && c != a) //find a third, which is not one of the two others
 					{
-						angAB = CalcAngle(aNormVecsList[a], aNormVecsList[b]);
+						angAC = CalcAngle(aNormVecsList[a], aNormVecsList[c]); //calc the angle between the two fingers
 
-						if ( 0 <= angAB && angAB <= MAX_THREE_FING_ANG)
+						if ( 0 <= angAC && angAC <= MAX_THREE_FING_ANG) //if it is valid
 						{
-							minAng = ((6.28 - angAB)/2) - MAX_DEV_ANG;
-							maxAng = ((6.28 - angAB)/2) + MAX_DEV_ANG;
+							//calc the angles defining the tolerable range
+							minAng = ((6.28 - angAC)/2) - MAX_DEV_ANG;
+							maxAng = ((6.28 - angAC)/2) + MAX_DEV_ANG;
 
-							angBC = CalcAngle(aNormVecsList[b], aNormVecsList[c]);
+							angBC = CalcAngle(aNormVecsList[b], aNormVecsList[c]); //calc the angle between the thumb and second finger
 
-							if (minAng <= angBC && angBC <= maxAng)
+							if (minAng <= angBC && angBC <= maxAng) //if the angle is within the range
 							{
-								angCA = CalcAngle(aNormVecsList[c], aNormVecsList[a]);
+								angBA = CalcAngle(aNormVecsList[b], aNormVecsList[a]); //calc the angle between the thumb and first finger
 
-								if (minAng <= angCA && angCA <= maxAng)
+								if (minAng <= angBA && angBA <= maxAng) //if the angle is within the range
 								{
-									vector<int> temp(3, 0);
-									temp[0] = a;
-									temp[1] = b;
-									temp[2] = c;
-
-									aPossGraspsList.push_back(temp);
+									aPossGraspsList.push_back({a, b, c}); //we have found possible grasp!
 								}
 							}
 						}
@@ -163,27 +159,24 @@ void AnalytGrasp::ThreeFingAngCheck(vector<vector<int> > &aPossGraspsList, vecto
 
 void AnalytGrasp::TwoFingAngCheck(vector<vector<int> > &aPossGraspsList, vector<Coords> &aNormVecsList)
 {
-	double angAB;
+	double angAC;
 	double minAng, maxAng;
 
-	for (int a = 0; a < aNormVecsList.size(); a++)
+	for (int a = 0; a < aNormVecsList.size(); a++) //for all normal vectors
 	{
-		for (int b = 0; b < aNormVecsList.size(); b++)
+		for (int c = 0; c < aNormVecsList.size(); c++)
 		{
-			if (b != a)
+			if (c != a) //find another one which is not the first
 			{
-				angAB = CalcAngle(aNormVecsList[a], aNormVecsList[b]);
+				angAC = CalcAngle(aNormVecsList[a], aNormVecsList[c]); //calc the angle between the two fingers
 
+				//calc angles defining the tolerable range
 				minAng = 3.14 - MAX_DEV_ANG;
 				maxAng = 3.14 + MAX_DEV_ANG;
 
-				if ( minAng <= angAB && angAB <= maxAng)
+				if ( minAng <= angAC && angAC <= maxAng) //if the angle is within the range
 				{
-					vector<int> temp(2, 0);
-					temp[0] = a;
-					temp[1] = b;
-
-					aPossGraspsList.push_back(temp);
+					aPossGraspsList.push_back({a, c}); //we have found a possible grasp!
 				}
 			}
 		}
