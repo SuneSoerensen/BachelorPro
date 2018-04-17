@@ -54,7 +54,7 @@ public:
     bool isConnected();
 
     //Grasp, based on distance for each finger and an angle between finger a and c:
-    void grasp(double fingerAX, double fingerAY, double fingerBX, double fingerBY, double fingerCX, double fingerCY);
+    double grasp(double fingerAX, double fingerAY, double fingerBX, double fingerBY, double fingerCX, double fingerCY, bool isPreGrasp);
 
     //Two-finger grasp (finger B moves to init and joint #2 is 90deg):
     //void grasp(double distA, double distC);
