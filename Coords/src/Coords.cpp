@@ -1,7 +1,5 @@
 #include "Coords.hpp"
 
-
-
 //==================
 //   Constructors
 //==================

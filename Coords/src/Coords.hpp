@@ -3,8 +3,6 @@
 
 using namespace std;
 
-
-
 class Coords //Coordinates (2D)
 {
 public:

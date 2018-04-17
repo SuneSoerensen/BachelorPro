@@ -1,8 +1,6 @@
 #include "Vision.hpp"
 #include <iostream>
 
-
-
 Vision::Vision()
 {
 }
@@ -10,8 +8,7 @@ Vision::Vision()
 Coords Vision::GetObjCoords()
 {
 	//get new data
-	TIAFC::TakeImage(cropImage);
-	TIAFC::FindContour(cropImage, contourImage, contourList, contourMatrix);
+	TIAFC::DoItAll(cropImage, contourImage, contourList, contourMatrix);
 
 	//return the objects COM in real coordinates
 	return GetRealCoords(FindCOM(contourList, contourImage));
@@ -20,8 +17,7 @@ Coords Vision::GetObjCoords()
 void Vision::Calib()
 {
 	//get new data
-	TIAFC::TakeImage(cropImage);
-	TIAFC::FindContour(cropImage, contourImage, contourList, contourMatrix);
+	TIAFC::DoItAll(cropImage, contourImage, contourList, contourMatrix);
 
 	//calculate the offset
 	offset = FindCOM(contourList, contourImage).Mul(-1);

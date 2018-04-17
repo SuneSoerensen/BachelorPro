@@ -10,8 +10,6 @@
 using namespace std;
 using namespace cv;
 
-
-
 class AnalytGrasp //Analytical Grasping
 {
 public:

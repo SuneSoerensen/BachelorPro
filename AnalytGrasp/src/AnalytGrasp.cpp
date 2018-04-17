@@ -1,7 +1,5 @@
 #include "AnalytGrasp.hpp"
 
-
-
 void AnalytGrasp::FindGraspPoints(vector<Coords> &aGraspPointsList, Mat &aContourImage, vector<Coords> &aContourList, vector<vector<int> > &aContourMatrix)
 {
 	vector<vector<Coords> > graspRegsList;
@@ -78,7 +76,7 @@ void AnalytGrasp::FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aC
 		imwrite("DebugFiles/AnalytGrasp_graspRegs.jpg", graspRegsImage);
 
 		//draw all the lines individually:
-		for( int i = 0; i < lines.size(); i++ )
+		/*for( int i = 0; i < lines.size(); i++ )
 		{
 			aContourImage.copyTo(graspRegsImage);
 			cvtColor(graspRegsImage, graspRegsImage, COLOR_GRAY2BGR);
@@ -88,7 +86,7 @@ void AnalytGrasp::FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aC
 			line( graspRegsImage, startP, endP, Scalar(0,0,255), 1, LINE_AA);
 
 			imwrite("DebugFiles/AnalytGrasp_graspReg_" + to_string(i) + ".jpg", graspRegsImage);
-		}
+		}*/
 	}
 }
 
