@@ -85,7 +85,7 @@ bool SDHControl::isConnected()
   return connected;
 }
 
-void SDHControl::grasp(double fingerAX, double fingerAY, double fingerBX, double fingerBY, double fingerCX, double fingerCY)
+double SDHControl::grasp(double fingerAX, double fingerAY, double fingerBX, double fingerBY, double fingerCX, double fingerCY, bool isPreGrasp)
 {
   //Calculate sides for goal-triangle:
   goalSides[0] = sqrt(pow((fingerAX-fingerBX),2) + pow((fingerAY-fingerBY),2));
@@ -96,6 +96,13 @@ void SDHControl::grasp(double fingerAX, double fingerAY, double fingerBX, double
   double distA = sqrt(fingerAX*fingerAX + fingerAY*fingerAY) - SDH_DIST_INTO_OBJECT;
   double distB = sqrt(fingerBX*fingerBX + fingerBY*fingerBY) - SDH_DIST_INTO_OBJECT;
   double distC = sqrt(fingerCX*fingerCX + fingerCY*fingerCY) - SDH_DIST_INTO_OBJECT;
+
+  if(isPreGrasp)
+  {
+    distA += PREGRASP_SCALE;
+    distB += PREGRASP_SCALE;
+    distC += PREGRASP_SCALE;
+  }
 
   if(SDHCONTROL_MODE)
   {
@@ -163,17 +170,16 @@ void SDHControl::grasp(double fingerAX, double fingerAY, double fingerBX, double
   if(SDHCONTROL_MODE)
     cout << "Going to configuration: " << Q(7, anglesB[0]*rad2deg, anglesB[1]*rad2deg, fingertipPosA[1]*rad2deg, anglesA[0]*rad2deg, anglesA[1]*rad2deg, anglesC[0]*rad2deg, anglesC[1]*rad2deg) << endl;
 
-    //First, go to pos near target:
-
-    goToPreQ(Q(7, anglesB[0], anglesB[1], fingertipPosA[1], anglesA[0],anglesA[1], anglesC[0], anglesC[1]));
-
-    //fullStop();
-
     //Then, go to target:
     goToQ(Q(7, anglesB[0], anglesB[1], fingertipPosA[1], anglesA[0],anglesA[1], anglesC[0], anglesC[1]));
-    fullStop();
+    if(isPreGrasp)
+      fullStop();
 
-  controlGrasp(xA, xB, xC);
+    if(!isPreGrasp)
+      controlGrasp(xA, xB, xC);
+
+    return y + WRIST_HEIGHT + TARGET_Z + SEPERATOR_HEIGHT; //Z-coordinate to give directly to URControl (moveAbs())
+
 }
 
 void SDHControl::adjustVel(double joint0, double joint1, double joint2, double joint3, double joint4, double joint5, double joint6)
@@ -211,7 +217,7 @@ vector<double> SDHControl::calcFingertipPos(double visDist, double anAngle)
   double graspDist = sqrt((visDist*visDist)+(FINGEROFFSET*FINGEROFFSET)-(2*visDist*FINGEROFFSET*cos(theta)));
 
   if(SDHCONTROL_MODE)
-    cout << "[calcFingerDist]: theta (deg): " << theta*rad2deg << endl;
+    cout << "[calcFingertipPos]: theta (deg): " << theta*rad2deg << endl;
 
   if(theta <= (-28.0*deg2rad) /*&& theta > -SDH_PRECISION*/) //If fingers are parrallel (or very close to)
     theta = -60.0*deg2rad;
@@ -323,10 +329,10 @@ bool SDHControl::controlGrasp(double goalDistA, double goalDistB, double goalDis
   }
 
 
-  if(/*res == true*/true)
+  if(res == true)
   {
     //check for controlGraspPlacment:
-    res = controlGraspPlacment(currQ[2], currDistA[0], currDistB[0], currDistC[0]);
+    res = controlGraspPlacment(currQ[2], currDistA[0] - SDH_HALF_FINGER_WIDTH, currDistB[0] - SDH_HALF_FINGER_WIDTH, currDistC[0] - SDH_HALF_FINGER_WIDTH);
   }
 
   return res;
@@ -360,9 +366,18 @@ bool SDHControl::controlGraspPlacment(double angleAC, double currDistA, double c
 
   for(int i = 0; i < 3; i++)
   {
-    if(abs(currentSides[i]-goalSides[i]) > SDH_PRECISION)
+    if(abs(currentSides[i]-goalSides[i]) > SDH_PRECISION && abs(goalSides[i]) < abs(currentSides[i]))
     {
       cout << "goal-current side no." << i << " is too big (grasp is not as expected)!" << endl;
+
+      if(SDHCONTROL_MODE)
+        cout << "side" << i << ". Goal = " << goalSides[i] << ". Current = " << currentSides[i] <<  ". Diff = " << abs(currentSides[i]-goalSides[i]) << endl;
+
+      res = false;
+    }
+    else if(abs(currentSides[i]-goalSides[i]) > SDH_PRECISION && abs(goalSides[i]) > abs(currentSides[i]))
+    {
+      cout << "goal-current side no." << i << " is too small (grasp is not as expected)!" << endl;
 
       if(SDHCONTROL_MODE)
         cout << "side" << i << ". Goal = " << goalSides[i] << ". Current = " << currentSides[i] <<  ". Diff = " << abs(currentSides[i]-goalSides[i]) << endl;

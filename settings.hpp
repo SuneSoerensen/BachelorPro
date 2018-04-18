@@ -83,8 +83,14 @@
 #define GRASPFINDSTEPSIZE 0.001 //Stepsize for finding finger-config
 #define GRASPDISTLIM 155.0 //Max distance from finger-base to grasp-point
 #define FINGEROFFSET 38.105 //Distance from center of SDH to base of fingers
+#define SDH_HALF_FINGER_WIDTH 12.5 //mm
 #define LENGTH1 86.5 //Length of finger from base to middle-joint
 #define LENGTH2 68.5 //length of finger from middle-joint to tip
+#define WRIST_HEIGHT 98.0 //mm
+#define SEPERATOR_HEIGHT 23 //mm
+
+#define TARGET_Z 100.0 //mm above plate
+
 
 #define SDH_ANGLE_THRESH 10.0*deg2rad
 #define SDH_MAX_ABS_ANGLE 90.0*deg2rad
@@ -94,3 +100,10 @@
 
 #define SDH_FINGER_BASE_OFF_X 33.0 //mm
 #define SDH_FINGER_BASE_OFF_Y 19.0525 //mm
+<<<<<<< HEAD
+=======
+
+#define SDH_ANGLE_DIFF_FIRST 10.0 //deg
+
+#define PREGRASP_SCALE 30.0 //mm
+>>>>>>> 8e01ec0975f592af6b1398e93c8187fdb9ca9a03
