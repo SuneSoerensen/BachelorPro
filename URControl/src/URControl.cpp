@@ -33,6 +33,7 @@ URControl::URControl(string anIp, int APort)
   port = APort;
   ip = anIp;
   haveBeenToInit = 0;
+  connect();
 }
 
 void URControl::connect()
@@ -178,6 +179,14 @@ void URControl::moveAbs(double anX, double aY, double aZ)
   double relZ = aZ - currToolPos[2]*1000.0;
 
   moveRel(relX, relY, relZ);
+}
+
+void URControl::setWristAngle(double anAngle)
+{
+  if(abs(anAngle) < 360.0*deg2rad)
+    throw("[URControl::setWristAngle]: Invalid angle (|angle| > 360 deg)!");
+
+  ofstream out("rotateWristScript", ofstream::out);
 }
 
 bool URControl::checkBounds(double x, double y, double z)
