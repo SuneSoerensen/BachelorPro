@@ -53,8 +53,11 @@ public:
     //Grasp, based on coordinates for each contact point OR pre-grasp (each finger is 30 mm further out than actual grasp):
     double grasp(double fingerAX, double fingerAY, double fingerBX, double fingerBY, double fingerCX, double fingerCY, bool isPreGrasp);
 
-    //Two-finger grasp (finger B moves to init and joint #2 is 90deg):
-    //void grasp(double distA, double distC);
+    //Two-finger grasp (finger B moves to away and joint #2 is 90deg):
+    double grasp(double fingerAX, double fingerAY, double fingerCX, double fingerCY, bool isPreGrasp);
+
+    bool getIsValidGrasp();
+    bool getIsExpectedGrasp();
 
     //Adjust velocity for SDH joints: TODO: delete this, as it is not used!
     void adjustVel(double joint0, double joint1, double joint2, double joint3, double joint4, double joint5, double joint6);
@@ -73,6 +76,10 @@ private:
 
     //Sides of the triangle to control grasp {AB, BC, CA}:
     double goalSides[3] = {0.0, 0.0, 0.0};
+
+    //To control if the hand is grasping
+    bool isValidGrasp= false;
+    bool isExpectedGrasp = false;
 
     //Calculate fingertip-pos and finger angle in the plane, for finger A and C:
     //Output: {dist, angle}
@@ -96,10 +103,12 @@ private:
 
     //Control if hand is grasping an object
     //Output: true if the grasp is valid
-    bool controlGrasp(double goalDistA, double goalDistB, double goalDistC);
+    void controlGrasp(double goalDistA, double goalDistB, double goalDistC);
+    void controlGrasp(double goalDistA, double goalDistC);
+
 
     //Control if grasp is the intended grasp, using the triangle calculated in grasp():
-    bool controlGraspPlacement(double angleAC, double currDistA, double currDistB, double currDistC);
+    void controlGraspPlacement(double angleAC, double currDistA, double currDistB, double currDistC);
 
     //Same as above, but for two-finger grasps:
     bool checkSolution(vector<double> anglesA, vector<double> anglesC);

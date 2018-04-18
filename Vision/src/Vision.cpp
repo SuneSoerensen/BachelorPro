@@ -11,7 +11,7 @@ Coords Vision::GetObjCoords()
 	TIAFC::DoItAll(cropImage, contourImage, contourList, contourMatrix);
 
 	//return the objects COM in real coordinates
-	return GetRealCoords(FindCOM(contourList, contourImage));
+	return GetRealCoords(AnalytGrasp::FindCOM(contourList, contourImage));
 }
 
 void Vision::Calib()
@@ -20,7 +20,7 @@ void Vision::Calib()
 	TIAFC::DoItAll(cropImage, contourImage, contourList, contourMatrix);
 
 	//calculate the offset
-	offset = FindCOM(contourList, contourImage).Mul(-1);
+	offset = AnalytGrasp::FindCOM(contourList, contourImage).Mul(-1);
 
 	//find height and width of calibration object
 	Coords min = contourList[0];
@@ -46,55 +46,13 @@ void Vision::Calib()
 	scaleFactor = globScale.Div(locScale); //(mm*CALC_FACTOR)/pixels
 }
 
-void Vision::RunFindGraspPoints()
+void Vision::RunFindGrasp()
 {
-	AnalytGrasp::FindGraspPoints(graspPointsList, contourImage, contourList, contourMatrix);
+	AnalytGrasp::FindGrasp(contourImage, contourList, contourMatrix);
 }
 
 Vision::~Vision()
 {
-}
-
-Coords Vision::FindCOM(vector<Coords> &aContourList, Mat &aContourImage)
-{
-	//calculate sum of all x- and y-coordinates
-	Coords sum(0, 0);
-	for (int i = 0; i < aContourList.size(); i++)
-	{
-		sum = sum.Add(aContourList[i]);
-	}
-
-	//divide by number of points to find average
-	Coords res = sum.Div(aContourList.size());
-
-	if (VISION_MODE) //DEBUG
-	{
-		//make image
-		Mat centOfMassImage;
-		aContourImage.copyTo(centOfMassImage);
-		cvtColor(centOfMassImage, centOfMassImage, COLOR_GRAY2BGR);
-
-		//relative coordinates of pixels to draw
-		int xVals[17] = {0, 2,  2,  2,  1,  0, -1, -2, -2, -2, -2, -2, -1, 0, 1, 2, 2};
-		int yVals[17] = {0, 0, -1, -2, -2, -2, -2, -2, -1,  0,  1,  2,  2, 2, 2, 2, 1};
-
-		//drawing color
-		Vec3b color;
-		color.val[0] = 0;
-		color.val[1] = 0;
-		color.val[2] = 255;
-
-		//draw pixels to mark the COM
-		for (int i = 0; i < 17; i++)
-		{
-			centOfMassImage.at<Vec3b>(res.y + yVals[i], res.x + xVals[i]) = color;
-		}
-
-		//save image
-		imwrite("DebugFiles/Vision_centOfMass.jpg", centOfMassImage);
-	}
-
-	return res;
 }
 
 Coords Vision::GetRealCoords(Coords coordsInPixels)
