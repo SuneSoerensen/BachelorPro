@@ -217,7 +217,7 @@ void TIAFC::FindContour(Mat &objectImage, Mat &aContourImage, vector<Coords> &aC
 
 		//add it to the contour
 		aContourList.push_back(nextPoint);
-		aContourMatrix[aContourList[index].x][aContourList[index].y] = index + 1;
+		aContourMatrix[nextPoint.x][nextPoint.y] = index + 1;
 		index++;
 	}
 

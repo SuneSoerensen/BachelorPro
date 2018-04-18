@@ -46,9 +46,9 @@ void Vision::Calib()
 	scaleFactor = globScale.Div(locScale); //(mm*CALC_FACTOR)/pixels
 }
 
-void Vision::RunFindGraspPoints()
+void Vision::RunFindGrasp()
 {
-	AnalytGrasp::FindGraspPoints(contourImage, contourList, contourMatrix);
+	AnalytGrasp::FindGrasp(contourImage, contourList, contourMatrix);
 }
 
 Vision::~Vision()

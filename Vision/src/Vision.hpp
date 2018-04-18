@@ -12,7 +12,7 @@ public:
 	Coords GetObjCoords();
 	void Calib(); //always call "Calib()" at least once before doing anything else!!!
 
-	/*DEBUG*/void RunFindGraspPoints();
+	/*DEBUG*/void RunFindGrasp();
 
 	~Vision();
 

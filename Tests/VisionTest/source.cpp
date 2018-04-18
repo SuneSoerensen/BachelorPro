@@ -23,7 +23,7 @@ int main()
 			cout << "(0): misc." << endl;
 			cout << "(1): Calib()" << endl;
 			cout << "(2): GetObjCoords()" << endl;
-			cout << "(3): FindGraspPoints()" << endl;
+			cout << "(3): FindGrasp()" << endl;
 			cout << "type input: ";
 			cin >> mode;
 			cout << endl;
@@ -44,7 +44,7 @@ int main()
 			}
 			else if (mode == "3")
 			{
-				test.RunFindGraspPoints();
+				test.RunFindGrasp();
 			}
 			else
 			{

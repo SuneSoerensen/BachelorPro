@@ -12,23 +12,25 @@ using namespace cv;
 
 struct Grasp
 {
-	
+	enum Type {p1, p2, p3};
+	Type type;
 };
 
 class AnalytGrasp //Analytical Grasping
 {
 public:
-	static void FindGraspPoints(Mat &aContourImage, vector<Coords> &aContourList, vector<vector<int> > &aContourMatrix);
+	static void FindGrasp(Mat &aContourImage, vector<Coords> &aContourList, vector<vector<int> > &aContourMatrix);
 
 	static Coords FindCOM(vector<Coords> &aContourList, Mat &aContourImage);
 
 private:
-	static void FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aContourImage, vector<vector<int> > &aContourMatrix);
+	static void FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aContourImage, vector<Coords> &aContourList, vector<vector<int> > &aContourMatrix);
 
 	static void CalcP1Grasps();
 
 	static void CalcNormVecs(vector<vector<Coords> > &aGraspRegsList, vector<Coords> &aNormVecsList);
 	static double CalcAngle(Coords vecA, Coords vecB);
+
 	static void ThreeFingAngCheck(vector<vector<int> > &aPossGraspsList, vector<Coords> &aNormVecsList);
 	static void TwoFingAngCheck(vector<vector<int> > &aPossGraspsList, vector<Coords> &aNormVecsList);
 
