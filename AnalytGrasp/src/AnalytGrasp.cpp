@@ -1,10 +1,12 @@
 #include "AnalytGrasp.hpp"
 
-void AnalytGrasp::FindGraspPoints(vector<Coords> &aGraspPointsList, Mat &aContourImage, vector<Coords> &aContourList, vector<vector<int> > &aContourMatrix)
+void AnalytGrasp::FindGraspPoints(Mat &aContourImage, vector<Coords> &aContourList, vector<vector<int> > &aContourMatrix)
 {
+	//find grasping regions
 	vector<vector<Coords> > graspRegsList;
 	FindGraspRegs(graspRegsList, aContourImage, aContourMatrix);
 
+	//calc their normal vectors
 	vector<Coords> normVecsList;
 	CalcNormVecs(graspRegsList, normVecsList);
 
@@ -27,6 +29,48 @@ void AnalytGrasp::FindGraspPoints(vector<Coords> &aGraspPointsList, Mat &aContou
 		cout << endl;
 	}
 	cout << endl;
+}
+
+Coords AnalytGrasp::FindCOM(vector<Coords> &aContourList, Mat &aContourImage)
+{
+	//calculate sum of all x- and y-coordinates
+	Coords sum(0, 0);
+	for (int i = 0; i < aContourList.size(); i++)
+	{
+		sum = sum.Add(aContourList[i]);
+	}
+
+	//divide by number of points to find average
+	Coords res = sum.Div(aContourList.size());
+
+	if (ANALYT_GRASP_MODE) //DEBUG
+	{
+		//make image
+		Mat centOfMassImage;
+		aContourImage.copyTo(centOfMassImage);
+		cvtColor(centOfMassImage, centOfMassImage, COLOR_GRAY2BGR);
+
+		//relative coordinates of pixels to draw
+		int xVals[17] = {0, 2,  2,  2,  1,  0, -1, -2, -2, -2, -2, -2, -1, 0, 1, 2, 2};
+		int yVals[17] = {0, 0, -1, -2, -2, -2, -2, -2, -1,  0,  1,  2,  2, 2, 2, 2, 1};
+
+		//drawing color
+		Vec3b color;
+		color.val[0] = 0;
+		color.val[1] = 0;
+		color.val[2] = 255;
+
+		//draw pixels to mark the COM
+		for (int i = 0; i < 17; i++)
+		{
+			centOfMassImage.at<Vec3b>(res.y + yVals[i], res.x + xVals[i]) = color;
+		}
+
+		//save image
+		imwrite("DebugFiles/AnalytGrasp_centOfMass.jpg", centOfMassImage);
+	}
+
+	return res;
 }
 
 void AnalytGrasp::FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aContourImage, vector<vector<int> > &aContourMatrix)

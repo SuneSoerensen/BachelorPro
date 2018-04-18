@@ -100,10 +100,8 @@
 
 #define SDH_FINGER_BASE_OFF_X 33.0 //mm
 #define SDH_FINGER_BASE_OFF_Y 19.0525 //mm
-<<<<<<< HEAD
-=======
 
 #define SDH_ANGLE_DIFF_FIRST 10.0 //deg
 
 #define PREGRASP_SCALE 30.0 //mm
->>>>>>> 8e01ec0975f592af6b1398e93c8187fdb9ca9a03
+
