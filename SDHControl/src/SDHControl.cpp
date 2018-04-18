@@ -180,8 +180,8 @@ double SDHControl::grasp(double fingerAX, double fingerAY, double fingerCX, doub
    isValidGrasp = false;
    isExpectedGrasp = false;
    //calc finger dist
-   double distA = fingerAX-SDH_FINGER_BASE_OFF_X;
-   double distC = fingerCX-SDH_FINGER_BASE_OFF_X;
+   double distA = abs(fingerAX)-SDH_FINGER_BASE_OFF_X;
+   double distC = abs(fingerCX)-SDH_FINGER_BASE_OFF_X;
 
    if(isPreGrasp)
    {
@@ -195,6 +195,11 @@ double SDHControl::grasp(double fingerAX, double fingerAY, double fingerCX, doub
 
    double xA = distA-FINGEROFFSET;
    double xC = distC-FINGEROFFSET;
+   if(SDHCONTROL_MODE)
+   {
+    cout << "\033[1;33m DEBUG: \033[0m" << "Finger A: dist = " << xA  << endl;
+     cout << "\033[1;33m DEBUG: \033[0m" << "Finger C: dist = " << xC << endl;
+   }
 
    //To make sure that for-loop is run first time, insert invalid y's:
    anglesA = calcFingerAngle(xA, 400.0);
@@ -224,7 +229,7 @@ double SDHControl::grasp(double fingerAX, double fingerAY, double fingerCX, doub
    }
 
    if(SDHCONTROL_MODE)
-     cout << "\033[1;33m DEBUG: \033[0m" << "Going to configuration: " << Q(7, -80, .80, 90, anglesA[0]*rad2deg, anglesA[1]*rad2deg, anglesC[0]*rad2deg, anglesC[1]*rad2deg) << endl;
+     cout << "\033[1;33m DEBUG: \033[0m" << "Going to configuration: " << Q(7, -80, -80, 90, anglesA[0]*rad2deg, anglesA[1]*rad2deg, anglesC[0]*rad2deg, anglesC[1]*rad2deg) << endl;
 
      //Then, go to target:
      goToQ(Q(7, -80*deg2rad, -80*deg2rad, 90*deg2rad, anglesA[0],anglesA[1], anglesC[0], anglesC[1]));
