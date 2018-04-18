@@ -25,7 +25,6 @@ USING_NAMESPACE_SDH
 using namespace rw::math;
 using namespace rw::common;
 using namespace rwhw;
-//using namespace rw::common;
 using namespace std;
 
 class SDHControl
@@ -39,8 +38,6 @@ public:
     //Constructor. Connects automatically via RS232:
     SDHControl(int port, unsigned long baudrate, double timeout);
 
-    void goToPreQ(Q aQ);
-
     //Go to any valid configuration:
     void goToQ(Q aQ);
 
@@ -53,13 +50,13 @@ public:
     //Check if connected to hand:
     bool isConnected();
 
-    //Grasp, based on distance for each finger and an angle between finger a and c:
+    //Grasp, based on coordinates for each contact point OR pre-grasp (each finger is 30 mm further out than actual grasp):
     double grasp(double fingerAX, double fingerAY, double fingerBX, double fingerBY, double fingerCX, double fingerCY, bool isPreGrasp);
 
     //Two-finger grasp (finger B moves to init and joint #2 is 90deg):
     //void grasp(double distA, double distC);
 
-    //Adjust velocity for SDH joints:
+    //Adjust velocity for SDH joints: TODO: delete this, as it is not used!
     void adjustVel(double joint0, double joint1, double joint2, double joint3, double joint4, double joint5, double joint6);
 
     ~SDHControl();
@@ -68,8 +65,8 @@ private:
     //Pointer to SDHDriver-object:
     SDHDriver *sdh;
 
-    //Init-configuration:
-    Q initQ = Q(7, -80*deg2rad, 80*deg2rad, 60*deg2rad, -80*deg2rad, 80*deg2rad, -80*deg2rad, 80*deg2rad);
+    //Init-configuration: TODO: delete, as it is moved directly into goToInit.
+    //Q initQ = Q(7, -80*deg2rad, 80*deg2rad, 60*deg2rad, -80*deg2rad, 80*deg2rad, -80*deg2rad, 80*deg2rad);
 
     //Reflects whether connected to hand or not:
     bool connected = false;
@@ -81,7 +78,8 @@ private:
     //Output: {dist, angle}
     vector<double> calcFingertipPos(double visDist, double anAngle);
 
-    //Inverse kinematics for a finger (output is {finger_base, finger_tip}):
+    //Inverse kinematics for a finger
+    //Output: {finger_base, finger_tip}:
     vector<double> calcFingerAngle(double x, double y);
 
     //Misc. checks (NOTE: all returns TRUE if input is not applicable for finger):
@@ -93,9 +91,15 @@ private:
     //Uses all above checks to verify if input angles are a valid configuration:
     bool checkSolution(vector<double> anglesA, vector<double> anglesB, vector<double> anglesC);
 
+    //Kinematics for finger (seen as 2-joint "arm", from the side):
     vector<double> calcFingerDist(double angleBase, double angleTop);
+
+    //Control if hand is grasping an object
+    //Output: true if the grasp is valid
     bool controlGrasp(double goalDistA, double goalDistB, double goalDistC);
-    bool controlGraspPlacment(double angleAC, double currDistA, double currDistB, double currDistC);
+
+    //Control if grasp is the intended grasp, using the triangle calculated in grasp():
+    bool controlGraspPlacement(double angleAC, double currDistA, double currDistB, double currDistC);
 
     //Same as above, but for two-finger grasps:
     bool checkSolution(vector<double> anglesA, vector<double> anglesC);
