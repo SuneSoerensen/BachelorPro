@@ -37,6 +37,8 @@ public:
     void moveRel(double anX, double aY, double aZ);
     void moveAbs(double anX, double aY, double aZ);
 
+    void setWristAngle(double anAngle);
+
     bool checkBounds(double x, double y, double z);
 
     void updateCurrToolPos();

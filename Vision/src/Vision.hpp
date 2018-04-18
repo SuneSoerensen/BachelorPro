@@ -39,4 +39,3 @@ private:
 	Coords offset;
 	Coords scaleFactor;
 };
-
