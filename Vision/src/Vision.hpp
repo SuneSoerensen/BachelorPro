@@ -9,10 +9,13 @@ class Vision //Vision
 public:
 	Vision();
 
-	Coords GetObjCoords();
 	void Calib(); //always call "Calib()" at least once before doing anything else!!!
 
-	/*DEBUG*/void RunFindGrasp();
+	void CalcGrasp(); //call this before the other grasp related functions!
+	Coords GetGraspFocus();
+	vector<Coords> GetGraspPoints();
+
+	Coords GetObjCoords(); //this is not meant for grasping!
 
 	~Vision();
 
@@ -31,7 +34,7 @@ private:
 	vector<vector<int> > contourMatrix; //relates coordinates of contour points to indices in the list (indices are offset by +1!!!)
 
 	//grasping
-	vector<Coords> graspPointsList;
+	Grasp grasp;
 
 	//calibration
 	Coords offset;

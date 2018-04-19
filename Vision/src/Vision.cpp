@@ -5,15 +5,6 @@ Vision::Vision()
 {
 }
 
-Coords Vision::GetObjCoords()
-{
-	//get new data
-	TIAFC::DoItAll(cropImage, contourImage, contourList, contourMatrix);
-
-	//return the objects COM in real coordinates
-	return GetRealCoords(AnalytGrasp::FindCOM(contourList, contourImage));
-}
-
 void Vision::Calib()
 {
 	//get new data
@@ -46,9 +37,30 @@ void Vision::Calib()
 	scaleFactor = globScale.Div(locScale); //(mm*CALC_FACTOR)/pixels
 }
 
-void Vision::RunFindGrasp()
+void Vision::CalcGrasp()
 {
-	AnalytGrasp::FindGrasp(contourImage, contourList, contourMatrix);
+	//get new data
+	TIAFC::DoItAll(cropImage, contourImage, contourList, contourMatrix);
+
+	grasp = AnalytGrasp::FindGrasp(contourImage, contourList, contourMatrix);
+}
+
+Coords Vision::GetGraspFocus()
+{
+	//return the grasps focus in real coordinates
+	return GetRealCoords(grasp.focus);
+}
+
+vector<Coords> Vision::GetGraspPoints()
+{
+	//return the grasps points in real coordinates
+	return {GetRealCoords(grasp.points[0]), GetRealCoords(grasp.points[1]), GetRealCoords(grasp.points[2])};
+}
+
+Coords Vision::GetObjCoords()
+{
+	//return the objects COM in real coordinates
+	return GetRealCoords(AnalytGrasp::FindCOM(contourList, contourImage));
 }
 
 Vision::~Vision()

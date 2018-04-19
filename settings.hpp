@@ -9,7 +9,7 @@
 //===========
 //   TIAFC
 //===========
-#define TIAFC_MODE		1	// 0 = normal, 1 = debug
+#define TIAFC_MODE		1	// 0 = normal, 1 = info
 
 //camera settings (taking an image):
 #define CAMERA			0	// 0 = default camera
@@ -30,7 +30,7 @@
 //============
 //   Vision
 //============
-#define VISION_MODE		1	// 0 = normal, 1 = debug
+#define VISION_MODE		1	// 0 = normal, 1 = info
 
 //for calibration (pixel-coords to real-coords):
 #define CALC_FACTOR		1000	//determines precision in intermediate results and calculations
@@ -49,10 +49,13 @@
 //=================
 //   AnalytGrasp
 //=================
-#define ANALYT_GRASP_MODE	1	// 0 = normal, 1 = debug
+#define ANALYT_GRASP_MODE	1	// 0 = normal, 1 = info
 
-#define MAX_THREE_FING_ANG	2.35 //radians (~135 deg)
+#define MIN_P1_ANG		0.17 //radians (~10 deg)
+#define MAX_P1_ANG		2.62 //radians (~150 deg)
 #define MAX_DEV_ANG		0.17 //radians (~10 deg)
+
+#define MAX_P1_INTERSEC_DIST	10.0 //pixels
 
 //===============
 //   URControl
