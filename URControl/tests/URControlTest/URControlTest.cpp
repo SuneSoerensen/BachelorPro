@@ -71,6 +71,7 @@ int main()
       {
         cout << "Moving..." << endl;
         ur5.moveRel(x,y,z);
+        ur5.printcurrToolPos();
 
       }
       catch(const char e[])

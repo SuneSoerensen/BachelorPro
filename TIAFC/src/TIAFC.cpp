@@ -4,10 +4,10 @@
 void TIAFC::DoItAll(Mat &aCropImage, Mat &aContourImage, vector<Coords> &aContourList, vector<vector<int> > &aContourMatrix)
 {
 	TakeImage(aCropImage);
-	
+
 	Mat objectImage;
 	FindObject(aCropImage, objectImage);
-	
+
 	FindContour(objectImage, aContourImage, aContourList, aContourMatrix);
 }
 
@@ -26,13 +26,13 @@ void TIAFC::TakeImage(Mat &aCropImage)
 
 	//get frame
 	Mat frame;
-	/*for (int i = 0; i < FRAMES_TO_GET ; i++) //comment this out when the following debug is commented in
+	for (int i = 0; i < FRAMES_TO_GET ; i++) //comment this out when the following debug is commented in
 	{
 		cap.read(frame);
-	}*/
+	}
 
-	/*DEBUG*/frame = imread("TestImg/box.jpg");
-	
+	///*DEBUG*/frame = imread("TestImg/box.jpg");
+
 	if (!frame.data) //check if empty
 		throw("[TIAFC::TakeImage()]: Couldn't take image!");
 
@@ -86,7 +86,7 @@ void TIAFC::FindObject(Mat &aCropImage, Mat &anObjectImage)
 	ThereCanOnlyBeOne(thresImage, 1);
 	if (TIAFC_MODE) //DEBUG
 		imwrite("DebugFiles/TIAFC_img_proc_7(outliers).jpg", thresImage);
-	
+
 	//save
 	thresImage.copyTo(anObjectImage);
 }
@@ -110,7 +110,7 @@ void TIAFC::ThereCanOnlyBeOne(Mat &aThresImage, bool mode)
 				//make a new blob
 				aThresImage.at<uchar>(i, j) = 255 - color; //remove the point
 				vector<Coords> temp = {Coords(j, i)}; //add it to the list
-				
+
 				for (int k = 0; k < temp.size(); k++) //for all points part of this blob
 				{
 					CatchNeighbours(aThresImage, color, temp[k], temp);
@@ -213,7 +213,7 @@ void TIAFC::FindContour(Mat &objectImage, Mat &aContourImage, vector<Coords> &aC
 		nextPoint = FindNextNeighbour(objectImage, aContourMatrix, aContourList[index - 1]);
 
 		if (nextPoint.Eq(firstPoint)) //if we return to start
-			break;			
+			break;
 
 		//add it to the contour
 		aContourList.push_back(nextPoint);
@@ -338,4 +338,3 @@ TIAFC::TIAFC()
 TIAFC::~TIAFC()
 {
 }
-

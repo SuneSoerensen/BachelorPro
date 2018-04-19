@@ -1,5 +1,6 @@
 #include <iostream>
 #include "URControl.hpp"
+#include "SDHControl.hpp"
 #include "Vision.hpp"
 #include <string>
 #include <unistd.h>
@@ -24,6 +25,13 @@ int main()
     *****************/
     Vision cp;
 
+    /******************
+    * SDHControl setup
+    ******************/
+    SDHControl hand(0, 115200, 0.5);
+    double SDHheight;
+
+
     /*****************
     *  Application
     *****************/
@@ -41,7 +49,7 @@ int main()
 
     while(true)
     {
-      cout << "Calibrate, move, home or init (c/m/h/i)?" << endl;
+      cout << "Calibrate, move and grasp, home or init (c/m/h/i)?" << endl;
       cin >> dummy;
 
       if(dummy == "c")
@@ -58,10 +66,15 @@ int main()
 
         cout << "Moving to init" << endl;
         ur5.moveToInit();
-        //cout << "Moving to object with moveAbs(" << objCoords.x+REAL_TO_UR_OFFSET_X << " ; " << objCoords.y+REAL_TO_UR_OFFSET_Y << ";" <<  310 << ")"<< endl;
-        //ur5.moveAbs(objCoords.x+REAL_TO_UR_OFFSET_X, objCoords.y+REAL_TO_UR_OFFSET_Y, 310);
+        cout << "Hand is going to init" << endl;
+        hand.goToInit();
+        cout << "Hand is going to pre-grasp conf." << endl;
+        //Yellow plastic pot:
+        SDHheight = hand.grasp(60.62, 35.0, 0.0, -70, -60.62, 35.0, true) - 433.02; //Pregrasp and save height
+        cout << "Grasping for real" << endl;
+        ur5.moveRel(objCoords.x, objCoords.y, SDHheight);
+        hand.grasp(60.62, 35.0, 0.0, -70, -60.62, 35.0, false); //Grasp
         cout << "Moving to target" << endl;
-        ur5.moveRel(objCoords.x, objCoords.y, -100);
       }
       else if(dummy == "h")
       {

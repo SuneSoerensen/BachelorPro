@@ -51,8 +51,13 @@ int main()
 
     //Rotate vectors:
     handLocalGraspPoints[0].x = cos(wristRotation) * handLocalGraspPoints[0].x - sin(wristRotation) * handLocalGraspPoints[0].y;
-    handLocalGraspPoints[1].x = cos(wristRotation) * handLocalGraspPoints[0].x - sin(wristRotation) * handLocalGraspPoints[0].y;
-    handLocalGraspPoints[2].x = cos(wristRotation) * handLocalGraspPoints[0].x - sin(wristRotation) * handLocalGraspPoints[0].y;
+    handLocalGraspPoints[0].y = sin(wristRotation) * handLocalGraspPoints[0].x + cos(wristRotation) * handLocalGraspPoints[0].y;
+
+    handLocalGraspPoints[1].x = cos(wristRotation) * handLocalGraspPoints[1].x - sin(wristRotation) * handLocalGraspPoints[1].y;
+    handLocalGraspPoints[1].y = sin(wristRotation) * handLocalGraspPoints[1].x + cos(wristRotation) * handLocalGraspPoints[1].y;
+
+    handLocalGraspPoints[2].x = cos(wristRotation) * handLocalGraspPoints[2].x - sin(wristRotation) * handLocalGraspPoints[2].y;
+    handLocalGraspPoints[2].y = sin(wristRotation) * handLocalGraspPoints[2].x + cos(wristRotation) * handLocalGraspPoints[2].y;
 
     //Convert to angle of wrist (angle of B - 90 deg)
     wristRotation -= 90.0*deg2rad;
@@ -62,7 +67,10 @@ int main()
     //Find angle to rotate with, such that y-coord. of finger A is ~0:
     wristRotation = - atan2(handLocalGraspPoints[0].y, handLocalGraspPoints[0].x);
     handLocalGraspPoints[0].x = cos(wristRotation) * handLocalGraspPoints[0].x - sin(wristRotation) * handLocalGraspPoints[0].y;
-    handLocalGraspPoints[1].x = cos(wristRotation) * handLocalGraspPoints[0].x - sin(wristRotation) * handLocalGraspPoints[0].y;
+    handLocalGraspPoints[0].x = sin(wristRotation) * handLocalGraspPoints[0].x + cos(wristRotation) * handLocalGraspPoints[0].y;
+
+    handLocalGraspPoints[1].x = cos(wristRotation) * handLocalGraspPoints[1].x - sin(wristRotation) * handLocalGraspPoints[1].y;
+    handLocalGraspPoints[1].x = sin(wristRotation) * handLocalGraspPoints[1].x + cos(wristRotation) * handLocalGraspPoints[1].y;
 
     //Convert to angle of wrist
     wristRotation -= 90*deg2rad - wristRotation;
