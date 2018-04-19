@@ -183,10 +183,21 @@ void URControl::moveAbs(double anX, double aY, double aZ)
 
 void URControl::setWristAngle(double anAngle)
 {
-  if(abs(anAngle) < 360.0*deg2rad)
+  if(abs(anAngle) > 360.0*deg2rad)
     throw("[URControl::setWristAngle]: Invalid angle (|angle| > 360 deg)!");
 
-  ofstream out("rotateWristScript", ofstream::out);
+  ofstream out("rotateWristScript.txt", ofstream::out);
+
+  out << "HOST=" << ip << "\n" << "PORT=" << port << "\n" << "def rotWrist():\n";
+  out << "\t" << "pos = get_joint_positions()" << "\n";
+  out << "\t" << "pos[5] =" << anAngle << "\n";
+  out << "\t" << "textmsg(\"Rotating wrist\")" << "\n";
+  out << "\t" << "movej(pos, 0.1, 0.1, 5, 0)" << "\n";
+  out << "end\n";
+
+  out.close();
+
+  sendScript("rotateWristScript.txt");
 }
 
 bool URControl::checkBounds(double x, double y, double z)

@@ -21,7 +21,7 @@ int main()
 
   URControl ur5(ip, port);
 
-  ur5.connect();
+  //ur5.connect();
 
   string command;
 
