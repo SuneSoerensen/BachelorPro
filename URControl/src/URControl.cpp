@@ -11,7 +11,6 @@
 #include <unistd.h>
 #include <rwhw/universalrobots/UniversalRobotsData.hpp>
 #include <rw/math/Vector3D.hpp>
-#include "settings.hpp"
 
 USE_ROBWORK_NAMESPACE
 
@@ -53,47 +52,48 @@ void URControl::sendScript(string fileName)
   ur.sendScriptFile(fileName);
   if(URCONTROL_MODE)
   {
-    cout << "Script sent!" << endl;
+    cout << "\033[1;33m DEBUG: \033[0m" << "Script \"" << fileName << "\" sent!" << endl;
   }
 }
 
 void URControl::moveToInit()
 {
-  sendScript("goToInit.txt");
-  haveBeenToInit = 1;
-  usleep(5100000);
-  //updateCurrToolPos();
-  /*currToolPos[0] = -0.1087;
-  currToolPos[1] = -0.48537;
-  currToolPos[2] =  0.43305;
-  currToolPos[3] =  0.0;
-  currToolPos[4] = -3.1409;
-  currToolPos[5] = 0.0;*/
-  /*currToolPos[0] = -0.4199;
-  currToolPos[1] = -0.2665;
-  currToolPos[2] =  0.43305;
-  currToolPos[3] =  -1.1997;
-  currToolPos[4] = -2.9019;
-  currToolPos[5] = 0.0;*/
+  if(state != STATE_INIT)
+  {
+    string fileName = getenv("URCON_ROOT");
+    fileName += "goToInit.txt";
+    sendScript(fileName);
+    haveBeenToInit = 1;
+    state = STATE_INIT;
+    usleep(5100000);
 
-  currToolPos[0]= -0.3678;
-  currToolPos[1] = -0.3348;
-  currToolPos[2] =  0.43302;
-  currToolPos[3] = -0.945;
-  currToolPos[4] = -2.9945;
-  currToolPos[5] = 0.0;
+    currToolPos[0] = INIT_POS_X;
+    currToolPos[1] = INIT_POS_Y;
+    currToolPos[2] = INIT_POS_Z;
+    currToolPos[3] = INIT_POS_RX;
+    currToolPos[4] = INIT_POS_RY;
+    currToolPos[5] = INIT_POS_RZ;
+  }
 }
 
 void URControl::moveToHome()
 {
-  sendScript("goToHome.txt");
-  haveBeenToInit = 0;
-  usleep(5100000);
-  //updateCurrToolPos();
+  if(state != STATE_HOME)
+  {
+    string fileName = getenv("URCON_ROOT");
+    fileName += "goToHome.txt";
+    sendScript(fileName);
+    haveBeenToInit = 0;
+    state = STATE_HOME;
+    usleep(5100000);
+  }
 }
 
 void URControl::moveRel(double anX, double aY, double aZ)
 {
+  //Declare that UR is not in home or init
+  state = STATE_OTHER;
+
   //Convert from mm to m:
   double x = anX/1000.0;
   double y = aY/1000.0;
@@ -108,7 +108,7 @@ void URControl::moveRel(double anX, double aY, double aZ)
   double absY = currToolPos[1] + rotY;
 
   if(URCONTROL_MODE)
-    cout << "absX [mm] = " << absX*1000.0 << " absY [mm] = " << absY*1000.0 << endl;
+    cout << "\033[1;33m DEBUG: \033[0m" << "absX [mm] = " << absX*1000.0 << " absY [mm] = " << absY*1000.0 << endl;
 
   //Security check:
   if(!haveBeenToInit)
@@ -120,7 +120,7 @@ void URControl::moveRel(double anX, double aY, double aZ)
   if(absX < UR_MIN_X || absX > UR_MAX_X)
   {
     if(URCONTROL_MODE)
-      cout << "absX = " << absX << endl;
+      cout << "\033[1;33m DEBUG: \033[0m" << "absX = " << absX << endl;
 
     throw("[URControl::moveRel]: New x-coordinates are out of bounds!");
   }
@@ -163,21 +163,16 @@ void URControl::moveRel(double anX, double aY, double aZ)
   //Send scriptfile to peform movement:
   sendScript(fileName);
 
-  if(URCONTROL_MODE)
-  {
-    cout << "Sent scriptfile: \"" << fileName << "\"!" << endl;
-  }
-
   //Update current tool position:
-  currToolPos[0] += x;
-  currToolPos[1] += y;
+  currToolPos[0] = absX;
+  currToolPos[1] = absY;
   currToolPos[2] += z;
 
   usleep((MOVTIME*1000000)+100000); //Wait for movement to finish (MOVTIME) + 100000 µs (0.1 s)
   //updateCurrToolPos();
 }
 
-void URControl::updateCurrToolPos()
+/*void URControl::updateCurrToolPos()
 {
   UniversalRobotsData URdata;
   math::Vector3D<> toolPos;
@@ -188,25 +183,28 @@ void URControl::updateCurrToolPos()
     toolPos = URdata.toolPosition;
     currToolPos[0] = toolPos[0];
     currToolPos[1] = toolPos[1];
-    currToolPos[2] = toolPos[2];
+    currToolPos[2] = toolPos[2];*/
 
-    /*DEBUG*/ cout << "Toolpos: " << toolPos[0] << " " << toolPos[1] << " " << toolPos[2] << endl;
-    /*DEBUG*/ cout << "masterTemperature: " << URdata.masterTemperature << endl;
-  }
+    ///*DEBUG*/ cout << "Toolpos: " << toolPos[0] << " " << toolPos[1] << " " << toolPos[2] << endl;
+    ///*DEBUG*/ cout << "masterTemperature: " << URdata.masterTemperature << endl;
+/*  }
   else
   {
     cout << "{WARNING} [URControl::updateCurrToolPos()]: UR had no data!" << endl;
   }
-}
+}*/
 
-void URControl::moveAbs(double anX, double aY, double aZ)
+/*void URControl::moveAbs(double anX, double aY, double aZ)
 {
+  //Declare that UR is not in home or init
+  state = STATE_OTHER;
+
   double relX = anX - currToolPos[0]*1000.0;
   double relY = aY - currToolPos[1]*1000.0;
   double relZ = aZ - currToolPos[2]*1000.0;
 
   moveRel(relX, relY, relZ);
-}
+}*/
 
 void URControl::setWristAngle(double anAngle)
 {

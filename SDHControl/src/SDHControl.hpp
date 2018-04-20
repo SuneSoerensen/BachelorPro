@@ -53,7 +53,7 @@ public:
     //Grasp, based on coordinates for each contact point OR pre-grasp (each finger is 30 mm further out than actual grasp):
     double grasp(double fingerAX, double fingerAY, double fingerBX, double fingerBY, double fingerCX, double fingerCY, bool isPreGrasp);
 
-    //Two-finger grasp (finger B moves to away and joint #2 is 90deg):
+    //Two-finger grasp (finger B moves away and joint #2 is 90deg):
     double grasp(double fingerAX, double fingerAY, double fingerCX, double fingerCY, bool isPreGrasp);
 
     bool getIsValidGrasp();
@@ -67,9 +67,6 @@ public:
 private:
     //Pointer to SDHDriver-object:
     SDHDriver *sdh;
-
-    //Init-configuration: TODO: delete, as it is moved directly into goToInit.
-    //Q initQ = Q(7, -80*deg2rad, 80*deg2rad, 60*deg2rad, -80*deg2rad, 80*deg2rad, -80*deg2rad, 80*deg2rad);
 
     //Reflects whether connected to hand or not:
     bool connected = false;

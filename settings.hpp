@@ -18,9 +18,9 @@
 #define FRAMES_TO_GET	14	// min 7, according to initial tests
 
 //crop settings (taking an image):
-#define CROP_TOP		100 //(for tests: 100, 500, 400, 1000)
-#define CROP_BOTTOM		500
-#define CROP_LEFT		400
+#define CROP_TOP		100  //(for tests: 100, 500, 400, 1000)
+#define CROP_BOTTOM		695
+#define CROP_LEFT		140
 #define CROP_RIGHT		1000
 
 //for thresholding:
@@ -69,19 +69,29 @@
 #define MOVTIME			5
 #define BLENDR			0
 
-#define UR_MAX_X		3.0
-#define UR_MIN_X		-3.0
-#define UR_MAX_Y		3.0
-#define UR_MIN_Y		-3.0
-#define UR_MAX_Z		0.700
-#define UR_MIN_Z		0.300
-#define R_SQUARED		0.8*0.8
+#define UR_MAX_X		-0.15569 //m
+#define UR_MIN_X		-0.54456 //m
+#define UR_MAX_Y		-0.19335 //m
+#define UR_MIN_Y		-0.47619 //m
+#define UR_MAX_Z		 0.600 //m
+#define UR_MIN_Z		 0.300 //m
+#define R_SQUARED		 0.8*0.8
 
 #define REAL_TO_UR_OFFSET_X	-367.8
 #define REAL_TO_UR_OFFSET_Y	-334.8
 
 #define OFFSET_ANGLE -45.0*deg2rad // = -45 deg (because of new setup)
-//#define OFFSET_ANGLE -90.0*deg2rad // = -45 deg (because of new setup)
+
+#define INIT_POS_X  -0.3678 //m
+#define INIT_POS_Y  -0.3348 //m
+#define INIT_POS_Z   0.43302 //m
+#define INIT_POS_RX -0.945 //rad
+#define INIT_POS_RY -2.9945 //rad
+#define INIT_POS_RZ  0.0 //rad
+
+#define STATE_HOME  0
+#define STATE_INIT  1
+#define STATE_OTHER 2
 
 //===============
 //   SDHControl
@@ -111,4 +121,3 @@
 #define SDH_ANGLE_DIFF_FIRST 10.0 //deg
 
 #define PREGRASP_SCALE 30.0 //mm
-

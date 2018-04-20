@@ -56,7 +56,10 @@ void SDHControl::goToQ(Q aQ)
 void SDHControl::goToInit()
 {
   if(connected)
+  {
     sdh->moveCmd(Q(7, -80*deg2rad, 80*deg2rad, 60*deg2rad, -80*deg2rad, 80*deg2rad, -80*deg2rad, 80*deg2rad), true);
+    fullStop();
+  }
   else
     throw("[SDHControl::goToInit]: SDH is not connected!");
 }
@@ -179,6 +182,7 @@ double SDHControl::grasp(double fingerAX, double fingerAY, double fingerCX, doub
    //reset grasp checks
    isValidGrasp = false;
    isExpectedGrasp = false;
+
    //calc finger dist
    double distA = abs(fingerAX)-SDH_FINGER_BASE_OFF_X;
    double distC = abs(fingerCX)-SDH_FINGER_BASE_OFF_X;
@@ -195,6 +199,7 @@ double SDHControl::grasp(double fingerAX, double fingerAY, double fingerCX, doub
 
    double xA = distA;
    double xC = distC;
+
    if(SDHCONTROL_MODE)
    {
     cout << "\033[1;33m DEBUG: \033[0m" << "Finger A: dist = " << xA  << endl;
@@ -242,8 +247,6 @@ double SDHControl::grasp(double fingerAX, double fingerAY, double fingerCX, doub
      return y + WRIST_HEIGHT + TARGET_Z + SEPERATOR_HEIGHT;
 
 }
-
-
 
 bool SDHControl::getIsValidGrasp()
 {

@@ -13,6 +13,7 @@
 #include <string>
 #include <rw/rw.hpp>
 #include <rwhw/universalrobots/URCallBackInterface.hpp>
+#include "settings.hpp"
 
 
 USE_ROBWORK_NAMESPACE
@@ -35,27 +36,27 @@ public:
     void moveToInit();
     void moveToHome();
     void moveRel(double anX, double aY, double aZ);
-    void moveAbs(double anX, double aY, double aZ);
+    //void moveAbs(double anX, double aY, double aZ); //TODO: delete if not used
 
     void setWristAngle(double anAngle);
 
     bool checkBounds(double x, double y, double z);
 
-    void updateCurrToolPos();
+    //void updateCurrToolPos(); //TODO: delete eventually
 
     //Helpful debug function:
     void printcurrToolPos();
 
     ~URControl();
 private:
-  rwhw::URPrimaryInterface ur;
+  /*rwhw::*/URPrimaryInterface ur;
   int port;
   string ip;
   bool haveBeenToInit;
-  //double currToolPos[6] = {-0.1087, -0.48537, 0.43305, 0.0, -3.1409, 0.0};
-  //double currToolPos[6] = {-0.4199, -0.2665, 0.43305, -1.1997, -2.9019, 0.0};
-  double currToolPos[6] = {-0.3678, -0.3348, 0.43302, -0.945, -2.9945, 0.0};
+  double currToolPos[6] = {INIT_POS_X, INIT_POS_Y, INIT_POS_Z, INIT_POS_RX, INIT_POS_RY, INIT_POS_RZ};
   int numOfMoves = 0; //DEBUG: for saving all move scripts
+
+  int state = STATE_OTHER;
 
 };
 
