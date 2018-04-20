@@ -71,10 +71,20 @@ int main()
         cout << "Hand is going to pre-grasp conf." << endl;
         //Yellow plastic pot:
         SDHheight = hand.grasp(60.62, 35.0, 0.0, -70, -60.62, 35.0, true) - 433.02; //Pregrasp and save height
-        cout << "Grasping for real" << endl;
-        ur5.moveRel(objCoords.x, objCoords.y, SDHheight);
-        hand.grasp(60.62, 35.0, 0.0, -70, -60.62, 35.0, false); //Grasp
         cout << "Moving to target" << endl;
+        ur5.moveRel(objCoords.x, objCoords.y, 0.0);
+        ur5.moveRel(0.0, 0.0, SDHheight);
+        cout << "Grasping for real" << endl;
+        hand.grasp(60.62, 35.0, 0.0, -70, -60.62, 35.0, false); //Grasp
+        if(hand.getIsValidGrasp())
+        {
+          ur5.moveToInit();
+          hand.goToInit();
+        }
+        else
+        {
+          hand.fullStop();
+        }
       }
       else if(dummy == "h")
       {

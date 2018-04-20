@@ -1,7 +1,0 @@
-HOST = 192.168.100.4
-PORT = 30002
-def goHome():
-  qHome = [-2.356,-1.57,0,-1.57, 0, 0]
-  movej(qHome, 0.1, 0.1, 5, 0)
-  textmsg("Moved to qHome")
-end

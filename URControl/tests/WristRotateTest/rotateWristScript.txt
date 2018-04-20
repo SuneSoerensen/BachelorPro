@@ -1,0 +1,8 @@
+HOST=192.168.100.4
+PORT=30002
+def rotWrist():
+	pos = get_joint_positions()
+	pos[5] =-1.91986
+	textmsg("Rotating wrist")
+	movej(pos, 0.1, 0.1, 5, 0)
+end

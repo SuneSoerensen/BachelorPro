@@ -18,10 +18,10 @@
 #define FRAMES_TO_GET		14	// min 7, according to initial tests
 
 //crop settings (taking an image):
-#define CROP_TOP		0
-#define CROP_BOTTOM	600
-#define CROP_LEFT		200
-#define CROP_RIGHT		950
+#define CROP_TOP		100
+#define CROP_BOTTOM	695
+#define CROP_LEFT		140
+#define CROP_RIGHT	1000
 
 //for thresholding:
 #define THRESHOLDING_THRES	200 	//should be between the intensities of the background and the object
@@ -64,13 +64,13 @@
 #define MOVTIME			5
 #define BLENDR			0
 
-#define UR_MAX_X		3.0
-#define UR_MIN_X		-3.0
-#define UR_MAX_Y		3.0
-#define UR_MIN_Y		-3.0
-#define UR_MAX_Z		0.700
-#define UR_MIN_Z		0.300
-#define R_SQUARED		0.8*0.8
+#define UR_MAX_X		-0.15569 //m
+#define UR_MIN_X		-0.54456 //m
+#define UR_MAX_Y		-0.19335 //m
+#define UR_MIN_Y		-0.47619 //m
+#define UR_MAX_Z		 0.600 //m
+#define UR_MIN_Z		 0.300 //m
+#define R_SQUARED		 0.8*0.8
 
 #define REAL_TO_UR_OFFSET_X	-367.8
 #define REAL_TO_UR_OFFSET_Y	-334.8

@@ -11,7 +11,6 @@
 #include <unistd.h>
 #include <rwhw/universalrobots/UniversalRobotsData.hpp>
 #include <rw/math/Vector3D.hpp>
-#include "settings.hpp"
 
 USE_ROBWORK_NAMESPACE
 
@@ -166,8 +165,8 @@ void URControl::moveRel(double anX, double aY, double aZ)
   }
 
   //Update current tool position:
-  currToolPos[0] += x;
-  currToolPos[1] += y;
+  currToolPos[0] = absX;
+  currToolPos[1] = absY;
   currToolPos[2] += z;
 
   usleep((MOVTIME*1000000)+100000); //Wait for movement to finish (MOVTIME) + 100000 µs (0.1 s)

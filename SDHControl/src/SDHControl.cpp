@@ -56,7 +56,10 @@ void SDHControl::goToQ(Q aQ)
 void SDHControl::goToInit()
 {
   if(connected)
+  {
     sdh->moveCmd(Q(7, -80*deg2rad, 80*deg2rad, 60*deg2rad, -80*deg2rad, 80*deg2rad, -80*deg2rad, 80*deg2rad), true);
+    fullStop();
+  }
   else
     throw("[SDHControl::goToInit]: SDH is not connected!");
 }

@@ -13,6 +13,7 @@
 #include <string>
 #include <rw/rw.hpp>
 #include <rwhw/universalrobots/URCallBackInterface.hpp>
+#include "settings.hpp"
 
 
 USE_ROBWORK_NAMESPACE
@@ -55,7 +56,7 @@ private:
   double currToolPos[6] = {INIT_POS_X, INIT_POS_Y, INIT_POS_Z, INIT_POS_RX, INIT_POS_RY, INIT_POS_RZ};
   int numOfMoves = 0; //DEBUG: for saving all move scripts
 
-  int state;
+  int state = STATE_OTHER;
 
 };
 
