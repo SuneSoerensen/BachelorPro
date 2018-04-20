@@ -193,8 +193,8 @@ double SDHControl::grasp(double fingerAX, double fingerAY, double fingerCX, doub
    vector<double> anglesA;
    vector<double> anglesC;
 
-   double xA = distA-FINGEROFFSET;
-   double xC = distC-FINGEROFFSET;
+   double xA = distA;
+   double xC = distC;
    if(SDHCONTROL_MODE)
    {
     cout << "\033[1;33m DEBUG: \033[0m" << "Finger A: dist = " << xA  << endl;
