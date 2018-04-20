@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
 # The name of the project.
-PROJECT(ArmCamTest)
+PROJECT(ArmCamHandTest)
 
 SET(ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -49,10 +49,9 @@ add_library(AnalytGrasp $ENV{ANALYT_ROOT}/AnalytGrasp.cpp)
 
 
 # And now we add any targets that we want
-add_executable( source source.cpp )
+add_executable( ArmCamHandTest ArmCamHandTest.cpp $ENV{SDHCON_ROOT}/sdhoptions.cpp)
 
 #Link all libraries and classes
-
 target_link_libraries(URControl ${ROBWORK_LIBRARIES})
 target_link_libraries(URControl ${ROBWORKHARDWARE_LIBRARIES})
 
@@ -65,10 +64,14 @@ target_link_libraries(TIAFC Coords)
 target_link_libraries(Vision TIAFC)
 target_link_libraries(Vision AnalytGrasp)
 
-target_link_libraries(URControl ${ROBWORK_LIBRARIES})
-target_link_libraries(URControl ${ROBWORKHARDWARE_LIBRARIES})
+target_link_libraries(SDHControl ${ROBWORK_LIBRARIES})
+target_link_libraries(SDHControl ${ROBWORKHARDWARE_LIBRARIES})
+target_link_libraries(SDHControl ${SDH_LIBRARY})
+target_link_libraries(SDHControl ${PEAK_LIBRARY})
+target_link_libraries(SDHControl rwhw_sdh)
 
-target_link_libraries(source ${ROBWORK_LIBRARIES})
-target_link_libraries(source ${ROBWORKHARDWARE_LIBRARIES})
-target_link_libraries(source URControl)
-target_link_libraries(source Vision )
+target_link_libraries(ArmCamHandTest ${ROBWORK_LIBRARIES})
+target_link_libraries(ArmCamHandTest ${ROBWORKHARDWARE_LIBRARIES})
+target_link_libraries(ArmCamHandTest URControl)
+target_link_libraries(ArmCamHandTest Vision )
+target_link_libraries(ArmCamHandTest SDHControl)

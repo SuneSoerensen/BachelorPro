@@ -52,7 +52,9 @@ private:
   int port;
   string ip;
   bool haveBeenToInit;
-  double currToolPos[6] = {-0.1087, -0.48537, 0.43305, 0.0, -3.1409, 0.0};
+  //double currToolPos[6] = {-0.1087, -0.48537, 0.43305, 0.0, -3.1409, 0.0};
+  //double currToolPos[6] = {-0.4199, -0.2665, 0.43305, -1.1997, -2.9019, 0.0};
+  double currToolPos[6] = {-0.3678, -0.3348, 0.43302, -0.945, -2.9945, 0.0};
   int numOfMoves = 0; //DEBUG: for saving all move scripts
 
 };

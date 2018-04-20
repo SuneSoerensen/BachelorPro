@@ -12,19 +12,19 @@
 #define TIAFC_MODE		1	// 0 = normal, 1 = info
 
 //camera settings (taking an image):
-#define CAMERA			0	// 0 = default camera
-#define CAM_RES_WIDTH		1280
-#define CAM_RES_HEIGHT		720
-#define FRAMES_TO_GET		14	// min 7, according to initial tests
+#define CAMERA			1	// 0 = default camera
+#define CAM_RES_WIDTH	1280
+#define CAM_RES_HEIGHT	720
+#define FRAMES_TO_GET	14	// min 7, according to initial tests
 
 //crop settings (taking an image):
-#define CROP_TOP		150
-#define CROP_BOTTOM		500
-#define CROP_LEFT		500
+#define CROP_TOP		0
+#define CROP_BOTTOM		600
+#define CROP_LEFT		200
 #define CROP_RIGHT		950
 
 //for thresholding:
-#define THRESHOLDING_THRES	110 	//should be between the intensities of the background and the object
+#define THRESHOLDING_THRES	200 	//should be between the intensities of the background and the object
 #define THRESHOLDING_MODE	0	//0 = light object on dark background, 1 = dark object on light background
 
 //============
@@ -34,8 +34,8 @@
 
 //for calibration (pixel-coords to real-coords):
 #define CALC_FACTOR		1000	//determines precision in intermediate results and calculations
-#define REAL_WIDTH		48	//mm
-#define REAL_HEIGHT		48	//mm
+#define REAL_WIDTH		79.0	//mm
+#define REAL_HEIGHT		79.0	//mm
 #define GLOB_X_DIR		1	//global x-direction in relation to the cameras x-direction
 #define GLOB_Y_DIR		-1	//global y-direction in relation to the cameras y-direction
 
@@ -60,23 +60,26 @@
 //===============
 //   URControl
 //===============
-#define URCONTROL_MODE		0 //0=standard 1=debug
+#define URCONTROL_MODE	1 //0=standard 1=debug
 
 #define ACC			0.1
 #define VEL			0.1
 #define MOVTIME			5
 #define BLENDR			0
 
-#define UR_MAX_X		0.400
-#define UR_MIN_X		-0.308
-#define UR_MAX_Y		-0.285
-#define UR_MIN_Y		-0.785
+#define UR_MAX_X		3.0
+#define UR_MIN_X		-3.0
+#define UR_MAX_Y		3.0
+#define UR_MIN_Y		-3.0
 #define UR_MAX_Z		0.700
-#define UR_MIN_Z		0.305
+#define UR_MIN_Z		0.300
 #define R_SQUARED		0.8*0.8
 
-#define REAL_TO_UR_OFFSET_X	-108.7
-#define REAL_TO_UR_OFFSET_Y	-485.37
+#define REAL_TO_UR_OFFSET_X	-367.8
+#define REAL_TO_UR_OFFSET_Y	-334.8
+
+#define OFFSET_ANGLE -45.0*deg2rad // = -45 deg (because of new setup)
+//#define OFFSET_ANGLE -90.0*deg2rad // = -45 deg (because of new setup)
 
 //===============
 //   SDHControl
@@ -92,8 +95,7 @@
 #define WRIST_HEIGHT 98.0 //mm
 #define SEPERATOR_HEIGHT 23 //mm
 
-#define TARGET_Z 100.0 //mm above plate
-
+#define TARGET_Z 80.0 //mm above plate
 
 #define SDH_ANGLE_THRESH 10.0*deg2rad
 #define SDH_MAX_ABS_ANGLE 90.0*deg2rad
