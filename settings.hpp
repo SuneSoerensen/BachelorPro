@@ -9,19 +9,26 @@
 //===========
 //   TIAFC
 //===========
-#define TIAFC_MODE		1	// 0 = normal, 1 = debug
+#define TIAFC_MODE		1	// 0 = normal, 1 = info
 
 //camera settings (taking an image):
 #define CAMERA			1	// 0 = default camera
-#define CAM_RES_WIDTH		1280
-#define CAM_RES_HEIGHT		720
-#define FRAMES_TO_GET		14	// min 7, according to initial tests
+#define CAM_RES_WIDTH	1280
+#define CAM_RES_HEIGHT	720
+#define FRAMES_TO_GET	14	// min 7, according to initial tests
 
 //crop settings (taking an image):
+<<<<<<< HEAD
 #define CROP_TOP		100
 #define CROP_BOTTOM	695
 #define CROP_LEFT		140
 #define CROP_RIGHT	1000
+=======
+#define CROP_TOP		0
+#define CROP_BOTTOM		600
+#define CROP_LEFT		200
+#define CROP_RIGHT		950
+>>>>>>> e1089487b3e2f56699db2fb5a301ef389090f4cf
 
 //for thresholding:
 #define THRESHOLDING_THRES	200 	//should be between the intensities of the background and the object
@@ -30,7 +37,7 @@
 //============
 //   Vision
 //============
-#define VISION_MODE		1	// 0 = normal, 1 = debug
+#define VISION_MODE		1	// 0 = normal, 1 = info
 
 //for calibration (pixel-coords to real-coords):
 #define CALC_FACTOR		1000	//determines precision in intermediate results and calculations
@@ -49,10 +56,13 @@
 //=================
 //   AnalytGrasp
 //=================
-#define ANALYT_GRASP_MODE	1	// 0 = normal, 1 = debug
+#define ANALYT_GRASP_MODE	1	// 0 = normal, 1 = info
 
-#define MAX_THREE_FING_ANG	2.35 //radians (~135 deg)
+#define MIN_P1_ANG		0.17 //radians (~10 deg)
+#define MAX_P1_ANG		2.62 //radians (~150 deg)
 #define MAX_DEV_ANG		0.17 //radians (~10 deg)
+
+#define MAX_P1_INTERSEC_DIST	10.0 //pixels
 
 //===============
 //   URControl
@@ -104,7 +114,6 @@
 
 #define TARGET_Z 80.0 //mm above plate
 
-
 #define SDH_ANGLE_THRESH 10.0*deg2rad
 #define SDH_MAX_ABS_ANGLE 90.0*deg2rad
 
@@ -117,3 +126,4 @@
 #define SDH_ANGLE_DIFF_FIRST 10.0 //deg
 
 #define PREGRASP_SCALE 30.0 //mm
+

@@ -26,12 +26,12 @@ void TIAFC::TakeImage(Mat &aCropImage)
 
 	//get frame
 	Mat frame;
-	for (int i = 0; i < FRAMES_TO_GET ; i++) //comment this out when the following debug is commented in
+	/*for (int i = 0; i < FRAMES_TO_GET ; i++) //comment this out when the following debug is commented in
 	{
 		cap.read(frame);
-	}
+	}*/
 
-	///*DEBUG*/frame = imread("TestImg/box.jpg");
+	/*DEBUG*/frame = imread("TestImg/pot.jpg");
 
 	if (!frame.data) //check if empty
 		throw("[TIAFC::TakeImage()]: Couldn't take image!");
@@ -50,10 +50,10 @@ void TIAFC::TakeImage(Mat &aCropImage)
 	Mat croppedFrame(frame, Rect(CROP_LEFT, CROP_TOP, CROP_RIGHT - CROP_LEFT, CROP_BOTTOM - CROP_TOP));
 	croppedFrame.copyTo(aCropImage);
 
-	if (TIAFC_MODE) //DEBUG
+	if (TIAFC_MODE) //INFO
 	{
-		imwrite("DebugFiles/TIAFC_img_proc_1(image).jpg", frame);
-		imwrite("DebugFiles/TIAFC_img_proc_2(crop).jpg", aCropImage);
+		imwrite("InfoFiles/TIAFC_img_proc_1(image).jpg", frame);
+		imwrite("InfoFiles/TIAFC_img_proc_2(crop).jpg", aCropImage);
 	}
 }
 
@@ -62,30 +62,30 @@ void TIAFC::FindObject(Mat &aCropImage, Mat &anObjectImage)
 	//make greyscale image
 	Mat greyscaleImage;
 	cvtColor(aCropImage, greyscaleImage, COLOR_BGR2GRAY);
-	if (TIAFC_MODE) //DEBUG
-		imwrite("DebugFiles/TIAFC_img_proc_3(greyscale).jpg", greyscaleImage);
+	if (TIAFC_MODE) //INFO
+		imwrite("InfoFiles/TIAFC_img_proc_3(greyscale).jpg", greyscaleImage);
 
 	//blur
 	Mat blurImage;
 	blur(greyscaleImage, blurImage, Size(3,3));
-	if (TIAFC_MODE) //DEBUG
-		imwrite("DebugFiles/TIAFC_img_proc_4(blur).jpg", blurImage);
+	if (TIAFC_MODE) //INFO
+		imwrite("InfoFiles/TIAFC_img_proc_4(blur).jpg", blurImage);
 
 	//apply threshold
 	Mat thresImage;
 	threshold(blurImage, thresImage, THRESHOLDING_THRES, 255, THRESHOLDING_MODE);
-	if (TIAFC_MODE) //DEBUG
-		imwrite("DebugFiles/TIAFC_img_proc_5(thres).jpg", thresImage);
+	if (TIAFC_MODE) //INFO
+		imwrite("InfoFiles/TIAFC_img_proc_5(thres).jpg", thresImage);
 
 	//remove holes
 	ThereCanOnlyBeOne(thresImage, 0);
-	if (TIAFC_MODE) //DEBUG
-		imwrite("DebugFiles/TIAFC_img_proc_6(holes).jpg", thresImage);
+	if (TIAFC_MODE) //INFO
+		imwrite("InfoFiles/TIAFC_img_proc_6(holes).jpg", thresImage);
 
 	//remove outliers
 	ThereCanOnlyBeOne(thresImage, 1);
-	if (TIAFC_MODE) //DEBUG
-		imwrite("DebugFiles/TIAFC_img_proc_7(outliers).jpg", thresImage);
+	if (TIAFC_MODE) //INFO
+		imwrite("InfoFiles/TIAFC_img_proc_7(outliers).jpg", thresImage);
 
 	//save
 	thresImage.copyTo(anObjectImage);
@@ -229,8 +229,8 @@ void TIAFC::FindContour(Mat &objectImage, Mat &aContourImage, vector<Coords> &aC
 	for (int i = 0; i < aContourList.size(); i++)
 		aContourImage.at<uchar>(aContourList[i].y, aContourList[i].x) = 255;
 
-	if (TIAFC_MODE) //DEBUG
-		imwrite("DebugFiles/TIAFC_img_proc_8(outer_edge).jpg", aContourImage);
+	if (TIAFC_MODE) //INFO
+		imwrite("InfoFiles/TIAFC_img_proc_8(outer_edge).jpg", aContourImage);
 }
 
 Coords TIAFC::FindNextNeighbour(Mat &anObjectImage, vector<vector<int> > &aContourMatrix, Coords aCurrPoint)

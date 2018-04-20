@@ -23,14 +23,21 @@ int main()
 			cout << "(0): misc." << endl;
 			cout << "(1): Calib()" << endl;
 			cout << "(2): GetObjCoords()" << endl;
-			cout << "(3): FindGrasp()" << endl;
+			cout << "(3): CalcGrasp()" << endl;
 			cout << "type input: ";
 			cin >> mode;
 			cout << endl;
 
 			if (mode == "0")
 			{
-				
+				Coords pL(0, 0);
+				Coords rL(0, 1);
+				Coords pM(5, 5);
+				Coords rM(-1, 0);
+
+				Coords point = AnalytGrasp::CalcIntersection(pL, rL, pM, rM);
+
+				cout << "(" << point.x << "; " << point.y << ")" << endl;
 			}
 			else if (mode == "1")
 			{
@@ -44,7 +51,14 @@ int main()
 			}
 			else if (mode == "3")
 			{
-				test.RunFindGrasp();
+				test.CalcGrasp();
+				Coords focus = test.GetGraspFocus();
+				vector<Coords> points = test.GetGraspPoints();
+				cout << "grasp focus: " << focus.x << ";" << focus.y << endl;
+				cout << "grasp points: ";
+				for (int i = 0; i < points.size(); i++)
+					cout << "(" << points[i].x << "; " << points[i].y << ")";
+				cout << endl;
 			}
 			else
 			{
