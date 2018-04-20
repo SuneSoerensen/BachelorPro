@@ -122,7 +122,5 @@ int main()
     cout << "\033[1;31m ERROR: \033[0m" << e << endl;
   }
 
-
-
   return 0;
 }
