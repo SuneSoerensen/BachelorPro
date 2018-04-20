@@ -4,10 +4,10 @@
 void TIAFC::DoItAll(Mat &aCropImage, Mat &aContourImage, vector<Coords> &aContourList, vector<vector<int> > &aContourMatrix)
 {
 	TakeImage(aCropImage);
-	
+
 	Mat objectImage;
 	FindObject(aCropImage, objectImage);
-	
+
 	FindContour(objectImage, aContourImage, aContourList, aContourMatrix);
 }
 
@@ -26,13 +26,13 @@ void TIAFC::TakeImage(Mat &aCropImage)
 
 	//get frame
 	Mat frame;
-	/*for (int i = 0; i < FRAMES_TO_GET ; i++) //comment this out when the following debug is commented in
+	for (int i = 0; i < FRAMES_TO_GET ; i++) //comment this out when the following debug is commented in
 	{
 		cap.read(frame);
-	}*/
+	}
 
-	/*DEBUG*/frame = imread("TestImg/box.jpg");
-	
+	///*DEBUG*/frame = imread("TestImg/box.jpg");
+
 	if (!frame.data) //check if empty
 		throw("[TIAFC::TakeImage()]: Couldn't take image!");
 
@@ -86,7 +86,7 @@ void TIAFC::FindObject(Mat &aCropImage, Mat &anObjectImage)
 	ThereCanOnlyBeOne(thresImage, 1);
 	if (TIAFC_MODE) //DEBUG
 		imwrite("DebugFiles/TIAFC_img_proc_7(outliers).jpg", thresImage);
-	
+
 	//save
 	thresImage.copyTo(anObjectImage);
 }
@@ -110,7 +110,7 @@ void TIAFC::ThereCanOnlyBeOne(Mat &aThresImage, bool mode)
 				//make a new blob
 				aThresImage.at<uchar>(i, j) = 255 - color; //remove the point
 				vector<Coords> temp = {Coords(j, i)}; //add it to the list
-				
+
 				for (int k = 0; k < temp.size(); k++) //for all points part of this blob
 				{
 					CatchNeighbours(aThresImage, color, temp[k], temp);
@@ -150,7 +150,7 @@ void TIAFC::ThereCanOnlyBeOne(Mat &aThresImage, bool mode)
 void TIAFC::CatchNeighbours(Mat &aThresImage, int aColor, Coords aCurrPoint, vector<Coords> &aListOfPoints)
 {
 	//relative coordinates:
-	int xVals[4] = {1, 0, -1, 0};
+	int xVals[4] = {1, 0, -1, 0}; //use four-connectivity. this should make the blobs less "hairy"
 	int yVals[4] = {0, -1, 0, 1};
 
 	for ( int i = 0; i < 4; i++) //run through all neighbours
@@ -213,11 +213,11 @@ void TIAFC::FindContour(Mat &objectImage, Mat &aContourImage, vector<Coords> &aC
 		nextPoint = FindNextNeighbour(objectImage, aContourMatrix, aContourList[index - 1]);
 
 		if (nextPoint.Eq(firstPoint)) //if we return to start
-			break;			
+			break;
 
 		//add it to the contour
 		aContourList.push_back(nextPoint);
-		aContourMatrix[aContourList[index].x][aContourList[index].y] = index + 1;
+		aContourMatrix[nextPoint.x][nextPoint.y] = index + 1;
 		index++;
 	}
 
@@ -236,10 +236,10 @@ void TIAFC::FindContour(Mat &objectImage, Mat &aContourImage, vector<Coords> &aC
 Coords TIAFC::FindNextNeighbour(Mat &anObjectImage, vector<vector<int> > &aContourMatrix, Coords aCurrPoint)
 {
 	//relative coordinates (this EXACT sequence is important!):
-	int xVals[8] = {1, 0, -1, 0, 1, -1, -1, 1};
+	int xVals[8] = {1, 0, -1, 0, 1, -1, -1, 1}; //sides first, otherwise we can get stuck
 	int yVals[8] = {0, -1, 0, 1, -1, -1, 1, 1};
 
-	for ( int i = 0; i < 8; i++) //run through all neighbours
+	for (int i = 0; i < 8; i++) //run through all neighbours
 	{
 		if (IsWithinBounds(anObjectImage, aCurrPoint.x + xVals[i], aCurrPoint.y + yVals[i]))
 		{
@@ -258,7 +258,7 @@ Coords TIAFC::FindNextNeighbour(Mat &anObjectImage, vector<vector<int> > &aConto
 	}
 
 	//if we couldn't find any unvisited neighbours
-	for ( int i = 0; i < 8; i++) //run through all neighbours
+	for (int i = 0; i < 8; i++) //run through all neighbours
 	{
 		if (IsWithinBounds(anObjectImage, aCurrPoint.x + xVals[i], aCurrPoint.y + yVals[i]))
 		{
@@ -282,7 +282,7 @@ bool TIAFC::HasBlackNeighbour(Mat &anObjectImage, Coords aCurrPoint)
 	int xVals[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 	int yVals[8] = {0, -1, 0, 1, -1, -1, 1, 1};
 
-	for ( int i = 0; i < 8; i++) //run through all neighbours
+	for (int i = 0; i < 8; i++) //run through all neighbours
 	{
 		if (IsWithinBounds(anObjectImage, aCurrPoint.x + xVals[i], aCurrPoint.y + yVals[i]))
 		{
@@ -294,6 +294,28 @@ bool TIAFC::HasBlackNeighbour(Mat &anObjectImage, Coords aCurrPoint)
 	}
 
 	return false;
+}
+
+int TIAFC::NumOfWhiteNeighbours(Mat &anObjectImage, Coords aCurrPoint)
+{
+	//relative coordinates:
+	int xVals[8] = {1, 0, -1, 0, 1, -1, -1, 1};
+	int yVals[8] = {0, -1, 0, 1, -1, -1, 1, 1};
+
+	int res = 0;
+
+	for (int i = 0; i < 8; i++) //run through all neighbours
+	{
+		if (IsWithinBounds(anObjectImage, aCurrPoint.x + xVals[i], aCurrPoint.y + yVals[i]))
+		{
+			if (anObjectImage.at<uchar>(aCurrPoint.y + yVals[i], aCurrPoint.x + xVals[i]) == 255) //if the neighbour is white
+			{
+				res++;
+			}
+		}
+	}
+
+	return res;
 }
 
 bool TIAFC::IsWithinBounds(Mat &anImage, int anX, int aY)
@@ -316,4 +338,3 @@ TIAFC::TIAFC()
 TIAFC::~TIAFC()
 {
 }
-

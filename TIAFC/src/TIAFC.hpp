@@ -24,6 +24,7 @@ private:
 	static void FindContour(Mat &anObjectImage, Mat &aContourImage, vector<Coords> &aContourList, vector<vector<int> > &aContourMatrix);
 	static Coords FindNextNeighbour(Mat &anObjectImage, vector<vector<int> > &aContourMatrix, Coords aCurrPoint);
 	static bool HasBlackNeighbour(Mat &anObjectImage, Coords aCurrPoint);
+	static int NumOfWhiteNeighbours(Mat &anObjectImage, Coords aCurrPoint);
 
 	static bool IsWithinBounds(Mat &anImage, int anX, int aY);
 

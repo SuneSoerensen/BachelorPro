@@ -12,13 +12,11 @@ public:
 	Coords GetObjCoords();
 	void Calib(); //always call "Calib()" at least once before doing anything else!!!
 
-	/*DEBUG*/void RunFindGraspPoints();
+	/*DEBUG*/void RunFindGrasp();
 
 	~Vision();
 
 private:
-	static Coords FindCOM(vector<Coords> &aContourList, Mat &aContourImage);
-
 	Coords GetRealCoords(Coords coordsInPixels);
 
 	//================

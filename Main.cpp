@@ -47,26 +47,37 @@ int main()
   if(handLocalGraspPoints.size() == 3) //If it is a three-finger-grasp
   {
     //Find angle to rotate with, such that x-coord. of finger B is ~0:
-    wristRotation = -90.0*deg2rad - atan2(handLocalGraspPoints[1].y, handLocalGraspPoints[1].x); // -90[deg] - angleOfVectorB[deg] is how much to rotate vectors and wrist of UR
+    wristRotation = -90.0*deg2rad - atan2(handLocalGraspPoints[1].y, handLocalGraspPoints[1].x); // -90[deg] - angleOfVectorB[deg] is how much to rotate vectors
 
     //Rotate vectors:
     handLocalGraspPoints[0].x = cos(wristRotation) * handLocalGraspPoints[0].x - sin(wristRotation) * handLocalGraspPoints[0].y;
-    handLocalGraspPoints[1].x = cos(wristRotation) * handLocalGraspPoints[0].x - sin(wristRotation) * handLocalGraspPoints[0].y;
-    handLocalGraspPoints[2].x = cos(wristRotation) * handLocalGraspPoints[0].x - sin(wristRotation) * handLocalGraspPoints[0].y;
+    handLocalGraspPoints[0].y = sin(wristRotation) * handLocalGraspPoints[0].x + cos(wristRotation) * handLocalGraspPoints[0].y;
+
+    handLocalGraspPoints[1].x = cos(wristRotation) * handLocalGraspPoints[1].x - sin(wristRotation) * handLocalGraspPoints[1].y;
+    handLocalGraspPoints[1].y = sin(wristRotation) * handLocalGraspPoints[1].x + cos(wristRotation) * handLocalGraspPoints[1].y;
+
+    handLocalGraspPoints[2].x = cos(wristRotation) * handLocalGraspPoints[2].x - sin(wristRotation) * handLocalGraspPoints[2].y;
+    handLocalGraspPoints[2].y = sin(wristRotation) * handLocalGraspPoints[2].x + cos(wristRotation) * handLocalGraspPoints[2].y;
+
+    //Convert to angle of wrist (angle of B - 90 deg)
+    wristRotation -= 90.0*deg2rad;
   }
   else if(handLocalGraspPoints.size() == 2)
   {
     //Find angle to rotate with, such that y-coord. of finger A is ~0:
     wristRotation = - atan2(handLocalGraspPoints[0].y, handLocalGraspPoints[0].x);
     handLocalGraspPoints[0].x = cos(wristRotation) * handLocalGraspPoints[0].x - sin(wristRotation) * handLocalGraspPoints[0].y;
-    handLocalGraspPoints[1].x = cos(wristRotation) * handLocalGraspPoints[0].x - sin(wristRotation) * handLocalGraspPoints[0].y;
+    handLocalGraspPoints[0].x = sin(wristRotation) * handLocalGraspPoints[0].x + cos(wristRotation) * handLocalGraspPoints[0].y;
+
+    handLocalGraspPoints[1].x = cos(wristRotation) * handLocalGraspPoints[1].x - sin(wristRotation) * handLocalGraspPoints[1].y;
+    handLocalGraspPoints[1].x = sin(wristRotation) * handLocalGraspPoints[1].x + cos(wristRotation) * handLocalGraspPoints[1].y;
+
+    //Convert to angle of wrist
+    wristRotation -= 90*deg2rad - wristRotation;
   }
 
   cout << "Ready to grasp. Press ENTER to grasp." << endl;
   cin.get();
-
-  
-
 
 
 

@@ -63,11 +63,24 @@ void URControl::moveToInit()
   haveBeenToInit = 1;
   usleep(5100000);
   //updateCurrToolPos();
-  currToolPos[0] = -0.1087;
+  /*currToolPos[0] = -0.1087;
   currToolPos[1] = -0.48537;
   currToolPos[2] =  0.43305;
   currToolPos[3] =  0.0;
   currToolPos[4] = -3.1409;
+  currToolPos[5] = 0.0;*/
+  /*currToolPos[0] = -0.4199;
+  currToolPos[1] = -0.2665;
+  currToolPos[2] =  0.43305;
+  currToolPos[3] =  -1.1997;
+  currToolPos[4] = -2.9019;
+  currToolPos[5] = 0.0;*/
+
+  currToolPos[0]= -0.3678;
+  currToolPos[1] = -0.3348;
+  currToolPos[2] =  0.43302;
+  currToolPos[3] = -0.945;
+  currToolPos[4] = -2.9945;
   currToolPos[5] = 0.0;
 }
 
@@ -86,6 +99,17 @@ void URControl::moveRel(double anX, double aY, double aZ)
   double y = aY/1000.0;
   double z = aZ/1000.0;
 
+  //Rotate x- and y-coordinates -45 deg around (0,0):
+  double rotX = cos(OFFSET_ANGLE)*x - sin(OFFSET_ANGLE)*y;
+  double rotY = sin(OFFSET_ANGLE)*x + cos(OFFSET_ANGLE)*y;
+
+  //Calculate absolute coordinates:
+  double absX = currToolPos[0] + rotX;
+  double absY = currToolPos[1] + rotY;
+
+  if(URCONTROL_MODE)
+    cout << "absX [mm] = " << absX*1000.0 << " absY [mm] = " << absY*1000.0 << endl;
+
   //Security check:
   if(!haveBeenToInit)
   {
@@ -93,11 +117,14 @@ void URControl::moveRel(double anX, double aY, double aZ)
   }
 
   //Security check:
-  if((currToolPos[0]+x) < UR_MIN_X || (currToolPos[0]+x) > UR_MAX_X)
+  if(absX < UR_MIN_X || absX > UR_MAX_X)
   {
+    if(URCONTROL_MODE)
+      cout << "absX = " << absX << endl;
+
     throw("[URControl::moveRel]: New x-coordinates are out of bounds!");
   }
-  else if((currToolPos[1]+y) < UR_MIN_Y || (currToolPos[1]+y) > UR_MAX_Y)
+  else if(absY < UR_MIN_Y || absY > UR_MAX_Y)
   {
     throw("[URControl::moveRel]: New y-coordinates are out of bounds!");
   }
@@ -125,9 +152,9 @@ void URControl::moveRel(double anX, double aY, double aZ)
   ofstream out(fileName, ofstream::out);
 
   out << "HOST=" << ip << "\n" << "PORT=" << port << "\n" << "def moveRel():\n";
-  out << "\tpos=p[" << to_string(currToolPos[0]+x) << ", " << to_string(currToolPos[1]+y) << ", " << to_string(currToolPos[2]+z) << ", " << currToolPos[3] << ", " << currToolPos[4] << ", " << currToolPos[5] << "]\n";
+  out << "\tpos=p[" << to_string(absX) << ", " << to_string(absY) << ", " << to_string(currToolPos[2]+z) << ", " << currToolPos[3] << ", " << currToolPos[4] << ", " << currToolPos[5] << "]\n";
   out << "\tmovel(pos," << ACC << ", " << VEL << "," << MOVTIME << "," << BLENDR << ")\n";
-  out << "\ttextmsg(\"Moved to position:" << to_string(currToolPos[0]+x) << ", " << to_string(currToolPos[1]+y) << ", " << to_string(currToolPos[2]+z) << ", " << currToolPos[3] << ", " << currToolPos[4] << ", " << currToolPos[5] << "\")\n";
+  //out << "\ttextmsg(\"Moved to position:" << to_string(currToolPos[0]+x) << ", " << to_string(currToolPos[1]+y) << ", " << to_string(currToolPos[2]+z) << ", " << currToolPos[3] << ", " << currToolPos[4] << ", " << currToolPos[5] << "\")\n";
   out << "end\n";
 
   out.close();
@@ -183,10 +210,21 @@ void URControl::moveAbs(double anX, double aY, double aZ)
 
 void URControl::setWristAngle(double anAngle)
 {
-  if(abs(anAngle) < 360.0*deg2rad)
+  if(abs(anAngle) > 360.0*deg2rad)
     throw("[URControl::setWristAngle]: Invalid angle (|angle| > 360 deg)!");
 
-  ofstream out("rotateWristScript", ofstream::out);
+  ofstream out("rotateWristScript.txt", ofstream::out);
+
+  out << "HOST=" << ip << "\n" << "PORT=" << port << "\n" << "def rotWrist():\n";
+  out << "\t" << "pos = get_joint_positions()" << "\n";
+  out << "\t" << "pos[5] =" << anAngle << "\n";
+  out << "\t" << "textmsg(\"Rotating wrist\")" << "\n";
+  out << "\t" << "movej(pos, 0.1, 0.1, 5, 0)" << "\n";
+  out << "end\n";
+
+  out.close();
+
+  sendScript("rotateWristScript.txt");
 }
 
 bool URControl::checkBounds(double x, double y, double z)

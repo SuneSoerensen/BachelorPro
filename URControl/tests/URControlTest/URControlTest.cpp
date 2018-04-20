@@ -21,7 +21,7 @@ int main()
 
   URControl ur5(ip, port);
 
-  ur5.connect();
+  //ur5.connect();
 
   string command;
 
@@ -71,6 +71,7 @@ int main()
       {
         cout << "Moving..." << endl;
         ur5.moveRel(x,y,z);
+        ur5.printcurrToolPos();
 
       }
       catch(const char e[])
