@@ -1,61 +1,5 @@
 #include "AnalytGrasp.hpp"
 
-Grasp AnalytGrasp::FindGrasp(Mat &aContourImage, vector<Coords> &aContourList, vector<vector<int> > &aContourMatrix)
-{
-	//find grasping regions
-	vector<vector<Coords> > graspRegsList;
-	FindGraspRegs(graspRegsList, aContourImage, aContourList, aContourMatrix);
-
-	//calc their normal vectors
-	vector<Coords> normVecsList;
-	CalcNormVecs(graspRegsList, normVecsList);
-
-	//calc possible priority 1 grasps
-	vector<Grasp> p1GraspsList;
-	CalcP1Grasps(p1GraspsList, graspRegsList, normVecsList);
-
-	/*DEBUG*/cout << p1GraspsList.size() << " priority 1 grasps were found" << endl;
-
-	if (p1GraspsList.size() == 0) //check that possible sets of grasp regions were found
-		throw("[AnalytGrasp::FindGrasP()]: Couldn't find any p1 grasps!");
-
-	//find the best p1 grasp
-	Coords COM = FindCOM(aContourList, aContourImage);
-	double currShortestDist = INFINITY;
-	int currBestP1Grasp;
-	for (int i = 0; i < p1GraspsList.size(); i++)
-	{
-		double dist = ((p1GraspsList[i].focus).Sub(COM)).Length();
-		if (dist < currShortestDist)
-		{
-			currShortestDist = dist;
-			currBestP1Grasp = i;
-		}
-	}
-
-	return p1GraspsList[currBestP1Grasp];
-
-
-	
-	//TwoFingAngCheck(possGraspsList, normVecsList);
-
-	/*if (possGraspsList.size() == 0) //check that possible sets of grasp regions were found
-		throw("[AnalytGrasp::FindGraspPoints()]: Couldn't find any sets of grasp regions!");*/
-
-	/*cout << "[AnalytGrasp::FindGraspPoints()]: Possible grasps:" << endl;
-	for (int i = 0; i < possGraspsList.size(); i++)
-	{
-		for (int j = 0; j < possGraspsList[i].size(); j++)
-		{
-			cout << possGraspsList[i][j];
-			if (j != possGraspsList[i].size() - 1)
-				cout << ", ";
-		}
-		cout << endl;
-	}
-	cout << endl;*/
-}
-
 Coords AnalytGrasp::FindCOM(vector<Coords> &aContourList, Mat &aContourImage)
 {
 	//calculate sum of all x- and y-coordinates
@@ -81,9 +25,9 @@ Coords AnalytGrasp::FindCOM(vector<Coords> &aContourList, Mat &aContourImage)
 
 		//drawing color
 		Vec3b color;
-		color.val[0] = 0;
-		color.val[1] = 0;
-		color.val[2] = 255;
+		color.val[0] = 0; //blue
+		color.val[1] = 0; //green
+		color.val[2] = 255; //red
 
 		//draw pixels to mark the COM
 		for (int i = 0; i < 17; i++)
@@ -92,10 +36,54 @@ Coords AnalytGrasp::FindCOM(vector<Coords> &aContourList, Mat &aContourImage)
 		}
 
 		//save image
-		imwrite("DebugFiles/AnalytGrasp_centOfMass.jpg", centOfMassImage);
+		imwrite("InfoFiles/AnalytGrasp_centOfMass.jpg", centOfMassImage);
 	}
 
 	return res;
+}
+
+Grasp AnalytGrasp::FindGrasp(Mat &aContourImage, vector<Coords> &aContourList, vector<vector<int> > &aContourMatrix)
+{
+	//find grasping regions
+	vector<vector<Coords> > graspRegsList;
+	FindGraspRegs(graspRegsList, aContourImage, aContourList, aContourMatrix);
+
+	//calc their normal vectors
+	vector<Coords> normVecsList;
+	CalcNormVecs(graspRegsList, normVecsList);
+
+	//calc the objects center of mass
+	Coords COM = FindCOM(aContourList, aContourImage);
+
+	//calc possible priority 1 grasps
+	vector<Grasp> p1GraspsList;
+	CalcP1Grasps(p1GraspsList, graspRegsList, normVecsList, COM);
+
+	if (p1GraspsList.size() > 0)
+	{
+		//find the best p1 grasp
+		double currShortestDist = INFINITY;
+		int currBestP1Grasp;
+		for (int i = 0; i < p1GraspsList.size(); i++)
+		{
+			if (p1GraspsList[i].distFromCOM < currShortestDist)
+			{
+				currShortestDist = p1GraspsList[i].distFromCOM;
+				currBestP1Grasp = i;
+			}
+		}
+
+		return p1GraspsList[currBestP1Grasp];
+	}
+
+	//calc possible priority 2 grasps
+
+
+	//calc possible priority 3 grasps
+
+
+	//if we get to here, we couldn't find any accetable grasps!
+	throw("[AnalytGrasp::FindGrasP()]: Couldn't find any acceptable grasps!");
 }
 
 void AnalytGrasp::FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aContourImage, vector<Coords> &aContourList, vector<vector<int> > &aContourMatrix)
@@ -108,6 +96,7 @@ void AnalytGrasp::FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aC
 		throw("[AnalytGrasp::FindGraspRegs()]: Couldn't find any grasp regions!");
 
 	//copy found lines to the list of grasping regions
+	///*DEBUG*/cout << "grasp regs:" << endl;
 	aGraspRegsList.resize(lines.size());
 	for (int i = 0; i < lines.size(); i++)
 	{
@@ -144,9 +133,11 @@ void AnalytGrasp::FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aC
 			aGraspRegsList[i].resize((aContourList.size() + firstPointIndex) - secondPointIndex + 1);
 		}
 
+		///*DEBUG*/cout << aContourList[startPointIndex].x << "; " << aContourList[startPointIndex].y << " , " << aContourList[endPointIndex].x << "; " << aContourList[endPointIndex].y << endl;
+
 		//copy points to the list of grasping regions
 		int index = 0;
-		for (int j = startPointIndex; j != endPointIndex; j = ((j + 1) % aContourList.size()))
+		for (int j = startPointIndex; j != endPointIndex + 1; j = (j + 1) % aContourList.size())
 		{
 			aGraspRegsList[i][index] = aContourList[j];
 			index++;
@@ -163,9 +154,9 @@ void AnalytGrasp::FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aC
 
 		//draw the found lines
 		Vec3b color; //drawing color
-		color.val[0] = 0;
-		color.val[1] = 0;
-		color.val[2] = 255;
+		color.val[0] = 0; //blue
+		color.val[1] = 0; //green
+		color.val[2] = 255; //red
 
 		for(int i = 0; i < aGraspRegsList.size(); i++ )
 		{
@@ -186,7 +177,24 @@ void AnalytGrasp::FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aC
 
 			for(int j = 0; j < aGraspRegsList[i].size(); j++ )
 			{
-				graspRegsImage.at<Vec3b>(aGraspRegsList[i][j].y, aGraspRegsList[i][j].x) = color;
+				if (j < (aGraspRegsList[i].size() - 1) / 2)
+				{
+					Vec3b color; //drawing color
+					color.val[0] = 0; //blue
+					color.val[1] = 255; //green
+					color.val[2] = 0; //red
+
+					graspRegsImage.at<Vec3b>(aGraspRegsList[i][j].y, aGraspRegsList[i][j].x) = color;
+				}
+				else
+				{
+					Vec3b color; //drawing color
+					color.val[0] = 0; //blue
+					color.val[1] = 0; //green
+					color.val[2] = 255; //red
+
+					graspRegsImage.at<Vec3b>(aGraspRegsList[i][j].y, aGraspRegsList[i][j].x) = color;
+				}
 			}
 
 			imwrite("InfoFiles/AnalytGrasp_graspReg_" + to_string(i) + ".jpg", graspRegsImage);
@@ -196,28 +204,35 @@ void AnalytGrasp::FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aC
 
 void AnalytGrasp::CalcNormVecs(vector<vector<Coords> > &aGraspRegsList, vector<Coords> &aNormVecsList)
 {
-	//init result
-	aNormVecsList.resize(aGraspRegsList.size());
-
 	//calc direction-vectors
+	vector<Coords> dirVecsList;
+	dirVecsList.resize(aGraspRegsList.size());
+	///*DEBUG*/cout << "direction vectors:" << endl;
 	for (int i = 0; i < aGraspRegsList.size(); i++)
 	{
-		aNormVecsList[i] = aGraspRegsList[i][1].Sub(aGraspRegsList[i][0]); //r = p_end - p_start
+		dirVecsList[i] = (aGraspRegsList[i][aGraspRegsList[i].size() - 1]).Sub(aGraspRegsList[i][0]); //r = p_end - p_start
+		///*DEBUG*/cout << aGraspRegsList[i][aGraspRegsList[i].size() - 1].x << "; " << aGraspRegsList[i][aGraspRegsList[i].size() - 1].y << " - " << aGraspRegsList[i][0].x << "; " << aGraspRegsList[i][0].y << " = " << dirVecsList[i].x << "; " << dirVecsList[i].y << endl;
 	}
 
 	//calc normal-vectors
+	aNormVecsList.resize(aGraspRegsList.size());
+	///*DEBUG*/cout << "normal vectors:" << endl;
 	for (int i = 0; i < aNormVecsList.size(); i++)
 	{
-		aNormVecsList[i].Set(aNormVecsList[i].y, -aNormVecsList[i].x); //n = (y, -x), r = (x, y)
+		aNormVecsList[i].Set(dirVecsList[i].y, -dirVecsList[i].x); //n = (y, -x), r = (x, y)
+		///*DEBUG*/cout << aNormVecsList[i].x << "; " << aNormVecsList[i].y << endl;
 	}
 }
 
-void AnalytGrasp::CalcP1Grasps(vector<Grasp> &aP1GraspsList, vector<vector<Coords> > &aGraspRegsList, vector<Coords> aNormVecsList)
+void AnalytGrasp::CalcP1Grasps(vector<Grasp> &aP1GraspsList, vector<vector<Coords> > &aGraspRegsList, vector<Coords> aNormVecsList, Coords aCOM)
 {
 	vector<vector<int> > passedAngCheckList;
 	P1AngCheck(passedAngCheckList, aNormVecsList);
 
 	/*DEBUG*/cout << "found " << passedAngCheckList.size() << " sets of grasp regs that passed the angle check" << endl;
+
+	/*DEBUG*/int passedIntersecCheck = 0;
+	/*DEBUG*/int passedDistFromCOMCheck = 0;
 
 	for (int i = 0; i < passedAngCheckList.size(); i++) //for all sets of grasp regs that passed the angle check
 	{
@@ -242,34 +257,32 @@ void AnalytGrasp::CalcP1Grasps(vector<Grasp> &aP1GraspsList, vector<vector<Coord
 
 					if (P1IntersecCheck(pA, rA, pB, rB, pC, rC)) //if this specific grasp passes the intersection check
 					{
-						Grasp temp;
+						/*DEBUG*/passedIntersecCheck++;
 
-						temp.type = p1;
-						temp.points = {pA, pB, pC};
-						temp.focus = ((pA.Add(pB)).Add(pC)).Div(3);
+						Coords graspFocus = ((pA.Add(pB)).Add(pC)).Div(3);
+						double graspDistFromCOM = (graspFocus.Sub(aCOM)).Length();
 
-						aP1GraspsList.push_back(temp);
+						if (graspDistFromCOM <= MAX_DIST_FROM_COM) //check if its focus is close enough to the objects COM
+						{
+							/*DEBUG*/passedDistFromCOMCheck++;
+
+							Grasp newGrasp;
+
+							newGrasp.type = p1;
+							newGrasp.points = {pA, pB, pC};
+							newGrasp.focus = graspFocus;
+							newGrasp.distFromCOM = graspDistFromCOM;
+
+							aP1GraspsList.push_back(newGrasp);
+						}
 					}
 				}
 			}
 		}
 	}
-}
 
-bool AnalytGrasp::P1IntersecCheck(Coords pA, Coords rA, Coords pB, Coords rB, Coords pC, Coords rC)
-{
-	Coords intersecAB = CalcIntersection(pA, rA, pB, rB);
-	Coords intersecBC = CalcIntersection(pB, rB, pC, rC);
-	Coords intersecCA = CalcIntersection(pC, rC, pA, rA);
-
-	double dist1 = (intersecBC.Sub(intersecAB)).Length();
-	double dist2 = (intersecCA.Sub(intersecBC)).Length();
-	double dist3 = (intersecAB.Sub(intersecCA)).Length();
-
-	if (dist1 <= MAX_P1_INTERSEC_DIST && dist2 <= MAX_P1_INTERSEC_DIST && dist3 <= MAX_P1_INTERSEC_DIST)
-		return true;
-	else
-		return false;
+	/*DEBUG*/cout << "found " << passedIntersecCheck << " grasps that passed the intersection check" << endl;
+	/*DEBUG*/cout << "found " << passedDistFromCOMCheck << " grasps that passed the distance from COM check" << endl;
 }
 
 void AnalytGrasp::P1AngCheck(vector<vector<int> > &aPassedAngCheckList, vector<Coords> &aNormVecsList)
@@ -312,6 +325,25 @@ void AnalytGrasp::P1AngCheck(vector<vector<int> > &aPassedAngCheckList, vector<C
 			}
 		}
 	}
+}
+
+bool AnalytGrasp::P1IntersecCheck(Coords pA, Coords rA, Coords pB, Coords rB, Coords pC, Coords rC)
+{
+	Coords intersecAB = CalcIntersection(pA, rA, pB, rB);
+	Coords intersecBC = CalcIntersection(pB, rB, pC, rC);
+	Coords intersecCA = CalcIntersection(pC, rC, pA, rA);
+
+	if (intersecAB.Eq(-42) || intersecAB.Eq(-42) || intersecAB.Eq(-42))
+		return false;
+
+	double dist1 = (intersecBC.Sub(intersecAB)).Length();
+	double dist2 = (intersecCA.Sub(intersecBC)).Length();
+	double dist3 = (intersecAB.Sub(intersecCA)).Length();
+
+	if (dist1 <= MAX_P1_INTERSEC_DIST && dist2 <= MAX_P1_INTERSEC_DIST && dist3 <= MAX_P1_INTERSEC_DIST)
+		return true;
+	else
+		return false;
 }
 
 void AnalytGrasp::TwoFingAngCheck(vector<vector<int> > &aPossGraspsList, vector<Coords> &aNormVecsList)
@@ -357,7 +389,10 @@ Coords AnalytGrasp::CalcIntersection(Coords pL, Coords rL, Coords pM, Coords rM)
 	///*DEBUG*/cout << "den = " << den << endl;
 	///*DEBUG*/cout << "tM = " << tM << endl;
 
-	return Coords(pM.x + rM.x * tM, pM.y + rM.y * tM);
+	if (tM < 0)
+		return Coords(-42); //ERROR (for this purpose, tM < 0 is illegal)
+	else
+		return Coords(pM.x + rM.x * tM, pM.y + rM.y * tM);
 }
 
 AnalytGrasp::AnalytGrasp()
