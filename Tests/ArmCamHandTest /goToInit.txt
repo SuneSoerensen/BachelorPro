@@ -1,7 +1,0 @@
-HOST = 192.168.100.4
-PORT = 30002
-def goInit():
-  qInit = [-2.182, -1.57, -1.57, -1.57, 1.57, 0]
-  movej(qInit, 0.1, 0.1, 5, 0)
-  textmsg("Moved to qInit")
-end

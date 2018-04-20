@@ -52,7 +52,7 @@ void URControl::sendScript(string fileName)
   ur.sendScriptFile(fileName);
   if(URCONTROL_MODE)
   {
-    cout << "Script sent!" << endl;
+    cout << "\033[1;33m DEBUG: \033[0m" << "Script \"" << fileName << "\" sent!" << endl;
   }
 }
 
@@ -60,7 +60,9 @@ void URControl::moveToInit()
 {
   if(state != STATE_INIT)
   {
-    sendScript("goToInit.txt");
+    string fileName = getenv("URCON_ROOT");
+    fileName += "goToInit.txt";
+    sendScript(fileName);
     haveBeenToInit = 1;
     state = STATE_INIT;
     usleep(5100000);
@@ -78,7 +80,9 @@ void URControl::moveToHome()
 {
   if(state != STATE_HOME)
   {
-    sendScript("goToHome.txt");
+    string fileName = getenv("URCON_ROOT");
+    fileName += "goToHome.txt";
+    sendScript(fileName);
     haveBeenToInit = 0;
     state = STATE_HOME;
     usleep(5100000);
@@ -104,7 +108,7 @@ void URControl::moveRel(double anX, double aY, double aZ)
   double absY = currToolPos[1] + rotY;
 
   if(URCONTROL_MODE)
-    cout << "absX [mm] = " << absX*1000.0 << " absY [mm] = " << absY*1000.0 << endl;
+    cout << "\033[1;33m DEBUG: \033[0m" << "absX [mm] = " << absX*1000.0 << " absY [mm] = " << absY*1000.0 << endl;
 
   //Security check:
   if(!haveBeenToInit)
@@ -116,7 +120,7 @@ void URControl::moveRel(double anX, double aY, double aZ)
   if(absX < UR_MIN_X || absX > UR_MAX_X)
   {
     if(URCONTROL_MODE)
-      cout << "absX = " << absX << endl;
+      cout << "\033[1;33m DEBUG: \033[0m" << "absX = " << absX << endl;
 
     throw("[URControl::moveRel]: New x-coordinates are out of bounds!");
   }
@@ -158,11 +162,6 @@ void URControl::moveRel(double anX, double aY, double aZ)
 
   //Send scriptfile to peform movement:
   sendScript(fileName);
-
-  if(URCONTROL_MODE)
-  {
-    cout << "Sent scriptfile: \"" << fileName << "\"!" << endl;
-  }
 
   //Update current tool position:
   currToolPos[0] = absX;

@@ -24,11 +24,6 @@
 #define CROP_LEFT		140
 #define CROP_RIGHT	1000
 
-#define CROP_TOP		0
-#define CROP_BOTTOM		600
-#define CROP_LEFT		200
-#define CROP_RIGHT		950
-
 //for thresholding:
 #define THRESHOLDING_THRES	200 	//should be between the intensities of the background and the object
 #define THRESHOLDING_MODE	0	//0 = light object on dark background, 1 = dark object on light background
