@@ -76,7 +76,17 @@
 #define REAL_TO_UR_OFFSET_Y	-334.8
 
 #define OFFSET_ANGLE -45.0*deg2rad // = -45 deg (because of new setup)
-//#define OFFSET_ANGLE -90.0*deg2rad // = -45 deg (because of new setup)
+
+#define INIT_POS_X  -0.3678 //m
+#define INIT_POS_Y  -0.3348 //m
+#define INIT_POS_Z   0.43302 //m
+#define INIT_POS_RX -0.945 //rad
+#define INIT_POS_RY -2.9945 //rad
+#define INIT_POS_RZ  0.0 //rad
+
+#define STATE_HOME  0
+#define STATE_INIT  1
+#define STATE_OTHER 2
 
 //===============
 //   SDHControl

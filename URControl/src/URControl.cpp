@@ -59,41 +59,38 @@ void URControl::sendScript(string fileName)
 
 void URControl::moveToInit()
 {
-  sendScript("goToInit.txt");
-  haveBeenToInit = 1;
-  usleep(5100000);
-  //updateCurrToolPos();
-  /*currToolPos[0] = -0.1087;
-  currToolPos[1] = -0.48537;
-  currToolPos[2] =  0.43305;
-  currToolPos[3] =  0.0;
-  currToolPos[4] = -3.1409;
-  currToolPos[5] = 0.0;*/
-  /*currToolPos[0] = -0.4199;
-  currToolPos[1] = -0.2665;
-  currToolPos[2] =  0.43305;
-  currToolPos[3] =  -1.1997;
-  currToolPos[4] = -2.9019;
-  currToolPos[5] = 0.0;*/
+  if(state != STATE_INIT)
+  {
+    sendScript("goToInit.txt");
+    haveBeenToInit = 1;
+    state = STATE_INIT;
+    usleep(5100000);
 
-  currToolPos[0]= -0.3678;
-  currToolPos[1] = -0.3348;
-  currToolPos[2] =  0.43302;
-  currToolPos[3] = -0.945;
-  currToolPos[4] = -2.9945;
-  currToolPos[5] = 0.0;
+    currToolPos[0] = INIT_POS_X;
+    currToolPos[1] = INIT_POS_Y;
+    currToolPos[2] = INIT_POS_Z;
+    currToolPos[3] = INIT_POS_RX;
+    currToolPos[4] = INIT_POS_RY;
+    currToolPos[5] = INIT_POS_RZ;
+  }
 }
 
 void URControl::moveToHome()
 {
-  sendScript("goToHome.txt");
-  haveBeenToInit = 0;
-  usleep(5100000);
-  //updateCurrToolPos();
+  if(state != STATE_HOME)
+  {
+    sendScript("goToHome.txt");
+    haveBeenToInit = 0;
+    state = STATE_HOME;
+    usleep(5100000);
+  }
 }
 
 void URControl::moveRel(double anX, double aY, double aZ)
 {
+  //Declare that UR is not in home or init
+  state = STATE_OTHER;
+
   //Convert from mm to m:
   double x = anX/1000.0;
   double y = aY/1000.0;
@@ -177,7 +174,7 @@ void URControl::moveRel(double anX, double aY, double aZ)
   //updateCurrToolPos();
 }
 
-void URControl::updateCurrToolPos()
+/*void URControl::updateCurrToolPos()
 {
   UniversalRobotsData URdata;
   math::Vector3D<> toolPos;
@@ -188,25 +185,28 @@ void URControl::updateCurrToolPos()
     toolPos = URdata.toolPosition;
     currToolPos[0] = toolPos[0];
     currToolPos[1] = toolPos[1];
-    currToolPos[2] = toolPos[2];
+    currToolPos[2] = toolPos[2];*/
 
-    /*DEBUG*/ cout << "Toolpos: " << toolPos[0] << " " << toolPos[1] << " " << toolPos[2] << endl;
-    /*DEBUG*/ cout << "masterTemperature: " << URdata.masterTemperature << endl;
-  }
+    ///*DEBUG*/ cout << "Toolpos: " << toolPos[0] << " " << toolPos[1] << " " << toolPos[2] << endl;
+    ///*DEBUG*/ cout << "masterTemperature: " << URdata.masterTemperature << endl;
+/*  }
   else
   {
     cout << "{WARNING} [URControl::updateCurrToolPos()]: UR had no data!" << endl;
   }
-}
+}*/
 
-void URControl::moveAbs(double anX, double aY, double aZ)
+/*void URControl::moveAbs(double anX, double aY, double aZ)
 {
+  //Declare that UR is not in home or init
+  state = STATE_OTHER;
+
   double relX = anX - currToolPos[0]*1000.0;
   double relY = aY - currToolPos[1]*1000.0;
   double relZ = aZ - currToolPos[2]*1000.0;
 
   moveRel(relX, relY, relZ);
-}
+}*/
 
 void URControl::setWristAngle(double anAngle)
 {
