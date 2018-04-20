@@ -18,17 +18,16 @@
 #define FRAMES_TO_GET	14	// min 7, according to initial tests
 
 //crop settings (taking an image):
-<<<<<<< HEAD
+
 #define CROP_TOP		100
 #define CROP_BOTTOM	695
 #define CROP_LEFT		140
 #define CROP_RIGHT	1000
-=======
+
 #define CROP_TOP		0
 #define CROP_BOTTOM		600
 #define CROP_LEFT		200
 #define CROP_RIGHT		950
->>>>>>> e1089487b3e2f56699db2fb5a301ef389090f4cf
 
 //for thresholding:
 #define THRESHOLDING_THRES	200 	//should be between the intensities of the background and the object
@@ -126,4 +125,3 @@
 #define SDH_ANGLE_DIFF_FIRST 10.0 //deg
 
 #define PREGRASP_SCALE 30.0 //mm
-
