@@ -30,14 +30,12 @@ private:
 	Mat cropImage;
 
 	//finding the contour
-	Mat contourImage;
-	vector<Coords> contourList; //list of points in contour
-	vector<vector<int> > contourMatrix; //relates coordinates of contour points to indices in the list (indices are offset by +1!!!)
+	Contour contour;
 
 	//grasping
 	Grasp grasp;
 
 	//calibration
 	Coords offset;
-	Coords scaleFactor;
+	double scaleFactor; //mm/pixels
 };

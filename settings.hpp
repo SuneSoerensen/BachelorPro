@@ -12,7 +12,7 @@
 #define TIAFC_MODE		1	// 0 = normal, 1 = info
 
 //camera settings (taking an image):
-#define CAMERA			1	// 0 = default camera
+#define CAMERA			0	// 0 = default camera
 #define CAM_RES_WIDTH	1280
 #define CAM_RES_HEIGHT	720
 #define FRAMES_TO_GET	14	// min 7, according to initial tests
@@ -24,7 +24,7 @@
 #define CROP_RIGHT		1000
 
 //for thresholding:
-#define THRESHOLDING_THRES	200 //should be between the intensities of the background and the object
+#define THRESHOLDING_THRES	110 //should be between the intensities of the background and the object
 #define THRESHOLDING_MODE	0 //0 = light object on dark background, 1 = dark object on light background
 
 //============
@@ -35,7 +35,6 @@
 #define VISION_MODE		1	// 0 = normal, 1 = info
 
 //for calibration (pixel-coords to real-coords):
-#define CALC_FACTOR		1000 //determines precision in intermediate results and calculations
 #define REAL_WIDTH		79.0 //mm
 #define REAL_HEIGHT		79.0 //mm
 #define GLOB_X_DIR		1 //global x-direction in relation to the cameras x-direction
@@ -52,6 +51,8 @@
 //   AnalytGrasp
 //=================
 #define ANALYT_GRASP_MODE	1	// 0 = normal, 1 = info
+
+#define GRASP_REG_WIDTH		30.0 //mm (width of a finger + a bit)
 
 #define MIN_P1_ANG		45.0*deg2rad //radians (~10 deg)
 #define MAX_P1_ANG		2.62 //radians (~150 deg)

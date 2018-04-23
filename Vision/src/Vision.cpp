@@ -8,59 +8,53 @@ Vision::Vision()
 void Vision::Calib()
 {
 	//get new data
-	TIAFC::DoItAll(cropImage, contourImage, contourList, contourMatrix);
+	TIAFC::DoItAll(cropImage, contour);
 
 	//calculate the offset
-	offset = AnalytGrasp::FindCOM(contourList, contourImage).Mul(-1);
+	offset = TIAFC::FindCOM(contour).Mul(-1);
 
 	//find height and width of calibration object
-	Coords min = contourList[0];
-	Coords max = contourList[0];
-	for (int i = 1; i < contourList.size(); i++)
+	Coords min = contour.list[0];
+	Coords max = contour.list[0];
+	for (int i = 1; i < contour.list.size(); i++)
 	{
-		if (contourList[i].x < min.x)
-			min.x = contourList[i].x;
+		if (contour.list[i].x < min.x)
+			min.x = contour.list[i].x;
 
-		if (contourList[i].x > max.x)
-			max.x = contourList[i].x;
+		if (contour.list[i].x > max.x)
+			max.x = contour.list[i].x;
 
-		if (contourList[i].y < min.y)
-			min.y = contourList[i].y;
+		if (contour.list[i].y < min.y)
+			min.y = contour.list[i].y;
 
-		if (contourList[i].y > max.y)
-			max.y = contourList[i].y;
+		if (contour.list[i].y > max.y)
+			max.y = contour.list[i].y;
 	}
 
 	//calculate the scale factor
-	Coords locScale = max.Sub(min); //pixels
-	Coords globScale(REAL_WIDTH*CALC_FACTOR, REAL_HEIGHT*CALC_FACTOR); //mm*CALC_FACTOR
-	scaleFactor = globScale.Div(locScale); //(mm*CALC_FACTOR)/pixels
+	Coords dims = max.Sub(min); //the calibration objects dimensions in pixels
+	double scaleX = REAL_WIDTH / dims.x; //mm/pixels
+	double scaleY = REAL_HEIGHT / dims.y; //mm/pixels
+	scaleFactor = (scaleX + scaleY) / 2.0; //average of the scales
 }
 
 void Vision::CalcGrasp()
 {
 	//get new data
-	TIAFC::DoItAll(cropImage, contourImage, contourList, contourMatrix);
+	TIAFC::DoItAll(cropImage, contour);
 
-	grasp = AnalytGrasp::FindGrasp(contourImage, contourList, contourMatrix);
+	grasp = AnalytGrasp::FindGrasp(contour, scaleFactor);
 
 	if (VISION_MODE)
 	{
+		//for points:
 		//make image
 		Mat graspImage;
-		contourImage.copyTo(graspImage);
+		contour.image.copyTo(graspImage);
 		cvtColor(graspImage, graspImage, COLOR_GRAY2BGR);
 
 		//drawing color
 		Vec3b color;
-		color.val[0] = 255; //blue
-		color.val[1] = 255; //green
-		color.val[2] = 255; //red
-
-		//draw pixels to mark the focus
-		for (int i = -2; i <= 2; i++)
-			for (int j = -2; j <= 2; j++)
-				graspImage.at<Vec3b>(grasp.focus.y + j, grasp.focus.x + i) = color;
 
 		//draw pixels to mark point a
 		color.val[0] = 0; //blue
@@ -78,7 +72,7 @@ void Vision::CalcGrasp()
 			for (int j = -2; j <= 2; j++)
 				graspImage.at<Vec3b>(grasp.points[1].y + j, grasp.points[1].x + i) = color;
 
-		//draw pixels to mark point b
+		//draw pixels to mark point c
 		color.val[0] = 255; //blue
 		color.val[1] = 0; //green
 		color.val[2] = 0; //red
@@ -87,7 +81,32 @@ void Vision::CalcGrasp()
 				graspImage.at<Vec3b>(grasp.points[2].y + j, grasp.points[2].x + i) = color;
 
 		//save image
-		imwrite("InfoFiles/Vision_grasp.jpg", graspImage);
+		imwrite("InfoFiles/Vision(grasp_points).jpg", graspImage);
+
+		//for focus and COM:
+		//make image
+		Mat COMFocusImage;
+		contour.image.copyTo(COMFocusImage);
+		cvtColor(COMFocusImage, COMFocusImage, COLOR_GRAY2BGR);
+
+		//draw pixels to mark the focus
+		color.val[0] = 0; //blue
+		color.val[1] = 255; //green
+		color.val[2] = 0; //red
+		for (int i = -2; i <= 2; i++)
+			for (int j = -2; j <= 2; j++)
+				graspImage.at<Vec3b>(grasp.focus.y + j, grasp.focus.x + i) = color;
+
+		//draw pixels to mark the COM
+		color.val[0] = 0; //blue
+		color.val[1] = 0; //green
+		color.val[2] = 255; //red
+		for (int i = -2; i <= 2; i++)
+			for (int j = -2; j <= 2; j++)
+				COMFocusImage.at<Vec3b>(grasp.COM.y + j, grasp.COM.x + i) = color;
+
+		//save image
+		imwrite("InfoFiles/Vision(COM_and_focus).jpg", COMFocusImage);
 	}
 }
 
@@ -111,7 +130,7 @@ double Vision::GetDistFromCOM()
 Coords Vision::GetObjCoords()
 {
 	//return the objects COM in real coordinates
-	return GetRealCoords(AnalytGrasp::FindCOM(contourList, contourImage));
+	return GetRealCoords(TIAFC::FindCOM(contour));
 }
 
 Vision::~Vision()
@@ -121,11 +140,7 @@ Vision::~Vision()
 Coords Vision::GetRealCoords(Coords coordsInPixels)
 {
 	Coords globAxeDirs(GLOB_X_DIR, GLOB_Y_DIR);
-	return (((coordsInPixels.Add(offset)).Mul(globAxeDirs)).Mul(scaleFactor)).Div(CALC_FACTOR);
-	// ((pixels + pixels) * ((mm * CALC_FACTOR) / pixels)) / CALC_FACTOR
-	//				=
-	//	(pixels * mm * CALC_FACTOR) / (pixels * CALC_FACTOR)
-	//				=
-	//				mm
+	Coords temp = (coordsInPixels.Add(offset)).Mul(globAxeDirs);
+	return Coords(temp.x * scaleFactor, temp.y * scaleFactor); //pixels * (mm / pixels) = pixels
 }
 
