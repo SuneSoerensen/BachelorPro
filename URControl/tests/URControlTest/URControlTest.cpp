@@ -14,6 +14,8 @@ int main()
   cout << "mov  | Run move-program" << endl;
   cout << "home | Run home-program" << endl;
   cout << "init | Run init-program" << endl;
+  cout << "rel  | Run moveRel()" << endl;
+  cout << "rot  | Run setWristAngle()" << endl;
   cout << "Invalid command will terminate program" << endl;
 
   string ip = "192.168.100.4";
@@ -84,6 +86,16 @@ int main()
     {
       cout << "Are bounds of (1000,0,0) okay? " << ur5.checkBounds(1000,0,0) << endl;
     }
+    else if(command == "rot")
+    {
+      cout << "Please enter an angle in deg.: ";
+      double angle;
+      cin >> angle;
+
+      angle *= deg2rad;
+      cout << "Rotating wrist." << endl;
+      ur5.setWristAngle(angle);
+   }
     else
     {
       cout << "Terminating..." << endl;

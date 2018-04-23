@@ -33,9 +33,9 @@ int main()
     cout << "Done calibrating. Remove calibration-marker and place target-object. Then, press ENTER to compute grasp." << endl;
     cin.get();
     cout << "Computing grasp.." << endl;
-    //TODO: graspPoints = insert function(s) when ready..
-    //...
-    objCoords = vis.GetObjCoords();
+    vis.CalcGrasp();
+    objCoords = vis.GetGraspFocus();
+    graspPoints = vis.GetGraspPoints();
     cout << "Found real-world coordinates for target-object: (" << objCoords.x << ";" <<  objCoords.y << ")." << "Press ENTER to initialize hand and arm.." << endl;
     cin.get();
     cout << "Initializing hand and arm..." << endl;
@@ -81,10 +81,14 @@ int main()
     ur.moveRel(objCoords.x, objCoords.y, 0.0); //Hand above object
     ur.setWristAngle(-wristRotation); //Rotate wrist
 
+    /*DEBUG*/ cout << "Press ENTER TO CONTINUE." << endl;
+    /*DEBUG*/ cin.get();
+
     if(handLocalGraspPoints.size() == 3) //If it is a three-finger-grasp
     {
       cout << "Going to pre-grasp configuration." << endl;
       SDHheight = hand.grasp(handLocalGraspPoints[0].x , handLocalGraspPoints[0].y, handLocalGraspPoints[1].x, handLocalGraspPoints[1].y, handLocalGraspPoints[2].x, handLocalGraspPoints[2].y, true) - INIT_POS_Z*1000.0; //Pregrasp and save height
+
       cout << "Press ENTER to grasp object." << endl;
       cin.get();
       cout << "Grasping." << endl;

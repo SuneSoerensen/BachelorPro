@@ -60,8 +60,9 @@ void URControl::moveToInit()
 {
   if(state != STATE_INIT)
   {
-    string fileName = getenv("URCON_ROOT");
-    fileName += "goToInit.txt";
+    /*string fileName = getenv("URCON_ROOT");
+    fileName += "goToInit.txt";*/
+    string fileName = "goToInit.txt";
     sendScript(fileName);
     haveBeenToInit = 1;
     state = STATE_INIT;
@@ -80,8 +81,9 @@ void URControl::moveToHome()
 {
   if(state != STATE_HOME)
   {
-    string fileName = getenv("URCON_ROOT");
-    fileName += "goToHome.txt";
+    /*string fileName = getenv("URCON_ROOT");
+    fileName += "goToHome.txt";*/
+    string fileName = "goToHome.txt";
     sendScript(fileName);
     haveBeenToInit = 0;
     state = STATE_HOME;
@@ -208,6 +210,9 @@ void URControl::moveRel(double anX, double aY, double aZ)
 
 void URControl::setWristAngle(double anAngle)
 {
+  if(URCONTROL_MODE)
+    printcurrToolPos();
+
   if(abs(anAngle) > 360.0*deg2rad)
     throw("[URControl::setWristAngle]: Invalid angle (|angle| > 360 deg)!");
 
@@ -223,6 +228,11 @@ void URControl::setWristAngle(double anAngle)
   out.close();
 
   sendScript("rotateWristScript.txt");
+
+  currToolPos[5] = anAngle;
+
+  if(URCONTROL_MODE)
+    printcurrToolPos();
 }
 
 bool URControl::checkBounds(double x, double y, double z)
@@ -233,7 +243,7 @@ bool URControl::checkBounds(double x, double y, double z)
 //Helpful debug functions:
 void URControl::printcurrToolPos()
 {
-  cout << "Current tool position (x, y, z, rotX, rotY, rotZ): ";
+  cout << "\033[1;33m DEBUG: \033[0m" << "Current tool position (x, y, z, rotX, rotY, rotZ): ";
   for(int i = 0; i < 6; i++)
   {
     cout << currToolPos[i] << "  ";

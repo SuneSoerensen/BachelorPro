@@ -12,7 +12,7 @@
 #define TIAFC_MODE		1	// 0 = normal, 1 = info
 
 //camera settings (taking an image):
-#define CAMERA			0	// 0 = default camera
+#define CAMERA			1	// 0 = default camera
 #define CAM_RES_WIDTH	1280
 #define CAM_RES_HEIGHT	720
 #define FRAMES_TO_GET	14	// min 7, according to initial tests
@@ -24,7 +24,7 @@
 #define CROP_RIGHT		1000
 
 //for thresholding:
-#define THRESHOLDING_THRES	110 //should be between the intensities of the background and the object
+#define THRESHOLDING_THRES	200 //should be between the intensities of the background and the object
 #define THRESHOLDING_MODE	0 //0 = light object on dark background, 1 = dark object on light background
 
 //============
@@ -53,11 +53,11 @@
 //=================
 #define ANALYT_GRASP_MODE	1	// 0 = normal, 1 = info
 
-#define MIN_P1_ANG		0.17 //radians (~10 deg)
+#define MIN_P1_ANG		45.0*deg2rad //radians (~10 deg)
 #define MAX_P1_ANG		2.62 //radians (~150 deg)
 #define MAX_DEV_ANG		0.17 //radians (~10 deg)
 
-#define MAX_P1_INTERSEC_DIST	75.0 //pixels
+#define MAX_P1_INTERSEC_DIST	600.0 //pixels
 
 #define MAX_DIST_FROM_COM	42.0 //pixels
 
@@ -111,7 +111,7 @@
 
 #define TARGET_Z 80.0 //mm above plate
 
-#define SDH_ANGLE_THRESH 10.0*deg2rad
+#define SDH_ANGLE_THRESH 20.0*deg2rad
 #define SDH_MAX_ABS_ANGLE 90.0*deg2rad
 
 #define SDH_PRECISION 10.0 //mm
