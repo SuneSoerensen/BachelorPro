@@ -30,10 +30,9 @@ Coords AnalytGrasp::FindCOM(vector<Coords> &aContourList, Mat &aContourImage)
 		color.val[2] = 255; //red
 
 		//draw pixels to mark the COM
-		for (int i = 0; i < 17; i++)
-		{
-			centOfMassImage.at<Vec3b>(res.y + yVals[i], res.x + xVals[i]) = color;
-		}
+		for (int i = -2; i <= 2; i++)
+			for (int j = -2; j <= 2; j++)
+				centOfMassImage.at<Vec3b>(res.y + j, res.x + i) = color;
 
 		//save image
 		imwrite("InfoFiles/AnalytGrasp_centOfMass.jpg", centOfMassImage);

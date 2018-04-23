@@ -26,12 +26,17 @@ void TIAFC::TakeImage(Mat &aCropImage)
 
 	//get frame
 	Mat frame;
-	/*for (int i = 0; i < FRAMES_TO_GET ; i++) //comment this out when the following debug is commented in
+	if (VISION_DEV_MODE)
 	{
-		cap.read(frame);
-	}*/
-
-	/*DEBUG*/frame = imread("TestImg/pot.jpg");
+		frame = imread("TestImg/pot.jpg");
+	}
+	else
+	{
+		for (int i = 0; i < FRAMES_TO_GET ; i++)
+		{
+			cap.read(frame);
+		}
+	}
 
 	if (!frame.data) //check if empty
 		throw("[TIAFC::TakeImage()]: Couldn't take image!");
@@ -290,6 +295,10 @@ bool TIAFC::HasBlackNeighbour(Mat &anObjectImage, Coords aCurrPoint)
 			{
 				return true;
 			}
+		}
+		else
+		{
+			return true; //the edge of the image counts as black!
 		}
 	}
 

@@ -19,8 +19,8 @@
 
 //crop settings (taking an image):
 #define CROP_TOP		100  //(for tests: 100, 500, 400, 1000)
-#define CROP_BOTTOM		695
-#define CROP_LEFT		140
+#define CROP_BOTTOM		500
+#define CROP_LEFT		400
 #define CROP_RIGHT		1000
 
 //for thresholding:
@@ -30,6 +30,8 @@
 //============
 //   Vision
 //============
+#define VISION_DEV_MODE	1	//developer mode for Vision and all of its dependencies (0 = false, 1 = true)
+
 #define VISION_MODE		1	// 0 = normal, 1 = info
 
 //for calibration (pixel-coords to real-coords):

@@ -51,10 +51,6 @@ void Vision::CalcGrasp()
 		contourImage.copyTo(graspImage);
 		cvtColor(graspImage, graspImage, COLOR_GRAY2BGR);
 
-		//relative coordinates of pixels to draw
-		int xVals[17] = {0, 2,  2,  2,  1,  0, -1, -2, -2, -2, -2, -2, -1, 0, 1, 2, 2};
-		int yVals[17] = {0, 0, -1, -2, -2, -2, -2, -2, -1,  0,  1,  2,  2, 2, 2, 2, 1};
-
 		//drawing color
 		Vec3b color;
 		color.val[0] = 255; //blue
@@ -62,37 +58,33 @@ void Vision::CalcGrasp()
 		color.val[2] = 255; //red
 
 		//draw pixels to mark the focus
-		for (int i = 0; i < 17; i++)
-		{
-			graspImage.at<Vec3b>(grasp.focus.y + yVals[i], grasp.focus.x + xVals[i]) = color;
-		}
+		for (int i = -2; i <= 2; i++)
+			for (int j = -2; j <= 2; j++)
+				graspImage.at<Vec3b>(grasp.focus.y + j, grasp.focus.x + i) = color;
 
 		//draw pixels to mark point a
 		color.val[0] = 0; //blue
 		color.val[1] = 0; //green
 		color.val[2] = 255; //red
-		for (int i = 0; i < 17; i++)
-		{
-			graspImage.at<Vec3b>(grasp.points[0].y + yVals[i], grasp.points[0].x + xVals[i]) = color;
-		}
+		for (int i = -2; i <= 2; i++)
+			for (int j = -2; j <= 2; j++)
+				graspImage.at<Vec3b>(grasp.points[0].y + j, grasp.points[0].x + i) = color;
 
 		//draw pixels to mark point b
 		color.val[0] = 0; //blue
 		color.val[1] = 255; //green
 		color.val[2] = 0; //red
-		for (int i = 0; i < 17; i++)
-		{
-			graspImage.at<Vec3b>(grasp.points[1].y + yVals[i], grasp.points[1].x + xVals[i]) = color;
-		}
+		for (int i = -2; i <= 2; i++)
+			for (int j = -2; j <= 2; j++)
+				graspImage.at<Vec3b>(grasp.points[1].y + j, grasp.points[1].x + i) = color;
 
 		//draw pixels to mark point b
 		color.val[0] = 255; //blue
 		color.val[1] = 0; //green
 		color.val[2] = 0; //red
-		for (int i = 0; i < 17; i++)
-		{
-			graspImage.at<Vec3b>(grasp.points[2].y + yVals[i], grasp.points[2].x + xVals[i]) = color;
-		}
+		for (int i = -2; i <= 2; i++)
+			for (int j = -2; j <= 2; j++)
+				graspImage.at<Vec3b>(grasp.points[2].y + j, grasp.points[2].x + i) = color;
 
 		//save image
 		imwrite("InfoFiles/Vision_grasp.jpg", graspImage);
