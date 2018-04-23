@@ -173,6 +173,9 @@ double SDHControl::grasp(double fingerAX, double fingerAY, double fingerBX, doub
     if(!isPreGrasp)
       controlGrasp(xA, xB, xC);
 
+    if(isPreGrasp && SDHCONTROL_MODE)
+      cout << "\033[1;33m DEBUG: \033[0m" << "Found height is = " << y + WRIST_HEIGHT + TARGET_Z + SEPERATOR_HEIGHT << endl;
+
     return y + WRIST_HEIGHT + TARGET_Z + SEPERATOR_HEIGHT; //Z-coordinate to give directly to URControl (moveAbs())
 
 }

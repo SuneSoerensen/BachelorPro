@@ -26,12 +26,12 @@ void TIAFC::TakeImage(Mat &aCropImage)
 
 	//get frame
 	Mat frame;
-	/*for (int i = 0; i < FRAMES_TO_GET ; i++) //comment this out when the following debug is commented in
+	for (int i = 0; i < FRAMES_TO_GET ; i++) //comment this out when the following debug is commented in
 	{
 		cap.read(frame);
-	}*/
+	}
 
-	/*DEBUG*/frame = imread("TestImg/pot.jpg");
+	///*DEBUG*/frame = imread("TestImg/pot.jpg");
 
 	if (!frame.data) //check if empty
 		throw("[TIAFC::TakeImage()]: Couldn't take image!");
