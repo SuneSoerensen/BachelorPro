@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <rwhw/universalrobots/UniversalRobotsData.hpp>
 #include <rw/math/Vector3D.hpp>
+#include <stdlib.h>
 
 USE_ROBWORK_NAMESPACE
 
@@ -60,9 +61,12 @@ void URControl::moveToInit()
 {
   if(state != STATE_INIT)
   {
-    /*string fileName = getenv("URCON_ROOT");
-    fileName += "goToInit.txt";*/
+    /*string root(getenv("URCON_ROOT"));
+    string file = "goToInit.txt";
+    string fileName = root + file;*/
+
     string fileName = "goToInit.txt";
+
     sendScript(fileName);
     haveBeenToInit = 1;
     state = STATE_INIT;
@@ -81,9 +85,14 @@ void URControl::moveToHome()
 {
   if(state != STATE_HOME)
   {
-    /*string fileName = getenv("URCON_ROOT");
-    fileName += "goToHome.txt";*/
+    /*string root(getenv("BACH_ROOT"));
+    if(URCONTROL_MODE)
+        cout << "\033[1;33m DEBUG: \033[0m" << "Created fileName with success" << endl;
+    string file = "goToHome.txt";
+    string fileName = root + file;*/
+
     string fileName = "goToHome.txt";
+
     sendScript(fileName);
     haveBeenToInit = 0;
     state = STATE_HOME;
@@ -154,9 +163,11 @@ void URControl::moveRel(double anX, double aY, double aZ)
   ofstream out(fileName, ofstream::out);
 
   out << "HOST=" << ip << "\n" << "PORT=" << port << "\n" << "def moveRel():\n";
-  out << "\tpos=p[" << to_string(absX) << ", " << to_string(absY) << ", " << to_string(currToolPos[2]+z) << ", " << currToolPos[3] << ", " << currToolPos[4] << ", " << currToolPos[5] << "]\n";
+  out << "\t pos = get_forward_kin() \n";
+  out << "\t pos[0] = " << to_string(absX) << "\n";
+  out << "\t pos[1] = " << to_string(absY) << "\n";
+  out << "\t pos[2] = " << to_string(currToolPos[2]+z)  << "\n";
   out << "\tmovel(pos," << ACC << ", " << VEL << "," << MOVTIME << "," << BLENDR << ")\n";
-  //out << "\ttextmsg(\"Moved to position:" << to_string(currToolPos[0]+x) << ", " << to_string(currToolPos[1]+y) << ", " << to_string(currToolPos[2]+z) << ", " << currToolPos[3] << ", " << currToolPos[4] << ", " << currToolPos[5] << "\")\n";
   out << "end\n";
 
   out.close();
@@ -218,18 +229,26 @@ void URControl::setWristAngle(double anAngle)
 
   ofstream out("rotateWristScript.txt", ofstream::out);
 
+  //Rotate wrist-joint directly:
   out << "HOST=" << ip << "\n" << "PORT=" << port << "\n" << "def rotWrist():\n";
   out << "\t" << "pos = get_joint_positions()" << "\n";
   out << "\t" << "pos[5] =" << anAngle << "\n";
   out << "\t" << "textmsg(\"Rotating wrist\")" << "\n";
   out << "\t" << "movej(pos, 0.1, 0.1, 5, 0)" << "\n";
-  out << "end\n";
+  out << "end \n";
+
+  //Alternative version 1: rotate by pose:
+  /*out << "HOST=" << ip << "\n" << "PORT=" << port << "\n" << "def rotWrist():\n";
+  out << "\t" << "pos = p[" << currToolPos[0] << "," << currToolPos[1] << "," << currToolPos[2] << "," << currToolPos[3] << "," << currToolPos[4] << "," << anAngle << "]" << "\n";
+  out << "\t" << "textmsg(\"Rotating wrist\")" << "\n";
+  out << "\tmovel(pos," << ACC << ", " << VEL << "," << MOVTIME << "," << BLENDR << ")\n";
+  out << "end\n";*/
 
   out.close();
 
   sendScript("rotateWristScript.txt");
 
-  currToolPos[5] = anAngle;
+  //currToolPos[5] = anAngle;
 
   if(URCONTROL_MODE)
     printcurrToolPos();

@@ -1,6 +1,6 @@
 # Test CMake version
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
-set( CMAKE_CXX_STANDARD 14)
+set( CMAKE_CXX_STANDARD 11)
 
 # The name of the project
 PROJECT(Main)

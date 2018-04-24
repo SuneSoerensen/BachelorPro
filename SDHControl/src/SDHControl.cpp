@@ -261,6 +261,11 @@ bool SDHControl::getIsExpectedGrasp()
   return isExpectedGrasp;
 }
 
+Q SDHControl::getQ()
+{
+  return sdh->getQ();
+}
+
 void SDHControl::adjustVel(double joint0, double joint1, double joint2, double joint3, double joint4, double joint5, double joint6)
 {
 

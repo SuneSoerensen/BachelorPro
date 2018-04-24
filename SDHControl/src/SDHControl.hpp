@@ -59,6 +59,8 @@ public:
     bool getIsValidGrasp();
     bool getIsExpectedGrasp();
 
+    Q getQ();
+
     //Adjust velocity for SDH joints: TODO: delete this, as it is not used!
     void adjustVel(double joint0, double joint1, double joint2, double joint3, double joint4, double joint5, double joint6);
 
