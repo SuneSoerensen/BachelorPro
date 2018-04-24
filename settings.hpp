@@ -101,7 +101,7 @@
 //===============
 //   SDHControl
 //===============
-#define SDHCONTROL_MODE 1 //0=standard 1=debug
+#define SDHCONTROL_MODE 0 //0=standard 1=debug
 #define GRASPSTARTHEIGHT 160 //5mm further than range of fingers
 #define GRASPFINDSTEPSIZE 0.001 //Stepsize for finding finger-config
 #define GRASPDISTLIM 155.0 //Max distance from finger-base to grasp-point
@@ -126,3 +126,5 @@
 #define SDH_ANGLE_DIFF_FIRST 10.0 //deg
 
 #define PREGRASP_SCALE 30.0 //mm
+
+#define POSTION_TEST true //0=standard 1=torun test

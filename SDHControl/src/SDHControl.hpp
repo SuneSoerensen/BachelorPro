@@ -70,6 +70,8 @@ private:
     //Pointer to SDHDriver-object:
     SDHDriver *sdh;
 
+    Q forTest;
+
     //Reflects whether connected to hand or not:
     bool connected = false;
 
