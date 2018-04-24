@@ -9,10 +9,19 @@
 using namespace std;
 using namespace cv;
 
+struct Contour
+{
+	Mat image; //image of the contour
+	vector<Coords> list; //list of the points in the contour
+	vector<vector<int> > matrix; //relates coordinates of contour points to indices in the list (indices are offset by +1!!!)
+};
+
 class TIAFC //Take Image And Find Contour
 {
 public:
-	static void DoItAll(Mat &aCropImage, Mat &aContourImage, vector<Coords> &aContourList, vector<vector<int> > &aContourMatrix);
+	static Coords FindCOM(Contour &aContour);
+
+	static void DoItAll(Mat &aCropImage, Contour &aContour);
 
 private:
 	static void TakeImage(Mat &aCropImage);
@@ -21,8 +30,8 @@ private:
 	static void ThereCanOnlyBeOne(Mat &aThresImage, bool mode);
 	static void CatchNeighbours(Mat &aThresImage, int aColor, Coords aCurrPoint, vector<Coords> &aListOfPoints);
 
-	static void FindContour(Mat &anObjectImage, Mat &aContourImage, vector<Coords> &aContourList, vector<vector<int> > &aContourMatrix);
-	static Coords FindNextNeighbour(Mat &anObjectImage, vector<vector<int> > &aContourMatrix, Coords aCurrPoint);
+	static void FindContour(Mat &anObjectImage, Contour &aContour);
+	static Coords FindNextNeighbour(Mat &anObjectImage, Contour &aContour, Coords aCurrPoint);
 	static bool HasBlackNeighbour(Mat &anObjectImage, Coords aCurrPoint);
 	static int NumOfWhiteNeighbours(Mat &anObjectImage, Coords aCurrPoint);
 

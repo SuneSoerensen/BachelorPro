@@ -1,59 +1,17 @@
 #include "AnalytGrasp.hpp"
 
-Coords AnalytGrasp::FindCOM(vector<Coords> &aContourList, Mat &aContourImage)
-{
-	//calculate sum of all x- and y-coordinates
-	Coords sum(0, 0);
-	for (int i = 0; i < aContourList.size(); i++)
-	{
-		sum = sum.Add(aContourList[i]);
-	}
-
-	//divide by number of points to find average
-	Coords res = sum.Div(aContourList.size());
-
-	if (ANALYT_GRASP_MODE) //INFO
-	{
-		//make image
-		Mat centOfMassImage;
-		aContourImage.copyTo(centOfMassImage);
-		cvtColor(centOfMassImage, centOfMassImage, COLOR_GRAY2BGR);
-
-		//relative coordinates of pixels to draw
-		int xVals[17] = {0, 2,  2,  2,  1,  0, -1, -2, -2, -2, -2, -2, -1, 0, 1, 2, 2};
-		int yVals[17] = {0, 0, -1, -2, -2, -2, -2, -2, -1,  0,  1,  2,  2, 2, 2, 2, 1};
-
-		//drawing color
-		Vec3b color;
-		color.val[0] = 0; //blue
-		color.val[1] = 0; //green
-		color.val[2] = 255; //red
-
-		//draw pixels to mark the COM
-		for (int i = 0; i < 17; i++)
-		{
-			centOfMassImage.at<Vec3b>(res.y + yVals[i], res.x + xVals[i]) = color;
-		}
-
-		//save image
-		imwrite("InfoFiles/AnalytGrasp_centOfMass.jpg", centOfMassImage);
-	}
-
-	return res;
-}
-
-Grasp AnalytGrasp::FindGrasp(Mat &aContourImage, vector<Coords> &aContourList, vector<vector<int> > &aContourMatrix)
+Grasp AnalytGrasp::FindGrasp(Contour &aContour, double aScaleFactor)
 {
 	//find grasping regions
 	vector<vector<Coords> > graspRegsList;
-	FindGraspRegs(graspRegsList, aContourImage, aContourList, aContourMatrix);
+	FindGraspRegs(graspRegsList, aContour, aScaleFactor);
 
 	//calc their normal vectors
 	vector<Coords> normVecsList;
 	CalcNormVecs(graspRegsList, normVecsList);
 
 	//calc the objects center of mass
-	Coords COM = FindCOM(aContourList, aContourImage);
+	Coords COM = TIAFC::FindCOM(aContour);
 
 	//calc possible priority 1 grasps
 	vector<Grasp> p1GraspsList;
@@ -72,7 +30,7 @@ Grasp AnalytGrasp::FindGrasp(Mat &aContourImage, vector<Coords> &aContourList, v
 				currBestP1Grasp = i;
 			}
 		}
-
+		/*TEMP*/p1GraspsList[currBestP1Grasp].COM = COM;
 		return p1GraspsList[currBestP1Grasp];
 	}
 
@@ -86,17 +44,38 @@ Grasp AnalytGrasp::FindGrasp(Mat &aContourImage, vector<Coords> &aContourList, v
 	throw("[AnalytGrasp::FindGrasP()]: Couldn't find any acceptable grasps!");
 }
 
-void AnalytGrasp::FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aContourImage, vector<Coords> &aContourList, vector<vector<int> > &aContourMatrix)
+void AnalytGrasp::FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Contour &aContour, double aScaleFactor)
 {
+	int regWidth = GRASP_REG_WIDTH / aScaleFactor; //mm / (mm / pixels) = mm * (pixels / mm) = pixels
+
+	for (int i = 0; i < aContour.list.size(); i++) //for all points in the contour
+	{
+		//find start and end points (of the grasp reg)
+		int startIndex = (aContour.list.size() + i - (regWidth/2)) % aContour.list.size(); //wrap
+		int endIndex = (i + (regWidth/2)) % aContour.list.size(); //wrap
+
+		//calc normal vector
+		Coords dirVec = (aContour.list[endIndex]).Sub(aContour.list[startIndex]); //r = p_end - p_start
+		Coords normVec = Coords(dirVec.y, -dirVec.x); //n = (y, -x), r = (x, y)
+
+		for (int j = startIndex; j <= endIndex; j++)
+		{
+			
+		}
+	}
+
+
+
+
+
 	//use Hough-transform to find straight lines
 	vector<Vec4i> lines;
-	HoughLinesP(aContourImage, lines, 1, CV_PI/180, MIN_POINTS_IN_LINE, MIN_LINE_LENGTH, MAX_LINE_GAP);
+	HoughLinesP(aContour.image, lines, 1, CV_PI/180, MIN_POINTS_IN_LINE, MIN_LINE_LENGTH, MAX_LINE_GAP);
 
 	if (lines.size() == 0) //check that lines were found
 		throw("[AnalytGrasp::FindGraspRegs()]: Couldn't find any grasp regions!");
 
 	//copy found lines to the list of grasping regions
-	///*DEBUG*/cout << "grasp regs:" << endl;
 	aGraspRegsList.resize(lines.size());
 	for (int i = 0; i < lines.size(); i++)
 	{
@@ -104,21 +83,21 @@ void AnalytGrasp::FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aC
 		int firstPointIndex;
 		int secondPointIndex;
 
-		if (aContourMatrix[lines[i][0]][lines[i][1]] < aContourMatrix[lines[i][2]][lines[i][3]])
+		if (aContour.matrix[lines[i][0]][lines[i][1]] < aContour.matrix[lines[i][2]][lines[i][3]])
 		{
-			firstPointIndex = aContourMatrix[lines[i][0]][lines[i][1]] - 1; //indices in the contour matrix is offset by +1!
-			secondPointIndex = aContourMatrix[lines[i][2]][lines[i][3]] - 1;
+			firstPointIndex = aContour.matrix[lines[i][0]][lines[i][1]] - 1; //indices in the contour matrix is offset by +1!
+			secondPointIndex = aContour.matrix[lines[i][2]][lines[i][3]] - 1;
 		}
 		else
 		{
-			firstPointIndex = aContourMatrix[lines[i][2]][lines[i][3]] - 1; //indices in the contour matrix is offset by +1!
-			secondPointIndex = aContourMatrix[lines[i][0]][lines[i][1]] - 1;
+			firstPointIndex = aContour.matrix[lines[i][2]][lines[i][3]] - 1; //indices in the contour matrix is offset by +1!
+			secondPointIndex = aContour.matrix[lines[i][0]][lines[i][1]] - 1;
 		}
 
 		int startPointIndex;
 		int endPointIndex;
 
-		if (secondPointIndex - firstPointIndex < (aContourList.size() + firstPointIndex) - secondPointIndex) //determine the shortest way round between the points
+		if (secondPointIndex - firstPointIndex < (aContour.list.size() + firstPointIndex) - secondPointIndex) //determine the shortest way round between the points
 		{
 			startPointIndex = firstPointIndex;
 			endPointIndex = secondPointIndex;
@@ -130,16 +109,14 @@ void AnalytGrasp::FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aC
 			startPointIndex = secondPointIndex;
 			endPointIndex = firstPointIndex;
 
-			aGraspRegsList[i].resize((aContourList.size() + firstPointIndex) - secondPointIndex + 1);
+			aGraspRegsList[i].resize((aContour.list.size() + firstPointIndex) - secondPointIndex + 1);
 		}
-
-		///*DEBUG*/cout << aContourList[startPointIndex].x << "; " << aContourList[startPointIndex].y << " , " << aContourList[endPointIndex].x << "; " << aContourList[endPointIndex].y << endl;
 
 		//copy points to the list of grasping regions
 		int index = 0;
-		for (int j = startPointIndex; j != endPointIndex + 1; j = (j + 1) % aContourList.size())
+		for (int j = startPointIndex; j != endPointIndex + 1; j = (j + 1) % aContour.list.size())
 		{
-			aGraspRegsList[i][index] = aContourList[j];
+			aGraspRegsList[i][index] = aContour.list[j];
 			index++;
 		}
 	}
@@ -149,7 +126,7 @@ void AnalytGrasp::FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aC
 		//draw all the lines:
 		//make output image
 		Mat graspRegsImage;
-		aContourImage.copyTo(graspRegsImage);
+		aContour.image.copyTo(graspRegsImage);
 		cvtColor(graspRegsImage, graspRegsImage, COLOR_GRAY2BGR);
 
 		//draw the found lines
@@ -167,12 +144,12 @@ void AnalytGrasp::FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aC
 		}
 
 		//save to image
-		imwrite("InfoFiles/AnalytGrasp_graspRegs.jpg", graspRegsImage);
+		imwrite("InfoFiles/AnalytGrasp(grasp_regs).jpg", graspRegsImage);
 
 		//draw all the lines individually:
 		for(int i = 0; i < aGraspRegsList.size(); i++ )
 		{
-			aContourImage.copyTo(graspRegsImage);
+			aContour.image.copyTo(graspRegsImage);
 			cvtColor(graspRegsImage, graspRegsImage, COLOR_GRAY2BGR);
 
 			for(int j = 0; j < aGraspRegsList[i].size(); j++ )
@@ -197,7 +174,7 @@ void AnalytGrasp::FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aC
 				}
 			}
 
-			imwrite("InfoFiles/AnalytGrasp_graspReg_" + to_string(i) + ".jpg", graspRegsImage);
+			imwrite("InfoFiles/AnalytGrasp(grasp_reg_" + to_string(i) + ").jpg", graspRegsImage);
 		}
 	}
 }
@@ -207,20 +184,16 @@ void AnalytGrasp::CalcNormVecs(vector<vector<Coords> > &aGraspRegsList, vector<C
 	//calc direction-vectors
 	vector<Coords> dirVecsList;
 	dirVecsList.resize(aGraspRegsList.size());
-	///*DEBUG*/cout << "direction vectors:" << endl;
 	for (int i = 0; i < aGraspRegsList.size(); i++)
 	{
 		dirVecsList[i] = (aGraspRegsList[i][aGraspRegsList[i].size() - 1]).Sub(aGraspRegsList[i][0]); //r = p_end - p_start
-		///*DEBUG*/cout << aGraspRegsList[i][aGraspRegsList[i].size() - 1].x << "; " << aGraspRegsList[i][aGraspRegsList[i].size() - 1].y << " - " << aGraspRegsList[i][0].x << "; " << aGraspRegsList[i][0].y << " = " << dirVecsList[i].x << "; " << dirVecsList[i].y << endl;
 	}
 
 	//calc normal-vectors
 	aNormVecsList.resize(aGraspRegsList.size());
-	///*DEBUG*/cout << "normal vectors:" << endl;
 	for (int i = 0; i < aNormVecsList.size(); i++)
 	{
 		aNormVecsList[i].Set(dirVecsList[i].y, -dirVecsList[i].x); //n = (y, -x), r = (x, y)
-		///*DEBUG*/cout << aNormVecsList[i].x << "; " << aNormVecsList[i].y << endl;
 	}
 }
 
@@ -384,10 +357,6 @@ Coords AnalytGrasp::CalcIntersection(Coords pL, Coords rL, Coords pM, Coords rM)
 	double num = rL.x * (pL.y - pM.y) + rL.y * (pM.x - pL.x);
 	double den = rL.x * rM.y - rL.y * rM.x;
 	double tM = num / den;
-
-	///*DEBUG*/cout << "num = " << num << endl;
-	///*DEBUG*/cout << "den = " << den << endl;
-	///*DEBUG*/cout << "tM = " << tM << endl;
 
 	if (tM < 0)
 		return Coords(-42); //ERROR (for this purpose, tM < 0 is illegal)

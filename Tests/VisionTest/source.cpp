@@ -30,14 +30,7 @@ int main()
 
 			if (mode == "0")
 			{
-				Coords pL(0, 0);
-				Coords rL(0, 1);
-				Coords pM(5, 5);
-				Coords rM(-1, 0);
-
-				Coords point = AnalytGrasp::CalcIntersection(pL, rL, pM, rM);
-
-				cout << "(" << point.x << "; " << point.y << ")" << endl;
+				
 			}
 			else if (mode == "1")
 			{

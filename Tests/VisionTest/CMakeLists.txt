@@ -26,6 +26,7 @@ add_executable( source source.cpp )
 #link AnalytGrasp's dependecies to it
 target_link_libraries( AnalytGrasp ${OpenCV_LIBS} )
 target_link_libraries( AnalytGrasp Coords)
+target_link_libraries( AnalytGrasp TIAFC)
 
 #link TIAFC's dependecies to it
 target_link_libraries( TIAFC ${OpenCV_LIBS} )

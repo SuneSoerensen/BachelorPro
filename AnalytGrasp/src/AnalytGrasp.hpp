@@ -6,6 +6,7 @@
 #include "settings.hpp"
 #include "Coords.hpp"
 #include <string>
+#include "TIAFC.hpp"
 
 using namespace std;
 using namespace cv;
@@ -17,20 +18,17 @@ struct Grasp
 	Type type;
 	vector<Coords> points;
 	Coords focus;
+	Coords COM;
 	double distFromCOM;
 };
 
 class AnalytGrasp //Analytical Grasping
 {
 public:
-	static Coords FindCOM(vector<Coords> &aContourList, Mat &aContourImage);
-
-	static Grasp FindGrasp(Mat &aContourImage, vector<Coords> &aContourList, vector<vector<int> > &aContourMatrix);
-
-	static Coords CalcIntersection(Coords pL, Coords rL, Coords pM, Coords rM);
+	static Grasp FindGrasp(Contour &aContour, double aScaleFactor);
 
 private:
-	static void FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Mat &aContourImage, vector<Coords> &aContourList, vector<vector<int> > &aContourMatrix);
+	static void FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Contour &aContour, double aScaleFactor);
 
 	static void CalcNormVecs(vector<vector<Coords> > &aGraspRegsList, vector<Coords> &aNormVecsList);
 
@@ -41,7 +39,7 @@ private:
 	static void TwoFingAngCheck(vector<vector<int> > &aPossGraspsList, vector<Coords> &aNormVecsList);
 
 	static double CalcAngle(Coords vecA, Coords vecB);
-
+	static Coords CalcIntersection(Coords pL, Coords rL, Coords pM, Coords rM);
 
 	AnalytGrasp();
 	~AnalytGrasp();
