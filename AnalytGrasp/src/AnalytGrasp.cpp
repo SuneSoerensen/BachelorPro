@@ -3,19 +3,15 @@
 Grasp AnalytGrasp::FindGrasp(Contour &aContour, double aScaleFactor)
 {
 	//find grasping regions
-	vector<vector<Coords> > graspRegsList;
+	vector<GraspReg> graspRegsList;
 	FindGraspRegs(graspRegsList, aContour, aScaleFactor);
-
-	//calc their normal vectors
-	vector<Coords> normVecsList;
-	CalcNormVecs(graspRegsList, normVecsList);
 
 	//calc the objects center of mass
 	Coords COM = TIAFC::FindCOM(aContour);
 
 	//calc possible priority 1 grasps
 	vector<Grasp> p1GraspsList;
-	CalcP1Grasps(p1GraspsList, graspRegsList, normVecsList, COM);
+	CalcP1Grasps(p1GraspsList, graspRegsList, COM);
 
 	if (p1GraspsList.size() > 0)
 	{
@@ -30,7 +26,6 @@ Grasp AnalytGrasp::FindGrasp(Contour &aContour, double aScaleFactor)
 				currBestP1Grasp = i;
 			}
 		}
-		/*TEMP*/p1GraspsList[currBestP1Grasp].COM = COM;
 		return p1GraspsList[currBestP1Grasp];
 	}
 
@@ -44,92 +39,58 @@ Grasp AnalytGrasp::FindGrasp(Contour &aContour, double aScaleFactor)
 	throw("[AnalytGrasp::FindGrasP()]: Couldn't find any acceptable grasps!");
 }
 
-void AnalytGrasp::FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Contour &aContour, double aScaleFactor)
+void AnalytGrasp::FindGraspRegs(vector<GraspReg> &aGraspRegsList, Contour &aContour, double aScaleFactor)
 {
 	int regWidth = GRASP_REG_WIDTH / aScaleFactor; //mm / (mm / pixels) = mm * (pixels / mm) = pixels
 
 	for (int i = 0; i < aContour.list.size(); i++) //for all points in the contour
 	{
-		//find start and end points (of the grasp reg)
+		//make a new region
+		GraspReg newReg;
+		newReg.point = aContour.list[i];
+
+		//find start and end points (of the current region)
 		int startIndex = (aContour.list.size() + i - (regWidth/2)) % aContour.list.size(); //wrap
 		int endIndex = (i + (regWidth/2)) % aContour.list.size(); //wrap
 
-		//calc normal vector
-		Coords dirVec = (aContour.list[endIndex]).Sub(aContour.list[startIndex]); //r = p_end - p_start
-		Coords normVec = Coords(dirVec.y, -dirVec.x); //n = (y, -x), r = (x, y)
+		//calc direction and normal vectors
+		newReg.dirVec = (aContour.list[endIndex]).Sub(aContour.list[startIndex]); //r = p_end - p_start
+		newReg.normVec = Coords(newReg.dirVec.y, -newReg.dirVec.x); //n = (y, -x), r = (x, y)
 
-		for (int j = startIndex; j <= endIndex; j++)
+		vector<Coords> devs; //deviations
+		devs.resize(regWidth);
+		for (int j = 0; j <= regWidth; j++) //for all points in the current region
 		{
+			//calc its deviation
+			Coords dirVec = (aContour.list[(startIndex + j) % aContour.list.size()]).Sub(aContour.list[startIndex]); //this points direction vector
+			int projLength = (dirVec.Dot(newReg.normVec) / pow(newReg.normVec.Length(), 2)) * 1000; //the length of the direction vector projected onto the normal vector
+			devs[j] = (newReg.normVec.Mul(projLength)).Div(1000); //projection of this points direction vector onto the normal vector of the region
+		}
+
+		//find largest (longest) deviation
+		Coords largestDev(0, 0);
+		for (int j = 0; j < devs.size(); j++)
+			if (devs[j].Length() > largestDev.Length())
+				largestDev = devs[j];
+
+		//determine if this region is a valid grasp region
+		if (largestDev.Length() * aScaleFactor <= 3.0)
+		{
+			//also check sum of lengths of deviations?
 			
-		}
-	}
-
-
-
-
-
-	//use Hough-transform to find straight lines
-	vector<Vec4i> lines;
-	HoughLinesP(aContour.image, lines, 1, CV_PI/180, MIN_POINTS_IN_LINE, MIN_LINE_LENGTH, MAX_LINE_GAP);
-
-	if (lines.size() == 0) //check that lines were found
-		throw("[AnalytGrasp::FindGraspRegs()]: Couldn't find any grasp regions!");
-
-	//copy found lines to the list of grasping regions
-	aGraspRegsList.resize(lines.size());
-	for (int i = 0; i < lines.size(); i++)
-	{
-		//make sure the order is correct
-		int firstPointIndex;
-		int secondPointIndex;
-
-		if (aContour.matrix[lines[i][0]][lines[i][1]] < aContour.matrix[lines[i][2]][lines[i][3]])
-		{
-			firstPointIndex = aContour.matrix[lines[i][0]][lines[i][1]] - 1; //indices in the contour matrix is offset by +1!
-			secondPointIndex = aContour.matrix[lines[i][2]][lines[i][3]] - 1;
-		}
-		else
-		{
-			firstPointIndex = aContour.matrix[lines[i][2]][lines[i][3]] - 1; //indices in the contour matrix is offset by +1!
-			secondPointIndex = aContour.matrix[lines[i][0]][lines[i][1]] - 1;
-		}
-
-		int startPointIndex;
-		int endPointIndex;
-
-		if (secondPointIndex - firstPointIndex < (aContour.list.size() + firstPointIndex) - secondPointIndex) //determine the shortest way round between the points
-		{
-			startPointIndex = firstPointIndex;
-			endPointIndex = secondPointIndex;
-
-			aGraspRegsList[i].resize(secondPointIndex - firstPointIndex + 1);
-		}
-		else
-		{
-			startPointIndex = secondPointIndex;
-			endPointIndex = firstPointIndex;
-
-			aGraspRegsList[i].resize((aContour.list.size() + firstPointIndex) - secondPointIndex + 1);
-		}
-
-		//copy points to the list of grasping regions
-		int index = 0;
-		for (int j = startPointIndex; j != endPointIndex + 1; j = (j + 1) % aContour.list.size())
-		{
-			aGraspRegsList[i][index] = aContour.list[j];
-			index++;
+			//we have found a valid grasp region!
+			aGraspRegsList.push_back(newReg);
 		}
 	}
 
 	if (ANALYT_GRASP_MODE) //INFO
 	{
-		//draw all the lines:
 		//make output image
 		Mat graspRegsImage;
 		aContour.image.copyTo(graspRegsImage);
 		cvtColor(graspRegsImage, graspRegsImage, COLOR_GRAY2BGR);
 
-		//draw the found lines
+		//draw the found grasp regs
 		Vec3b color; //drawing color
 		color.val[0] = 0; //blue
 		color.val[1] = 0; //green
@@ -137,70 +98,18 @@ void AnalytGrasp::FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Contour
 
 		for(int i = 0; i < aGraspRegsList.size(); i++ )
 		{
-			for(int j = 0; j < aGraspRegsList[i].size(); j++ )
-			{
-				graspRegsImage.at<Vec3b>(aGraspRegsList[i][j].y, aGraspRegsList[i][j].x) = color;
-			}
+			graspRegsImage.at<Vec3b>(aGraspRegsList[i].point.y, aGraspRegsList[i].point.x) = color;
 		}
 
 		//save to image
 		imwrite("InfoFiles/AnalytGrasp(grasp_regs).jpg", graspRegsImage);
-
-		//draw all the lines individually:
-		for(int i = 0; i < aGraspRegsList.size(); i++ )
-		{
-			aContour.image.copyTo(graspRegsImage);
-			cvtColor(graspRegsImage, graspRegsImage, COLOR_GRAY2BGR);
-
-			for(int j = 0; j < aGraspRegsList[i].size(); j++ )
-			{
-				if (j < (aGraspRegsList[i].size() - 1) / 2)
-				{
-					Vec3b color; //drawing color
-					color.val[0] = 0; //blue
-					color.val[1] = 255; //green
-					color.val[2] = 0; //red
-
-					graspRegsImage.at<Vec3b>(aGraspRegsList[i][j].y, aGraspRegsList[i][j].x) = color;
-				}
-				else
-				{
-					Vec3b color; //drawing color
-					color.val[0] = 0; //blue
-					color.val[1] = 0; //green
-					color.val[2] = 255; //red
-
-					graspRegsImage.at<Vec3b>(aGraspRegsList[i][j].y, aGraspRegsList[i][j].x) = color;
-				}
-			}
-
-			imwrite("InfoFiles/AnalytGrasp(grasp_reg_" + to_string(i) + ").jpg", graspRegsImage);
-		}
 	}
 }
 
-void AnalytGrasp::CalcNormVecs(vector<vector<Coords> > &aGraspRegsList, vector<Coords> &aNormVecsList)
-{
-	//calc direction-vectors
-	vector<Coords> dirVecsList;
-	dirVecsList.resize(aGraspRegsList.size());
-	for (int i = 0; i < aGraspRegsList.size(); i++)
-	{
-		dirVecsList[i] = (aGraspRegsList[i][aGraspRegsList[i].size() - 1]).Sub(aGraspRegsList[i][0]); //r = p_end - p_start
-	}
-
-	//calc normal-vectors
-	aNormVecsList.resize(aGraspRegsList.size());
-	for (int i = 0; i < aNormVecsList.size(); i++)
-	{
-		aNormVecsList[i].Set(dirVecsList[i].y, -dirVecsList[i].x); //n = (y, -x), r = (x, y)
-	}
-}
-
-void AnalytGrasp::CalcP1Grasps(vector<Grasp> &aP1GraspsList, vector<vector<Coords> > &aGraspRegsList, vector<Coords> aNormVecsList, Coords aCOM)
+void AnalytGrasp::CalcP1Grasps(vector<Grasp> &aP1GraspsList, vector<GraspReg> &aGraspRegsList, Coords aCOM)
 {
 	vector<vector<int> > passedAngCheckList;
-	P1AngCheck(passedAngCheckList, aNormVecsList);
+	P1AngCheck(passedAngCheckList, aGraspRegsList);
 
 	/*DEBUG*/cout << "found " << passedAngCheckList.size() << " sets of grasp regs that passed the angle check" << endl;
 
@@ -209,47 +118,30 @@ void AnalytGrasp::CalcP1Grasps(vector<Grasp> &aP1GraspsList, vector<vector<Coord
 
 	for (int i = 0; i < passedAngCheckList.size(); i++) //for all sets of grasp regs that passed the angle check
 	{
-		int a = passedAngCheckList[i][0];
-		int b = passedAngCheckList[i][1];
-		int c = passedAngCheckList[i][2];
+		GraspReg a = aGraspRegsList[passedAngCheckList[i][0]];
+		GraspReg b = aGraspRegsList[passedAngCheckList[i][1]];
+		GraspReg c = aGraspRegsList[passedAngCheckList[i][2]];
 
-		for (int ai = 0; ai < aGraspRegsList[a].size(); ai++) //for all points in grasp reg a
+		if (P1IntersecCheck(a.point, a.dirVec, b.point, b.dirVec, c.point, c.dirVec)) //if this grasp passes the intersection check
 		{
-			for (int bi = 0; bi < aGraspRegsList[b].size(); bi++) //for all points in grasp reg b
+			/*DEBUG*/passedIntersecCheck++;
+
+			Coords graspFocus = ((a.point.Add(b.point)).Add(c.point)).Div(3);
+			double graspDistFromCOM = (graspFocus.Sub(aCOM)).Length();
+
+			if (graspDistFromCOM <= MAX_DIST_FROM_COM) //check if its focus is close enough to the objects COM
 			{
-				for (int ci = 0; ci < aGraspRegsList[c].size(); ci++) //for all points in grasp reg c
-				{
-					Coords pA = aGraspRegsList[a][ai];
-					Coords rA = aNormVecsList[a];
+				/*DEBUG*/passedDistFromCOMCheck++;
 
-					Coords pB = aGraspRegsList[b][bi];
-					Coords rB = aNormVecsList[b];
+				Grasp newGrasp;
 
-					Coords pC = aGraspRegsList[c][ci];
-					Coords rC = aNormVecsList[c];
+				newGrasp.type = p1;
+				newGrasp.points = {a.point, b.point, c.point};
+				newGrasp.focus = graspFocus;
+				newGrasp.COM = aCOM;
+				newGrasp.distFromCOM = graspDistFromCOM;
 
-					if (P1IntersecCheck(pA, rA, pB, rB, pC, rC)) //if this specific grasp passes the intersection check
-					{
-						/*DEBUG*/passedIntersecCheck++;
-
-						Coords graspFocus = ((pA.Add(pB)).Add(pC)).Div(3);
-						double graspDistFromCOM = (graspFocus.Sub(aCOM)).Length();
-
-						if (graspDistFromCOM <= MAX_DIST_FROM_COM) //check if its focus is close enough to the objects COM
-						{
-							/*DEBUG*/passedDistFromCOMCheck++;
-
-							Grasp newGrasp;
-
-							newGrasp.type = p1;
-							newGrasp.points = {pA, pB, pC};
-							newGrasp.focus = graspFocus;
-							newGrasp.distFromCOM = graspDistFromCOM;
-
-							aP1GraspsList.push_back(newGrasp);
-						}
-					}
-				}
+				aP1GraspsList.push_back(newGrasp);
 			}
 		}
 	}
@@ -258,22 +150,22 @@ void AnalytGrasp::CalcP1Grasps(vector<Grasp> &aP1GraspsList, vector<vector<Coord
 	/*DEBUG*/cout << "found " << passedDistFromCOMCheck << " grasps that passed the distance from COM check" << endl;
 }
 
-void AnalytGrasp::P1AngCheck(vector<vector<int> > &aPassedAngCheckList, vector<Coords> &aNormVecsList)
+void AnalytGrasp::P1AngCheck(vector<vector<int> > &aPassedAngCheckList, vector<GraspReg> &aGraspRegsList)
 {
 	double angAC, angBC, angBA;
 	double minAng, maxAng;
 
-	for (int a = 0; a < aNormVecsList.size(); a++) //for all normal vectors
+	for (int a = 0; a < aGraspRegsList.size(); a++) //for all grasp regs
 	{
-		for (int b = 0; b < aNormVecsList.size(); b++)
+		for (int b = 0; b < aGraspRegsList.size(); b++)
 		{
 			if (b != a) //find another one, which is not the first
 			{
-				for (int c = 0; c < aNormVecsList.size(); c++)
+				for (int c = 0; c < aGraspRegsList.size(); c++)
 				{
 					if (c != b && c != a) //find a third, which is not one of the two others
 					{
-						angAC = CalcAngle(aNormVecsList[a], aNormVecsList[c]); //calc the angle between the two fingers
+						angAC = CalcAngle(aGraspRegsList[a].normVec, aGraspRegsList[c].normVec); //calc the angle between the two fingers
 
 						if (MIN_P1_ANG <= angAC && angAC <= MAX_P1_ANG) //if it is valid
 						{
@@ -281,11 +173,11 @@ void AnalytGrasp::P1AngCheck(vector<vector<int> > &aPassedAngCheckList, vector<C
 							minAng = ((6.28 - angAC)/2) - MAX_DEV_ANG;
 							maxAng = ((6.28 - angAC)/2) + MAX_DEV_ANG;
 
-							angBC = CalcAngle(aNormVecsList[b], aNormVecsList[c]); //calc the angle between the thumb and second finger
+							angBC = CalcAngle(aGraspRegsList[b].normVec, aGraspRegsList[c].normVec); //calc the angle between the thumb and second finger
 
 							if (minAng <= angBC && angBC <= maxAng) //if the angle is within the range
 							{
-								angBA = CalcAngle(aNormVecsList[b], aNormVecsList[a]); //calc the angle between the thumb and first finger
+								angBA = CalcAngle(aGraspRegsList[b].normVec, aGraspRegsList[a].normVec); //calc the angle between the thumb and first finger
 
 								if (minAng <= angBA && angBA <= maxAng) //if the angle is within the range
 								{

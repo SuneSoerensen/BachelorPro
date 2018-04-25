@@ -40,13 +40,6 @@
 #define REAL_HEIGHT		125.0 //mm#define GLOB_X_DIR		1 //global x-direction in relation to the cameras x-direction
 #define GLOB_Y_DIR		-1 //global y-direction in relation to the cameras y-direction
 
-//for the Hough-transform line detector (grasp regs):
-//(for curvy objects: short lines (f.ex. 10-15) and large gap (f.ex. 3-5))
-//(for edgy objects: long lines (f.ex. 40+) and small gap (f.ex. 0-2))
-#define MIN_POINTS_IN_LINE	10
-#define MIN_LINE_LENGTH		10
-#define MAX_LINE_GAP		3
-
 //=================
 //   AnalytGrasp
 //=================

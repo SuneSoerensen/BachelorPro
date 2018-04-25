@@ -65,12 +65,15 @@ void Vision::CalcGrasp()
 				graspImage.at<Vec3b>(grasp.points[0].y + j, grasp.points[0].x + i) = color;
 
 		//draw pixels to mark point b
-		color.val[0] = 0; //blue
-		color.val[1] = 255; //green
-		color.val[2] = 0; //red
-		for (int i = -2; i <= 2; i++)
-			for (int j = -2; j <= 2; j++)
-				graspImage.at<Vec3b>(grasp.points[1].y + j, grasp.points[1].x + i) = color;
+		if (grasp.type != p3)
+		{
+			color.val[0] = 0; //blue
+			color.val[1] = 255; //green
+			color.val[2] = 0; //red
+			for (int i = -2; i <= 2; i++)
+				for (int j = -2; j <= 2; j++)
+					graspImage.at<Vec3b>(grasp.points[1].y + j, grasp.points[1].x + i) = color;
+		}
 
 		//draw pixels to mark point c
 		color.val[0] = 255; //blue

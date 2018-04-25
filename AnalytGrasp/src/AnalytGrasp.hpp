@@ -13,6 +13,13 @@ using namespace cv;
 
 enum Type {p1, p2, p3};
 
+struct GraspReg
+{
+	Coords point;
+	Coords dirVec;
+	Coords normVec;
+};
+
 struct Grasp
 {
 	Type type;
@@ -28,12 +35,10 @@ public:
 	static Grasp FindGrasp(Contour &aContour, double aScaleFactor);
 
 private:
-	static void FindGraspRegs(vector<vector<Coords> > &aGraspRegsList, Contour &aContour, double aScaleFactor);
+	static void FindGraspRegs(vector<GraspReg> &aGraspRegsList, Contour &aContour, double aScaleFactor);
 
-	static void CalcNormVecs(vector<vector<Coords> > &aGraspRegsList, vector<Coords> &aNormVecsList);
-
-	static void CalcP1Grasps(vector<Grasp> &aP1GraspsList, vector<vector<Coords> > &aGraspRegsList, vector<Coords> aNormVecsList, Coords aCOM);
-	static void P1AngCheck(vector<vector<int> > &aPassedAngCheckList, vector<Coords> &aNormVecsList);
+	static void CalcP1Grasps(vector<Grasp> &aP1GraspsList, vector<GraspReg> &aGraspRegsList, Coords aCOM);
+	static void P1AngCheck(vector<vector<int> > &aPassedAngCheckList, vector<GraspReg> &aGraspRegsList);
 	static bool P1IntersecCheck(Coords pA, Coords rA, Coords pB, Coords rB, Coords pC, Coords rC);
 
 	static void TwoFingAngCheck(vector<vector<int> > &aPossGraspsList, vector<Coords> &aNormVecsList);

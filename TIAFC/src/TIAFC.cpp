@@ -44,7 +44,7 @@ void TIAFC::TakeImage(Mat &aCropImage)
 	Mat frame;
 	if (VISION_DEV_MODE)
 	{
-		frame = imread("TestImg/pot.jpg");
+		frame = imread("TestImg/box.jpg");
 	}
 	else
 	{
