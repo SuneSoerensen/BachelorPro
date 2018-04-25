@@ -26,7 +26,6 @@ struct Grasp
 	vector<Coords> points;
 	Coords focus;
 	Coords COM;
-	double distFromCOM;
 };
 
 class AnalytGrasp //Analytical Grasping
@@ -37,14 +36,13 @@ public:
 private:
 	static void FindGraspRegs(vector<GraspReg> &aGraspRegsList, Contour &aContour, double aScaleFactor);
 
-	static void CalcP1Grasps(vector<Grasp> &aP1GraspsList, vector<GraspReg> &aGraspRegsList, Coords aCOM);
-	static void P1AngCheck(vector<vector<int> > &aPassedAngCheckList, vector<GraspReg> &aGraspRegsList);
-	static bool P1IntersecCheck(Coords pA, Coords rA, Coords pB, Coords rB, Coords pC, Coords rC);
+	static void CalcP1Grasps(vector<Grasp> &aP1GraspsList, vector<GraspReg> &aGraspRegsList, Coords aCOM, double aScaleFactor);
+	static bool P1AngCheck(GraspReg a, GraspReg b, GraspReg c);
+	static bool P1PosCheck(GraspReg a, GraspReg b, GraspReg c, Coords aFocus, Coords aCOM, double aScaleFactor);
 
 	static void TwoFingAngCheck(vector<vector<int> > &aPossGraspsList, vector<Coords> &aNormVecsList);
 
 	static double CalcAngle(Coords vecA, Coords vecB);
-	static Coords CalcIntersection(Coords pL, Coords rL, Coords pM, Coords rM);
 
 	AnalytGrasp();
 	~AnalytGrasp();

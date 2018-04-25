@@ -14,7 +14,6 @@ public:
 	void CalcGrasp(); //call this before the other grasp related functions!
 	Coords GetGraspFocus();
 	vector<Coords> GetGraspPoints();
-	/*INFO*/double GetDistFromCOM();
 
 	Coords GetObjCoords(); //this is not meant for grasping!
 

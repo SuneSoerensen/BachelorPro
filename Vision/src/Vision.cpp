@@ -125,11 +125,6 @@ vector<Coords> Vision::GetGraspPoints()
 	return {GetRealCoords(grasp.points[0]), GetRealCoords(grasp.points[1]), GetRealCoords(grasp.points[2])};
 }
 
-double Vision::GetDistFromCOM()
-{
-	return grasp.distFromCOM;
-}
-
 Coords Vision::GetObjCoords()
 {
 	//return the objects COM in real coordinates
