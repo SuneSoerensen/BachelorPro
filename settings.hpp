@@ -115,10 +115,12 @@
 #define TARGET_Z 70.0 //mm above plate
 
 #define SDH_ANGLE_THRESH 20.0*deg2rad
-#define SDH_MAX_ABS_ANGLE 90.0*deg2rad
+#define SDH_MAX_ABS_ANGLE 91.0*deg2rad
 
 #define SDH_PRECISION 10.0 //mm
-#define SDH_DIST_INTO_OBJECT 4 //mm for each finger
+#define SDH_DIST_INTO_OBJECT 0 //mm for each finger
+
+#define FINGERAC_ANGLE_THRESH 10*deg2rad
 
 #define SDH_FINGER_BASE_OFF_X 33.0 //mm
 #define SDH_FINGER_BASE_OFF_Y 19.0525 //mm
@@ -127,4 +129,4 @@
 
 #define PREGRASP_SCALE 30.0 //mm
 
-#define POSTION_TEST true //0=standard 1=torun test
+#define POSTION_TEST 1 //0=standard 1=torun test
