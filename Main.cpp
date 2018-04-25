@@ -112,11 +112,13 @@ int main()
 
     if(hand.getIsValidGrasp())
     {
+      cout << "It was a valid grasp" << endl;
       ur.moveToInit();
       hand.goToInit();
     }
     else
     {
+      cout << "It was an invalid grasp" << endl;
       hand.fullStop();
       ur.moveRel(0.0,0.0,-SDHheight);
     }

@@ -69,7 +69,9 @@
 #define UR_MAX_Y		-0.19335 //m
 #define UR_MIN_Y		-0.47619 //m
 #define UR_MAX_Z		 0.600 //m
-#define UR_MIN_Z		 0.300 //m
+//#define UR_MIN_Z		 0.300 //m
+#define UR_MIN_Z		  0.0 //m ONLY FOR TESTING
+
 #define R_SQUARED		 0.8*0.8
 
 #define REAL_TO_UR_OFFSET_X	-367.8
@@ -102,13 +104,15 @@
 #define WRIST_HEIGHT 98.0 //mm
 #define SEPERATOR_HEIGHT 23 //mm
 
-#define TARGET_Z 80.0 //mm above plate
+#define TARGET_Z 70.0 //mm above plate
 
 #define SDH_ANGLE_THRESH 20.0*deg2rad
-#define SDH_MAX_ABS_ANGLE 90.0*deg2rad
+#define SDH_MAX_ABS_ANGLE 91.0*deg2rad
 
 #define SDH_PRECISION 10.0 //mm
 #define SDH_DIST_INTO_OBJECT 0 //mm for each finger
+
+#define FINGERAC_ANGLE_THRESH 10*deg2rad
 
 #define SDH_FINGER_BASE_OFF_X 33.0 //mm
 #define SDH_FINGER_BASE_OFF_Y 19.0525 //mm
@@ -117,4 +121,4 @@
 
 #define PREGRASP_SCALE 30.0 //mm
 
-#define POSTION_TEST true //0=standard 1=torun test
+#define POSTION_TEST 1 //0=standard 1=torun test

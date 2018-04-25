@@ -10,7 +10,7 @@ int main()
 {
   cout << "Welcome to URControlTest.cpp" << endl;
   cout << "Valid commands (command | description): " << endl;
-  cout << "tp   | update current tool position and print it" << endl;
+  cout << "tp   | Print current tool position" << endl;
   cout << "mov  | Run move-program" << endl;
   cout << "home | Run home-program" << endl;
   cout << "init | Run init-program" << endl;
@@ -82,10 +82,6 @@ int main()
       }
 
     }
-    else if (command == "checkb")
-    {
-      cout << "Are bounds of (1000,0,0) okay? " << ur5.checkBounds(1000,0,0) << endl;
-    }
     else if(command == "rot")
     {
       cout << "Please enter an angle in deg.: ";
@@ -98,8 +94,7 @@ int main()
    }
     else
     {
-      cout << "Terminating..." << endl;
-      break;
+      cout << "Invalid command!" << endl;
     }
   }
 
