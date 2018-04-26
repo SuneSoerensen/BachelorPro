@@ -1,23 +1,20 @@
 #ifndef SDHControl_hpp
 #define SDHControl_hpp
 
-#include <stdio.h>
-#include <vector>
-
-#include <rwhw/sdh/SDHDriver.hpp>
-#include <rw/math/Q.hpp>
-
-using namespace rw::math;
+/*using namespace rw::math;
 using namespace rw::common;
 
-using namespace rwhw;
+using namespace rwhw;*/
 
+#include <stdio.h>
+#include <vector>
+#include <rwhw/sdh/SDHDriver.hpp>
+#include <rw/math/Q.hpp>
 #include "sdh/sdh.h"
 #include "sdh/util.h"
 #include "sdh/sdhlibrary_settings.h"
 #include "sdh/basisdef.h"
 #include "sdhoptions.h"
-
 #include "settings.hpp"
 
 USING_NAMESPACE_SDH
@@ -59,6 +56,7 @@ public:
     bool getIsValidGrasp();
     bool getIsExpectedGrasp();
 
+    //Get the current configuration of the hand:
     Q getQ();
 
     //Adjust velocity for SDH joints: TODO: delete this, as it is not used!
@@ -70,6 +68,7 @@ private:
     //Pointer to SDHDriver-object:
     SDHDriver *sdh;
 
+    //Only used for PostionTest:
     Q forTest;
 
     //Reflects whether connected to hand or not:

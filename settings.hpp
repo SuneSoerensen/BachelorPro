@@ -69,10 +69,11 @@
 #define UR_MAX_Y		-0.19335 //m
 #define UR_MIN_Y		-0.47619 //m
 #define UR_MAX_Z		 0.600 //m
-//#define UR_MIN_Z		 0.300 //m
-#define UR_MIN_Z		  0.0 //m ONLY FOR TESTING
+#define UR_MIN_Z		 0.300 //m
 
 #define R_SQUARED		 0.8*0.8
+
+#define MAX_WRIST_ANGLE 360.0*deg2rad
 
 #define REAL_TO_UR_OFFSET_X	-367.8
 #define REAL_TO_UR_OFFSET_Y	-334.8
