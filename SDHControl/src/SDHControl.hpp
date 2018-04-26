@@ -1,11 +1,5 @@
 #ifndef SDHControl_hpp
 #define SDHControl_hpp
-
-/*using namespace rw::math;
-using namespace rw::common;
-
-using namespace rwhw;*/
-
 #include <stdio.h>
 #include <vector>
 #include <rwhw/sdh/SDHDriver.hpp>

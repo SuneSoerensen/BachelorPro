@@ -30,7 +30,7 @@ int main()
     //cin >> dummy;
 
     cout << "Grasping" << endl;
-    hand.grasp(xA, yA, xB, yB, xC, yC);
+    hand.grasp(xA, yA, xB, yB, xC, yC, false);
   }
   catch(const char e[])
   {
