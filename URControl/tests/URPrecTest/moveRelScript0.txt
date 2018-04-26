@@ -1,0 +1,9 @@
+HOST=192.168.100.4
+PORT=30002
+def moveRel():
+	 pos = get_forward_kin() 
+	 pos[0] = -0.367800
+	 pos[1] = -0.334800
+	 pos[2] = 0.094020
+	movel(pos,0.1, 0.1,5,0)
+end
