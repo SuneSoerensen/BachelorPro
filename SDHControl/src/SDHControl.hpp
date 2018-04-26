@@ -53,9 +53,6 @@ public:
     //Get the current configuration of the hand:
     Q getQ();
 
-    //Adjust velocity for SDH joints: TODO: delete this, as it is not used!
-    void adjustVel(double joint0, double joint1, double joint2, double joint3, double joint4, double joint5, double joint6);
-
     ~SDHControl();
 
 private:
@@ -69,11 +66,11 @@ private:
     bool connected = false;
 
     //Sides of the triangle to control grasp {AB, BC, CA}:
-    double goalSides[3] = {0.0, 0.0, 0.0};
+    double goalSides[3];// TODO: delete initialization: = {0.0, 0.0, 0.0};
 
     //To control if the hand is grasping
-    bool isValidGrasp= false;
-    bool isExpectedGrasp = false;
+    bool isValidGrasp; //TODO: delete initialization: = false;
+    bool isExpectedGrasp; //TODO: delete initialization: = false;
 
     //Calculate fingertip-pos and finger angle in the plane, for finger A and C:
     //Output: {dist, angle}

@@ -277,27 +277,6 @@ Q SDHControl::getQ()
   return sdh->getQ();
 }
 
-void SDHControl::adjustVel(double joint0, double joint1, double joint2, double joint3, double joint4, double joint5, double joint6)
-{
-
-  Q velLim = sdh->getVelLimits();
-
-  for(int i = 0; i < velLim.size(); i++)
-    velLim[i] *= 1.19;
-
-  //Q velLim(7, temp);
-
-  velLim[0] *= joint0;
-  velLim[1] *= joint1;
-  velLim[2] *= joint2;
-  velLim[3] *= joint3;
-  velLim[4] *= joint4;
-  velLim[5] *= joint5;
-  velLim[6] *= joint6;
-
-  sdh->setTargetQVel(velLim);
-}
-
 SDHControl::~SDHControl()
 {
 }
