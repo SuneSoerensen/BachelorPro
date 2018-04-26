@@ -74,10 +74,11 @@
 #define UR_MAX_Y		-0.19335 //m
 #define UR_MIN_Y		-0.47619 //m
 #define UR_MAX_Z		 0.600 //m
-//#define UR_MIN_Z		 0.300 //m
-#define UR_MIN_Z		  0.0 //m ONLY FOR TESTING
+#define UR_MIN_Z		 0.300 //m
 
 #define R_SQUARED		 0.8*0.8
+
+#define MAX_WRIST_ANGLE 360.0*deg2rad
 
 #define REAL_TO_UR_OFFSET_X	-367.8
 #define REAL_TO_UR_OFFSET_Y	-334.8
@@ -99,9 +100,9 @@
 //   SDHControl
 //===============
 #define SDHCONTROL_MODE 0 //0=standard 1=debug
-#define GRASPSTARTHEIGHT 160 //5mm further than range of fingers
-#define GRASPFINDSTEPSIZE 0.001 //Stepsize for finding finger-config
-#define GRASPDISTLIM 155.0 //Max distance from finger-base to grasp-point
+#define GRASPSTARTHEIGHT 160 //5mm further than range of fingers //TODO: delete if unused
+#define GRASPFINDSTEPSIZE 0.001 //Stepsize for finding finger-config. in grasp()
+#define GRASPDISTLIM 155.0 //Total length of a finger
 #define FINGEROFFSET 38.105 //Distance from center of SDH to base of fingers
 #define SDH_HALF_FINGER_WIDTH 12.5 //mm
 #define LENGTH1 86.5 //Length of finger from base to middle-joint
@@ -109,21 +110,21 @@
 #define WRIST_HEIGHT 98.0 //mm
 #define SEPERATOR_HEIGHT 23 //mm
 
-#define TARGET_Z 70.0 //mm above plate
+#define TARGET_Z 70.0 //mm Defines at which height the target object should be grasped
 
-#define SDH_ANGLE_THRESH 20.0*deg2rad
-#define SDH_MAX_ABS_ANGLE 91.0*deg2rad
+#define SDH_ANGLE_THRESH 20.0*deg2rad //Max angle of fingertips in a grasp
+#define SDH_MAX_ABS_ANGLE 91.0*deg2rad //Max abs. angle of any SDH joint
 
-#define SDH_PRECISION 10.0 //mm
-#define SDH_DIST_INTO_OBJECT 0 //mm for each finger
+#define SDH_PRECISION 10.0 //mm Defines how far a grasp can be from the intended, and still be valid
+#define SDH_DIST_INTO_OBJECT 4 //mm for each finger
 
-#define FINGERAC_ANGLE_THRESH 10*deg2rad
+#define FINGERAC_ANGLE_THRESH 10*deg2rad //How close the angle of finger A and C should be to each other
 
 #define SDH_FINGER_BASE_OFF_X 33.0 //mm
 #define SDH_FINGER_BASE_OFF_Y 19.0525 //mm
 
-#define SDH_ANGLE_DIFF_FIRST 10.0 //deg
+//#define SDH_ANGLE_DIFF_FIRST 10.0 //deg //TODO: delete if still unused
 
-#define PREGRASP_SCALE 30.0 //mm
+#define PREGRASP_SCALE 30.0 //mm How far from the grasp-position each finger should be, in a pre-grasp
 
-#define POSTION_TEST 1 //0=standard 1=torun test
+#define POSTION_TEST 1 //0 = Standard 1 = To run test

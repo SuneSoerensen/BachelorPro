@@ -1,11 +1,3 @@
-//
-//  URControl.hpp
-//  tutorial
-//
-//  Created by SLS on 21/02/2018.
-//
-//
-
 #ifndef URControl_hpp
 #define URControl_hpp
 
@@ -36,29 +28,23 @@ public:
     void moveToInit();
     void moveToHome();
     void moveRel(double anX, double aY, double aZ);
-    //void moveAbs(double anX, double aY, double aZ); //TODO: delete if not used
 
     void setWristAngle(double anAngle);
 
     bool checkBounds(double x, double y, double z);
 
-    //void updateCurrToolPos(); //TODO: delete eventually
-
-    //Helpful debug function:
     void printcurrToolPos();
 
     ~URControl();
 private:
-  /*rwhw::*/URPrimaryInterface ur;
+  URPrimaryInterface ur;
   int port;
   string ip;
   bool haveBeenToInit;
-  double currToolPos[6] = {INIT_POS_X, INIT_POS_Y, INIT_POS_Z, INIT_POS_RX, INIT_POS_RY, INIT_POS_RZ};
+  double currToolPos[3] = {INIT_POS_X, INIT_POS_Y, INIT_POS_Z};
   int numOfMoves = 0; //DEBUG: for saving all move scripts
 
   int state = STATE_OTHER;
 
 };
-
-
-#endif /* URControl_hpp */
+#endif

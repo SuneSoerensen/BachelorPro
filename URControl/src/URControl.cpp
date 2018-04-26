@@ -1,17 +1,10 @@
-//
-//  URControl.cpp
-//  tutorial
-//
-//  Created by <author> on 21/02/2018.
-//
-//
-
 #include "URControl.hpp"
 #include <fstream>
 #include <unistd.h>
 #include <rwhw/universalrobots/UniversalRobotsData.hpp>
-#include <rw/math/Vector3D.hpp>
+//#include <rw/math/Vector3D.hpp>
 #include <stdlib.h>
+#include <array>
 
 USE_ROBWORK_NAMESPACE
 
@@ -67,6 +60,11 @@ void URControl::moveToInit()
 
     string fileName = "goToInit.txt";
 
+    //Check if fileName exists:
+    ifstream fileTest(fileName);
+    if(!fileTest.good())
+      throw("[URControl::moveToInit]: goToInit-script does not exist!");
+
     sendScript(fileName);
     haveBeenToInit = 1;
     state = STATE_INIT;
@@ -75,9 +73,6 @@ void URControl::moveToInit()
     currToolPos[0] = INIT_POS_X;
     currToolPos[1] = INIT_POS_Y;
     currToolPos[2] = INIT_POS_Z;
-    currToolPos[3] = INIT_POS_RX;
-    currToolPos[4] = INIT_POS_RY;
-    currToolPos[5] = INIT_POS_RZ;
   }
 }
 
@@ -93,6 +88,11 @@ void URControl::moveToHome()
 
     string fileName = "goToHome.txt";
 
+    //Check if fileName exists:
+    ifstream fileTest(fileName);
+    if(!fileTest.good())
+      throw("[URControl::moveToInit]: goToHome-script does not exist!");
+
     sendScript(fileName);
     haveBeenToInit = 0;
     state = STATE_HOME;
@@ -102,10 +102,10 @@ void URControl::moveToHome()
 
 void URControl::moveRel(double anX, double aY, double aZ)
 {
-  //Declare that UR is not in home or init
+  //State that UR is not in home or init:
   state = STATE_OTHER;
 
-  //Convert from mm to m:
+  //Convert from mm to m, as URScripts are in m:
   double x = anX/1000.0;
   double y = aY/1000.0;
   double z = aZ/1000.0;
@@ -117,35 +117,20 @@ void URControl::moveRel(double anX, double aY, double aZ)
   //Calculate absolute coordinates:
   double absX = currToolPos[0] + rotX;
   double absY = currToolPos[1] + rotY;
+  double absZ = currToolPos[2] + aZ;
 
   if(URCONTROL_MODE)
     cout << "\033[1;33m DEBUG: \033[0m" << "absX [mm] = " << absX*1000.0 << " absY [mm] = " << absY*1000.0 << endl;
 
-  //Security check:
+  //Security checks:
   if(!haveBeenToInit)
   {
     throw("[URControl::moveRel]: Cannot use this function w/o having been to init-conf. first!");
   }
 
-  //Security check:
-  if(absX < UR_MIN_X || absX > UR_MAX_X)
+  if(!checkBounds(absX, absY, absZ))
   {
-    if(URCONTROL_MODE)
-      cout << "\033[1;33m DEBUG: \033[0m" << "absX = " << absX << endl;
-
-    throw("[URControl::moveRel]: New x-coordinates are out of bounds!");
-  }
-  else if(absY < UR_MIN_Y || absY > UR_MAX_Y)
-  {
-    throw("[URControl::moveRel]: New y-coordinates are out of bounds!");
-  }
-  else if((currToolPos[2]+z) < UR_MIN_Z || (currToolPos[2]+z) > UR_MAX_Z)
-  {
-    throw("[URControl::moveRel]: New z-coordinates are out of bounds!");
-  }
-  else if(!checkBounds((currToolPos[0]+x),(currToolPos[1]+y),(currToolPos[2]+z)))
-  {
-    throw("[URControl::moveRel]: Robot cannot reach so far!");
+    throw("[URControl::moveRel]: New coordinates are out of bounds!");
   }
 
   //Generate scriptfile:
@@ -166,70 +151,33 @@ void URControl::moveRel(double anX, double aY, double aZ)
   out << "\t pos = get_forward_kin() \n";
   out << "\t pos[0] = " << to_string(absX) << "\n";
   out << "\t pos[1] = " << to_string(absY) << "\n";
-  out << "\t pos[2] = " << to_string(currToolPos[2]+z)  << "\n";
+  out << "\t pos[2] = " << to_string(absZ)  << "\n";
   out << "\tmovel(pos," << ACC << ", " << VEL << "," << MOVTIME << "," << BLENDR << ")\n";
   out << "end\n";
 
   out.close();
 
 
-  //Send scriptfile to peform movement:
+  //Send scriptfile to perform movement:
   sendScript(fileName);
 
   //Update current tool position:
   currToolPos[0] = absX;
   currToolPos[1] = absY;
-  currToolPos[2] += z;
+  currToolPos[2] = absZ;
 
-  usleep((MOVTIME*1000000)+100000); //Wait for movement to finish (MOVTIME) + 100000 µs (0.1 s)
-  //updateCurrToolPos();
+  //Wait for movement to finish (MOVTIME) + 0.1s:
+  usleep((MOVTIME*1000000)+100000);
 }
-
-/*void URControl::updateCurrToolPos()
-{
-  UniversalRobotsData URdata;
-  math::Vector3D<> toolPos;
-
-  if(ur.hasData())
-  {
-    URdata = ur.getLastData();
-    toolPos = URdata.toolPosition;
-    currToolPos[0] = toolPos[0];
-    currToolPos[1] = toolPos[1];
-    currToolPos[2] = toolPos[2];*/
-
-    ///*DEBUG*/ cout << "Toolpos: " << toolPos[0] << " " << toolPos[1] << " " << toolPos[2] << endl;
-    ///*DEBUG*/ cout << "masterTemperature: " << URdata.masterTemperature << endl;
-/*  }
-  else
-  {
-    cout << "{WARNING} [URControl::updateCurrToolPos()]: UR had no data!" << endl;
-  }
-}*/
-
-/*void URControl::moveAbs(double anX, double aY, double aZ)
-{
-  //Declare that UR is not in home or init
-  state = STATE_OTHER;
-
-  double relX = anX - currToolPos[0]*1000.0;
-  double relY = aY - currToolPos[1]*1000.0;
-  double relZ = aZ - currToolPos[2]*1000.0;
-
-  moveRel(relX, relY, relZ);
-}*/
 
 void URControl::setWristAngle(double anAngle)
 {
-  if(URCONTROL_MODE)
-    printcurrToolPos();
-
-  if(abs(anAngle) > 360.0*deg2rad)
+  if(abs(anAngle) > MAX_WRIST_ANGLE)
     throw("[URControl::setWristAngle]: Invalid angle (|angle| > 360 deg)!");
 
+  //Generate script to rotate joint:
   ofstream out("rotateWristScript.txt", ofstream::out);
 
-  //Rotate wrist-joint directly:
   out << "HOST=" << ip << "\n" << "PORT=" << port << "\n" << "def rotWrist():\n";
   out << "\t" << "pos = get_joint_positions()" << "\n";
   out << "\t" << "pos[5] =" << anAngle << "\n";
@@ -237,33 +185,38 @@ void URControl::setWristAngle(double anAngle)
   out << "\t" << "movej(pos, 0.1, 0.1, 5, 0)" << "\n";
   out << "end \n";
 
-  //Alternative version 1: rotate by pose:
-  /*out << "HOST=" << ip << "\n" << "PORT=" << port << "\n" << "def rotWrist():\n";
-  out << "\t" << "pos = p[" << currToolPos[0] << "," << currToolPos[1] << "," << currToolPos[2] << "," << currToolPos[3] << "," << currToolPos[4] << "," << anAngle << "]" << "\n";
-  out << "\t" << "textmsg(\"Rotating wrist\")" << "\n";
-  out << "\tmovel(pos," << ACC << ", " << VEL << "," << MOVTIME << "," << BLENDR << ")\n";
-  out << "end\n";*/
-
   out.close();
 
+  //Send script to perform movement:
   sendScript("rotateWristScript.txt");
-
-  //currToolPos[5] = anAngle;
-
-  if(URCONTROL_MODE)
-    printcurrToolPos();
 }
 
 bool URControl::checkBounds(double x, double y, double z)
 {
-  return ((x*x + y*y + z*z) <= R_SQUARED);
+  if(x < UR_MIN_X || x > UR_MAX_X)
+  {
+    throw("[URControl::checkBounds]: New x-coordinates are out of bounds!");
+  }
+  else if(y < UR_MIN_Y || y > UR_MAX_Y)
+  {
+    throw("[URControl::checkBounds]: New y-coordinates are out of bounds!");
+  }
+  else if(z < UR_MIN_Z || z > UR_MAX_Z)
+  {
+    throw("[URControl::checkBounds]: New z-coordinates are out of bounds!");
+  }
+  else if((x*x + y*y + z*z) <= R_SQUARED)
+  {
+    throw("[URControl::checkBounds]: Robot cannot reach so far!");
+  }
+
+  return true;
 }
 
-//Helpful debug functions:
 void URControl::printcurrToolPos()
 {
-  cout << "\033[1;33m DEBUG: \033[0m" << "Current tool position (x, y, z, rotX, rotY, rotZ): ";
-  for(int i = 0; i < 6; i++)
+  cout << "\033[1;33m DEBUG: \033[0m" << "Current tool position (x, y, z): ";
+  for(int i = 0; i < (sizeof(currToolPos)/sizeof(double)); i++)
   {
     cout << currToolPos[i] << "  ";
   }
