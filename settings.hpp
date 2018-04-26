@@ -35,9 +35,9 @@
 #define VISION_MODE		1	// 0 = normal, 1 = info
 
 //for calibration (pixel-coords to real-coords):
-#define CALC_FACTOR		1000 //determines precision in intermediate results and calculations
-#define REAL_WIDTH		125.0 //mm
-#define REAL_HEIGHT		125.0 //mm#define GLOB_X_DIR		1 //global x-direction in relation to the cameras x-direction
+#define REAL_WIDTH		186.0 //mm
+#define REAL_HEIGHT		141.0 //mm
+#define GLOB_X_DIR		1 //global x-direction in relation to the cameras x-direction
 #define GLOB_Y_DIR		-1 //global y-direction in relation to the cameras y-direction
 
 //=================
@@ -47,13 +47,12 @@
 
 #define GRASP_REG_WIDTH		30.0 //mm (width of a finger + a bit)
 
-#define MIN_P1_ANG		45.0*deg2rad //radians (~10 deg)
+#define MIN_P1_ANG		0.17 //radians (~10 deg)
 #define MAX_P1_ANG		2.62 //radians (~150 deg)
 #define MAX_DEV_ANG		0.17 //radians (~10 deg)
 
-#define MAX_P1_INTERSEC_DIST	600.0 //pixels
-
-#define MAX_DIST_FROM_COM	42.0 //pixels
+#define MAX_DIST_FROM_COM	42.0 //mm
+#define MIN_GRASP_POINT_DIST	66.0 //mm
 
 //===============
 //   URControl

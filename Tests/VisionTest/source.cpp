@@ -48,7 +48,6 @@ int main()
 				Coords focus = test.GetGraspFocus();
 				vector<Coords> points = test.GetGraspPoints();
 				cout << "grasp focus: " << focus.x << ";" << focus.y << endl;
-				cout << "grasp distance from COM: " << test.GetDistFromCOM() << endl;
 				cout << "grasp points: ";
 				for (int i = 0; i < points.size(); i++)
 					cout << "(" << points[i].x << "; " << points[i].y << ")";
