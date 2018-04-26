@@ -23,7 +23,7 @@ struct GraspReg
 struct Grasp
 {
 	Type type;
-	vector<Coords> points;
+	vector<GraspReg> points;
 	Coords focus;
 	Coords COM;
 };
@@ -40,7 +40,9 @@ private:
 	static bool P1AngCheck(GraspReg a, GraspReg b, GraspReg c);
 	static bool P1PosCheck(GraspReg a, GraspReg b, GraspReg c, Coords aFocus, Coords aCOM, double aScaleFactor);
 
-	static void TwoFingAngCheck(vector<vector<int> > &aPossGraspsList, vector<Coords> &aNormVecsList);
+	static void CalcP3Grasps(vector<Grasp> &aP3GraspsList, vector<GraspReg> &aGraspRegsList, Coords aCOM, double aScaleFactor);
+	static bool P3AngCheck(GraspReg a, GraspReg c);
+	static bool P3PosCheck(GraspReg a, GraspReg c, Coords aFocus, Coords aCOM, double aScaleFactor);
 
 	static double CalcAngle(Coords vecA, Coords vecB);
 

@@ -62,7 +62,7 @@ void Vision::CalcGrasp()
 		color.val[2] = 255; //red
 		for (int i = -2; i <= 2; i++)
 			for (int j = -2; j <= 2; j++)
-				graspImage.at<Vec3b>(grasp.points[0].y + j, grasp.points[0].x + i) = color;
+				graspImage.at<Vec3b>(grasp.points[0].point.y + j, grasp.points[0].point.x + i) = color;
 
 		//draw pixels to mark point b
 		if (grasp.type != p3)
@@ -72,16 +72,28 @@ void Vision::CalcGrasp()
 			color.val[2] = 0; //red
 			for (int i = -2; i <= 2; i++)
 				for (int j = -2; j <= 2; j++)
-					graspImage.at<Vec3b>(grasp.points[1].y + j, grasp.points[1].x + i) = color;
+					graspImage.at<Vec3b>(grasp.points[1].point.y + j, grasp.points[1].point.x + i) = color;
 		}
 
 		//draw pixels to mark point c
-		color.val[0] = 255; //blue
-		color.val[1] = 0; //green
-		color.val[2] = 0; //red
-		for (int i = -2; i <= 2; i++)
-			for (int j = -2; j <= 2; j++)
-				graspImage.at<Vec3b>(grasp.points[2].y + j, grasp.points[2].x + i) = color;
+		if (grasp.type != p3)
+		{
+			color.val[0] = 255; //blue
+			color.val[1] = 0; //green
+			color.val[2] = 0; //red
+			for (int i = -2; i <= 2; i++)
+				for (int j = -2; j <= 2; j++)
+					graspImage.at<Vec3b>(grasp.points[2].point.y + j, grasp.points[2].point.x + i) = color;
+		}
+		else
+		{
+			color.val[0] = 255; //blue
+			color.val[1] = 0; //green
+			color.val[2] = 0; //red
+			for (int i = -2; i <= 2; i++)
+				for (int j = -2; j <= 2; j++)
+					graspImage.at<Vec3b>(grasp.points[1].point.y + j, grasp.points[1].point.x + i) = color;
+		}
 
 		//save image
 		imwrite("InfoFiles/Vision(grasp_points).jpg", graspImage);
@@ -122,7 +134,10 @@ Coords Vision::GetGraspFocus()
 vector<Coords> Vision::GetGraspPoints()
 {
 	//return the grasps points in real coordinates
-	return {GetRealCoords(grasp.points[0]), GetRealCoords(grasp.points[1]), GetRealCoords(grasp.points[2])};
+	if (grasp.type != p3)
+		return {GetRealCoords(grasp.points[0].point), GetRealCoords(grasp.points[1].point), GetRealCoords(grasp.points[2].point)};
+	else
+		return {GetRealCoords(grasp.points[0].point), GetRealCoords(grasp.points[1].point)};
 }
 
 Coords Vision::GetObjCoords()

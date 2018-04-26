@@ -14,6 +14,7 @@ struct Contour
 	Mat image; //image of the contour
 	vector<Coords> list; //list of the points in the contour
 	vector<vector<int> > matrix; //relates coordinates of contour points to indices in the list (indices are offset by +1!!!)
+	vector<Coords> inDirs; //list of vectors defining the in direction for all points in the contour
 };
 
 class TIAFC //Take Image And Find Contour
@@ -29,11 +30,13 @@ private:
 	static void FindObject(Mat &aCropImage, Mat &anObjectImage);
 	static void ThereCanOnlyBeOne(Mat &aThresImage, bool mode);
 	static void CatchNeighbours(Mat &aThresImage, int aColor, Coords aCurrPoint, vector<Coords> &aListOfPoints);
+	static bool IsNotBottleneck(Mat &aThresImage, Coords aCurrPoint);
 
 	static void FindContour(Mat &anObjectImage, Contour &aContour);
 	static Coords FindNextNeighbour(Mat &anObjectImage, Contour &aContour, Coords aCurrPoint);
 	static bool HasBlackNeighbour(Mat &anObjectImage, Coords aCurrPoint);
-	static int NumOfWhiteNeighbours(Mat &anObjectImage, Coords aCurrPoint);
+
+	static void CalcInDirs(Mat &anObjectImage, Contour &aContour);
 
 	static bool IsWithinBounds(Mat &anImage, int anX, int aY);
 

@@ -16,7 +16,6 @@ Coords TIAFC::FindCOM(Contour &aContour)
 	return res;
 }
 
-
 void TIAFC::DoItAll(Mat &aCropImage, Contour &aContour)
 {
 	TakeImage(aCropImage);
@@ -25,6 +24,8 @@ void TIAFC::DoItAll(Mat &aCropImage, Contour &aContour)
 	FindObject(aCropImage, objectImage);
 
 	FindContour(objectImage, aContour);
+
+	CalcInDirs(objectImage, aContour);
 }
 
 void TIAFC::TakeImage(Mat &aCropImage)
@@ -42,9 +43,19 @@ void TIAFC::TakeImage(Mat &aCropImage)
 
 	//get frame
 	Mat frame;
+	/*INFO*/static int calls = 0;
 	if (VISION_DEV_MODE)
 	{
-		frame = imread("TestImg/pot.jpg");
+		if (calls == 0)
+			frame = imread("TestImg/pot.jpg");
+		else if (calls == 1)
+			frame = imread("TestImg/pot.jpg");
+		else if (calls == 2)
+			frame = imread("TestImg/box.jpg");
+		else
+			frame = imread("TestImg/vandkande.jpg");
+
+		calls++;
 	}
 	else
 	{
@@ -174,17 +185,48 @@ void TIAFC::CatchNeighbours(Mat &aThresImage, int aColor, Coords aCurrPoint, vec
 	int xVals[4] = {1, 0, -1, 0}; //use four-connectivity. this should make the blobs less "hairy"
 	int yVals[4] = {0, -1, 0, 1};
 
-	for ( int i = 0; i < 4; i++) //run through all neighbours
+	for ( int i = 0; i < 8; i++) //run through all neighbours
 	{
 		if (IsWithinBounds(aThresImage, aCurrPoint.x + xVals[i], aCurrPoint.y + yVals[i]))
 		{
 			if (aThresImage.at<uchar>(aCurrPoint.y + yVals[i], aCurrPoint.x + xVals[i]) == aColor) //if the neighbour is the color
 			{
-				aThresImage.at<uchar>(aCurrPoint.y + yVals[i], aCurrPoint.x + xVals[i]) = 255 - aColor; //remove the point
-				aListOfPoints.push_back(Coords(aCurrPoint.x + xVals[i], aCurrPoint.y + yVals[i])); //add it to the list
+				if (true/*IsNotBottleneck(aThresImage, aCurrPoint)*/) //if the neighbour is not a bottleneck
+				{
+					aThresImage.at<uchar>(aCurrPoint.y + yVals[i], aCurrPoint.x + xVals[i]) = 255 - aColor; //remove the point
+					aListOfPoints.push_back(Coords(aCurrPoint.x + xVals[i], aCurrPoint.y + yVals[i])); //add it to the list
+				}
 			}
 		}
 	}
+}
+
+bool TIAFC::IsNotBottleneck(Mat &aThresImage, Coords aCurrPoint)
+{
+	//relative coordinates:
+	int xVals[8] = {1, 1, 0, -1, -1, -1, 0, 1}; //it is important to visit the neighbours in order!
+	int yVals[8] = {0, -1, -1, -1, 0, 1, 1, 1};
+
+	int colorChanges = 0;
+
+	int prevColor = aThresImage.at<uchar>(aCurrPoint.y + yVals[0], aCurrPoint.x + xVals[0]);
+	int currColor;
+
+	for (int i = 1; i < 8; i++) //run through all neighbours
+	{
+		if (IsWithinBounds(aThresImage, aCurrPoint.x + xVals[i], aCurrPoint.y + yVals[i]))
+			currColor = aThresImage.at<uchar>(aCurrPoint.y + yVals[i], aCurrPoint.x + xVals[i]);
+		else
+			currColor = 0; //the edge of the image counts as black!
+
+		if (currColor != prevColor)
+			colorChanges++;
+	}
+
+	if (colorChanges > 2)
+		return false;
+	else
+		return true;
 }
 
 void TIAFC::FindContour(Mat &objectImage, Contour &aContour)
@@ -321,26 +363,30 @@ bool TIAFC::HasBlackNeighbour(Mat &anObjectImage, Coords aCurrPoint)
 	return false;
 }
 
-int TIAFC::NumOfWhiteNeighbours(Mat &anObjectImage, Coords aCurrPoint)
+void TIAFC::CalcInDirs(Mat &anObjectImage, Contour &aContour)
 {
 	//relative coordinates:
 	int xVals[8] = {1, 0, -1, 0, 1, -1, -1, 1};
 	int yVals[8] = {0, -1, 0, 1, -1, -1, 1, 1};
 
-	int res = 0;
-
-	for (int i = 0; i < 8; i++) //run through all neighbours
+	//calculate the in direction for all points in the contour
+	aContour.inDirs.resize(aContour.list.size());
+	for (int i = 0; i < aContour.list.size(); i++)
 	{
-		if (IsWithinBounds(anObjectImage, aCurrPoint.x + xVals[i], aCurrPoint.y + yVals[i]))
-		{
-			if (anObjectImage.at<uchar>(aCurrPoint.y + yVals[i], aCurrPoint.x + xVals[i]) == 255) //if the neighbour is white
-			{
-				res++;
-			}
-		}
-	}
+		//find the relative coordinates of all the white neighbours
+		vector<Coords> whites;
+		for (int j = 0; j < 8; j++) //run through all neighbours
+			if (IsWithinBounds(anObjectImage, aContour.list[i].x + xVals[j], aContour.list[i].y + yVals[j]))
+				if (anObjectImage.at<uchar>(aContour.list[i].y + yVals[j], aContour.list[i].x + xVals[j]) == 255) //if the neighbour is white
+					whites.push_back(Coords(xVals[j], yVals[j]));
 
-	return res;
+		//calculate the average direction
+		Coords sum(0, 0);
+		for (int j = 0; j < 8; j++)
+			sum = sum.Add(whites[j]);
+
+		aContour.inDirs[i] = sum.Div(whites.size());
+	}
 }
 
 bool TIAFC::IsWithinBounds(Mat &anImage, int anX, int aY)

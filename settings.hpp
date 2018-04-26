@@ -6,32 +6,14 @@
 #define deg2rad 0.0174532925
 #define rad2deg 57.2957795
 
-//===========
-//   TIAFC
-//===========
-#define TIAFC_MODE		1	// 0 = normal, 1 = info
-
-//camera settings (taking an image):
-#define CAMERA			0	// 0 = default camera
-#define CAM_RES_WIDTH	1280
-#define CAM_RES_HEIGHT	720
-#define FRAMES_TO_GET	14	// min 7, according to initial tests
-
-//crop settings (taking an image):
-#define CROP_TOP		100  //(for tests: 100, 500, 400, 1000)
-#define CROP_BOTTOM		500
-#define CROP_LEFT		400
-#define CROP_RIGHT		1000
-
-//for thresholding:
-#define THRESHOLDING_THRES	110 //should be between the intensities of the background and the object
-#define THRESHOLDING_MODE	0 //0 = light object on dark background, 1 = dark object on light background
-
 //============
 //   Vision
 //============
 #define VISION_DEV_MODE	1	//developer mode for Vision and all of its dependencies (0 = false, 1 = true)
 
+//--------
+// Vision
+//--------
 #define VISION_MODE		1	// 0 = normal, 1 = info
 
 //for calibration (pixel-coords to real-coords):
@@ -40,19 +22,42 @@
 #define GLOB_X_DIR		1 //global x-direction in relation to the cameras x-direction
 #define GLOB_Y_DIR		-1 //global y-direction in relation to the cameras y-direction
 
-//=================
-//   AnalytGrasp
-//=================
+//-------------
+// AnalytGrasp
+//-------------
 #define ANALYT_GRASP_MODE	1	// 0 = normal, 1 = info
 
+//for grasping:
 #define GRASP_REG_WIDTH		30.0 //mm (width of a finger + a bit)
 
-#define MIN_P1_ANG		0.17 //radians (~10 deg)
-#define MAX_P1_ANG		2.62 //radians (~150 deg)
-#define MAX_DEV_ANG		0.17 //radians (~10 deg)
+#define MIN_P1_ANG		0.17 //radians (~10 deg) (the minimum angle between finger a and c for a p1 grasp)
+#define MAX_P1_ANG		2.62 //radians (~150 deg) (the maximum angle between finger a and c for a p1 grasp)
 
-#define MAX_DIST_FROM_COM	42.0 //mm
+#define MAX_DEV_ANG		0.17 //radians (~10 deg)
+#define MAX_DIST_FROM_COM	50.0 //mm
 #define MIN_GRASP_POINT_DIST	66.0 //mm
+
+//-------
+// TIAFC
+//-------
+#define TIAFC_MODE		1	// 0 = normal, 1 = info
+
+//camera settings:
+#define CAMERA			0	// 0 = default camera
+#define CAM_RES_WIDTH	1280
+#define CAM_RES_HEIGHT	720
+#define FRAMES_TO_GET	14	// min 7, according to initial tests
+
+//crop settings:
+//(for developer tests: 100, 500, 400, 1000)
+#define CROP_TOP		100
+#define CROP_BOTTOM		500
+#define CROP_LEFT		400
+#define CROP_RIGHT		1000
+
+//for thresholding:
+#define THRESHOLDING_THRES	110 //should be between the intensities of the background and the object
+#define THRESHOLDING_MODE	0 //0 = light object on dark background, 1 = dark object on light background
 
 //===============
 //   URControl
