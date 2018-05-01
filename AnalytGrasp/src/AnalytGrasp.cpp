@@ -33,7 +33,27 @@ Grasp AnalytGrasp::FindGrasp(Contour &aContour, double aScaleFactor)
 	}
 
 	//calc possible priority 2 grasps
+	///*INFO*/cout << "calculating p2 grasps..." << endl;
+	vector<Grasp> p2GraspsList;
+	//CalcP2Grasps(p2GraspsList, graspRegsList, COM, aScaleFactor);
 
+	if (p2GraspsList.size() > 0)
+	{
+		//find the best p2 grasp
+		double currShortestDist = INFINITY;
+		int currBestP2Grasp;
+		for (int i = 0; i < p2GraspsList.size(); i++)
+		{
+			double distFromCOM = (p2GraspsList[i].focus.Sub(p2GraspsList[i].COM)).Length();
+			if (distFromCOM < currShortestDist)
+			{
+				currShortestDist = distFromCOM;
+				currBestP2Grasp = i;
+			}
+		}
+
+		return p2GraspsList[currBestP2Grasp];
+	}
 
 	//calc possible priority 3 grasps
 	/*INFO*/cout << "calculating p3 grasps..." << endl;
@@ -84,29 +104,29 @@ void AnalytGrasp::FindGraspRegs(vector<GraspReg> &aGraspRegsList, Contour &aCont
 		if (CalcAngle(newReg.normVec, aContour.inDirs[i]) > CalcAngle(newReg.normVec.Mul(-1), aContour.inDirs[i]))
 			newReg.normVec = newReg.normVec.Mul(-1);
 
-		vector<Coords> devs; //deviations
-		devs.resize(halfRegWidth * 2 + 1);
+		//calc deviations
+		vector<double> devs(halfRegWidth * 2 + 1, 0.0);
 		int index = 0;
 		for (int j = 0; j < (halfRegWidth * 2 + 1); j++) //for all points in the current region
 		{
 			index = (startIndex + j) % aContour.list.size();
+			
 			//calc its deviation
 			Coords dirVec = (aContour.list[index]).Sub(aContour.list[startIndex]); //this points direction vector
-			int projLength = (dirVec.Dot(newReg.normVec) / pow(newReg.normVec.Length(), 2)) * 1000; //the length of the direction vector projected onto the normal vector
-			devs[j] = (newReg.normVec.Mul(projLength)).Div(1000); //projection of this points direction vector onto the normal vector of the region
+			double projLength = dirVec.Dot(newReg.normVec) / pow(newReg.normVec.Length(), 2); //the length of the direction vector projected onto the normal vector
+			Coords devVec = newReg.normVec.Mul(projLength * 1000); //projection of this points direction vector onto the normal vector of the region
+			devs[j] = (devVec.Length() * aScaleFactor) / 1000;
 		}
 
 		//find largest (longest) deviation
-		Coords largestDev(0, 0);
+		double largestDev = 0.0;
 		for (int j = 0; j < devs.size(); j++)
-			if (devs[j].Length() > largestDev.Length())
+			if (devs[j] > largestDev)
 				largestDev = devs[j];
 
 		//determine if this region is a valid grasp region
-		if (largestDev.Length() * aScaleFactor <= 1.0)
+		if (largestDev <= GRASP_REG_MAX_DEV)
 		{
-			//also check sum of lengths of deviations?
-			
 			//we have found a valid grasp region!
 			aGraspRegsList.push_back(newReg);
 		}
@@ -189,14 +209,14 @@ bool AnalytGrasp::P1AngCheck(GraspReg a, GraspReg b, GraspReg c)
 	//calc the angle between the two fingers
 	double angAC = CalcAngle(a.normVec, c.normVec);
 
-	//calc the angles defining the tolerable range
-	double minAng = ((6.28 - angAC)/2) - MAX_DEV_ANG;
-	double maxAng = ((6.28 - angAC)/2) + MAX_DEV_ANG;
+	//calc the angles defining the tolerable range for angles AB and BC
+	double minAng = ((6.28 - angAC)/2) - P1_MAX_ANG_AB_BC_DEV;
+	double maxAng = ((6.28 - angAC)/2) + P1_MAX_ANG_AB_BC_DEV;
 
 	double angBC = CalcAngle(b.normVec, c.normVec); //calc the angle between the thumb and second finger
 	double angBA = CalcAngle(b.normVec, a.normVec); //calc the angle between the thumb and first finger
 
-	if (MIN_P1_ANG <= angAC && angAC <= MAX_P1_ANG) //if the angle between the two fingers is valid
+	if (P1_MIN_ANG_AC <= angAC && angAC <= P1_MAX_ANG_AC) //if the angle between the two fingers is valid
 	{
 		if (minAng <= angBC && angBC <= maxAng) //if the angle between the thumb and second finger is within the range
 		{
@@ -213,7 +233,7 @@ bool AnalytGrasp::P1AngCheck(GraspReg a, GraspReg b, GraspReg c)
 bool AnalytGrasp::P1PosCheck(GraspReg a, GraspReg b, GraspReg c, Coords aFocus, Coords aCOM, double aScaleFactor)
 {
 	//check if the focus is too far from the COM
-	if ((aCOM.Sub(aFocus)).Length() * aScaleFactor > MAX_DIST_FROM_COM)
+	if ((aCOM.Sub(aFocus)).Length() * aScaleFactor > MAX_COM_FOCUS_DIST)
 		return false;
 
 	//check if the points are too close to each other
@@ -231,13 +251,117 @@ bool AnalytGrasp::P1PosCheck(GraspReg a, GraspReg b, GraspReg c, Coords aFocus, 
 	Coords bToFocus = aFocus.Sub(b.point);
 	Coords cToFocus = aFocus.Sub(c.point);
 
-	if (CalcAngle(aToFocus, a.normVec) > MAX_DEV_ANG)
+	if (CalcAngle(aToFocus, a.normVec) > P1_MAX_FOCUS_ANG_DEV)
 		return false;
 
-	if (CalcAngle(bToFocus, b.normVec) > MAX_DEV_ANG)
+	if (CalcAngle(bToFocus, b.normVec) > P1_MAX_FOCUS_ANG_DEV)
 		return false;
 
-	if (CalcAngle(cToFocus, c.normVec) > MAX_DEV_ANG)
+	if (CalcAngle(cToFocus, c.normVec) > P1_MAX_FOCUS_ANG_DEV)
+		return false;
+
+	return true; //if we get to here, we have found a possible grasp!
+}
+
+void AnalytGrasp::CalcP2Grasps(vector<Grasp> &aP2GraspsList, vector<GraspReg> &aGraspRegsList, Coords aCOM, double aScaleFactor)
+{
+	/*INFO*/int passedAngCheck = 0;
+	/*INFO*/int passedPosCheck = 0;
+
+	for (int a = 0; a < aGraspRegsList.size(); a++) //for all grasp regs
+	{
+		for (int b = 0; b < aGraspRegsList.size(); b++)
+		{
+			if (b != a) //find another one, which is not the first
+			{
+				for (int c = 0; c < aGraspRegsList.size(); c++)
+				{
+					if (c != b && c != a) //find a third, which is not one of the two others
+					{
+						if (P2AngCheck(aGraspRegsList[a], aGraspRegsList[b], aGraspRegsList[c])) //if they pass the angle check
+						{
+							/*INFO*/passedAngCheck++;
+
+							Coords graspFocus = ((aGraspRegsList[a].point.Add(aGraspRegsList[b].point)).Add(aGraspRegsList[c].point)).Div(3);
+
+							if (P2PosCheck(aGraspRegsList[a], aGraspRegsList[b], aGraspRegsList[c], graspFocus, aCOM, aScaleFactor)) //if they pass the position check
+							{
+								/*INFO*/passedPosCheck++;
+
+								Grasp newGrasp;
+								newGrasp.type = p2;
+								newGrasp.points = {aGraspRegsList[a], aGraspRegsList[b], aGraspRegsList[c]};
+								newGrasp.focus = graspFocus;
+								newGrasp.COM = aCOM;
+
+								aP2GraspsList.push_back(newGrasp);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if (ANALYT_GRASP_MODE) //INFO
+	{
+		cout << "found " << passedAngCheck << " p2 grasps that passed the angle check" << endl;
+		cout << "found " << passedPosCheck << " p2 grasps that passed the position check" << endl;
+	}
+}
+
+bool AnalytGrasp::P2AngCheck(GraspReg a, GraspReg b, GraspReg c)
+{
+	//calc the angle between the two fingers
+	double angAC = CalcAngle(a.normVec, c.normVec);
+
+	//calc the angles defining the tolerable range for angles AB and BC
+	double minAng = ((6.28 - angAC)/2) - P2_MAX_ANG_AB_BC_DEV;
+	double maxAng = ((6.28 - angAC)/2) + P2_MAX_ANG_AB_BC_DEV;
+
+	double angBC = CalcAngle(b.normVec, c.normVec); //calc the angle between the thumb and second finger
+	double angBA = CalcAngle(b.normVec, a.normVec); //calc the angle between the thumb and first finger
+
+	if (0 <= angAC && angAC <= P2_MAX_ANG_AC) //if the angle between the two fingers is valid
+	{
+		if (minAng <= angBC && angBC <= maxAng) //if the angle between the thumb and second finger is within the range
+		{
+			if (minAng <= angBA && angBA <= maxAng) //if the angle between the thumb and first finger is within the range
+			{
+				return true; //we have found a possible grasp!
+			}
+		}
+	}
+
+	return false; //if we get to here, the regions didn't pass the angle check!
+}
+
+bool AnalytGrasp::P2PosCheck(GraspReg a, GraspReg b, GraspReg c, Coords aFocus, Coords aCOM, double aScaleFactor)
+{
+	//check if the focus is too far from the COM
+	if ((aCOM.Sub(aFocus)).Length() * aScaleFactor > MAX_COM_FOCUS_DIST)
+		return false;
+
+	//check if the points are too close to each other
+	if ((a.point.Sub(b.point)).Length() * aScaleFactor < MIN_GRASP_POINT_DIST)
+		return false;
+
+	if ((b.point.Sub(c.point)).Length() * aScaleFactor < MIN_GRASP_POINT_DIST)
+		return false;
+
+	if ((c.point.Sub(a.point)).Length() * aScaleFactor < MIN_GRASP_POINT_DIST)
+		return false;
+
+	//check that the grasp regions are oriented correctly
+	Coords bToFocus = aFocus.Sub(b.point);
+
+	if (CalcAngle(bToFocus, (a.normVec).Mul(-1)) > P2_MAX_FOCUS_ANG_DEV)
+		return false;
+
+	if (CalcAngle(bToFocus, b.normVec) > P2_MAX_FOCUS_ANG_DEV)
+		return false;
+
+	if (CalcAngle(bToFocus, (c.normVec).Mul(-1)) > P2_MAX_FOCUS_ANG_DEV)
 		return false;
 
 	return true; //if we get to here, we have found a possible grasp!
@@ -289,7 +413,7 @@ bool AnalytGrasp::P3AngCheck(GraspReg a, GraspReg c)
 	//calc the angle between the two fingers
 	double angAC = CalcAngle(a.normVec, c.normVec);
 
-	if (3.14 - MAX_DEV_ANG <= angAC && angAC <= 3.14 + MAX_DEV_ANG) //if the angle between the two fingers is valid
+	if (3.14 - P3_MAX_ANG_AC_DEV <= angAC && angAC <= 3.14 + P3_MAX_ANG_AC_DEV) //if the angle between the two fingers is valid
 	{
 		return true; //we have found a possible grasp!
 	}
@@ -300,7 +424,7 @@ bool AnalytGrasp::P3AngCheck(GraspReg a, GraspReg c)
 bool AnalytGrasp::P3PosCheck(GraspReg a, GraspReg c, Coords aFocus, Coords aCOM, double aScaleFactor)
 {
 	//check if the focus is too far from the COM
-	if ((aCOM.Sub(aFocus)).Length() * aScaleFactor > MAX_DIST_FROM_COM)
+	if ((aCOM.Sub(aFocus)).Length() * aScaleFactor > MAX_COM_FOCUS_DIST)
 		return false;
 
 	//check if the points are too close to each other
@@ -311,10 +435,10 @@ bool AnalytGrasp::P3PosCheck(GraspReg a, GraspReg c, Coords aFocus, Coords aCOM,
 	Coords aToFocus = aFocus.Sub(a.point);
 	Coords cToFocus = aFocus.Sub(c.point);
 
-	if (CalcAngle(aToFocus, a.normVec) > MAX_DEV_ANG)
+	if (CalcAngle(aToFocus, a.normVec) > P3_MAX_FOCUS_ANG_DEV)
 		return false;
 
-	if (CalcAngle(cToFocus, c.normVec) > MAX_DEV_ANG)
+	if (CalcAngle(cToFocus, c.normVec) > P3_MAX_FOCUS_ANG_DEV)
 		return false;
 
 	return true; //if we get to here, we have found a possible grasp!

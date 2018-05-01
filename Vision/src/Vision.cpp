@@ -33,8 +33,8 @@ void Vision::Calib()
 
 	//calculate the scale factor
 	Coords dims = max.Sub(min); //the calibration objects dimensions in pixels
-	double scaleX = REAL_WIDTH / dims.x; //mm/pixels
-	double scaleY = REAL_HEIGHT / dims.y; //mm/pixels
+	double scaleX = REAL_OBJ_WIDTH / dims.x; //mm/pixels
+	double scaleY = REAL_OBJ_HEIGHT / dims.y; //mm/pixels
 	scaleFactor = (scaleX + scaleY) / 2.0; //average of the scales
 }
 

@@ -39,6 +39,10 @@ private:
 	static void CalcP1Grasps(vector<Grasp> &aP1GraspsList, vector<GraspReg> &aGraspRegsList, Coords aCOM, double aScaleFactor);
 	static bool P1AngCheck(GraspReg a, GraspReg b, GraspReg c);
 	static bool P1PosCheck(GraspReg a, GraspReg b, GraspReg c, Coords aFocus, Coords aCOM, double aScaleFactor);
+	
+	static void CalcP2Grasps(vector<Grasp> &aP2GraspsList, vector<GraspReg> &aGraspRegsList, Coords aCOM, double aScaleFactor);
+	static bool P2AngCheck(GraspReg a, GraspReg b, GraspReg c);
+	static bool P2PosCheck(GraspReg a, GraspReg b, GraspReg c, Coords aFocus, Coords aCOM, double aScaleFactor);
 
 	static void CalcP3Grasps(vector<Grasp> &aP3GraspsList, vector<GraspReg> &aGraspRegsList, Coords aCOM, double aScaleFactor);
 	static bool P3AngCheck(GraspReg a, GraspReg c);

@@ -191,42 +191,11 @@ void TIAFC::CatchNeighbours(Mat &aThresImage, int aColor, Coords aCurrPoint, vec
 		{
 			if (aThresImage.at<uchar>(aCurrPoint.y + yVals[i], aCurrPoint.x + xVals[i]) == aColor) //if the neighbour is the color
 			{
-				if (true/*IsNotBottleneck(aThresImage, aCurrPoint)*/) //if the neighbour is not a bottleneck
-				{
-					aThresImage.at<uchar>(aCurrPoint.y + yVals[i], aCurrPoint.x + xVals[i]) = 255 - aColor; //remove the point
-					aListOfPoints.push_back(Coords(aCurrPoint.x + xVals[i], aCurrPoint.y + yVals[i])); //add it to the list
-				}
+				aThresImage.at<uchar>(aCurrPoint.y + yVals[i], aCurrPoint.x + xVals[i]) = 255 - aColor; //remove the point
+				aListOfPoints.push_back(Coords(aCurrPoint.x + xVals[i], aCurrPoint.y + yVals[i])); //add it to the list
 			}
 		}
 	}
-}
-
-bool TIAFC::IsNotBottleneck(Mat &aThresImage, Coords aCurrPoint)
-{
-	//relative coordinates:
-	int xVals[8] = {1, 1, 0, -1, -1, -1, 0, 1}; //it is important to visit the neighbours in order!
-	int yVals[8] = {0, -1, -1, -1, 0, 1, 1, 1};
-
-	int colorChanges = 0;
-
-	int prevColor = aThresImage.at<uchar>(aCurrPoint.y + yVals[0], aCurrPoint.x + xVals[0]);
-	int currColor;
-
-	for (int i = 1; i < 8; i++) //run through all neighbours
-	{
-		if (IsWithinBounds(aThresImage, aCurrPoint.x + xVals[i], aCurrPoint.y + yVals[i]))
-			currColor = aThresImage.at<uchar>(aCurrPoint.y + yVals[i], aCurrPoint.x + xVals[i]);
-		else
-			currColor = 0; //the edge of the image counts as black!
-
-		if (currColor != prevColor)
-			colorChanges++;
-	}
-
-	if (colorChanges > 2)
-		return false;
-	else
-		return true;
 }
 
 void TIAFC::FindContour(Mat &objectImage, Contour &aContour)
@@ -336,7 +305,7 @@ Coords TIAFC::FindNextNeighbour(Mat &anObjectImage, Contour &aContour, Coords aC
 	}
 
 	//error
-	throw("[TIAFC::FindNextNeighbour()]: Couldn't follow the contour all the way around!");
+	throw("[TIAFC::FindNextNeighbour()]: The contour is not nice enough!");
 }
 
 bool TIAFC::HasBlackNeighbour(Mat &anObjectImage, Coords aCurrPoint)
@@ -391,9 +360,9 @@ void TIAFC::CalcInDirs(Mat &anObjectImage, Contour &aContour)
 
 bool TIAFC::IsWithinBounds(Mat &anImage, int anX, int aY)
 {
-	if (anX < anImage.cols && anX > -1)
+	if (-1 < anX && anX < anImage.cols)
 	{
-		if (aY < anImage.rows && aY > -1)
+		if (-1 < aY && aY < anImage.rows)
 		{
 			return true;
 		}

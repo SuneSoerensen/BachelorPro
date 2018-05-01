@@ -30,7 +30,6 @@ private:
 	static void FindObject(Mat &aCropImage, Mat &anObjectImage);
 	static void ThereCanOnlyBeOne(Mat &aThresImage, bool mode);
 	static void CatchNeighbours(Mat &aThresImage, int aColor, Coords aCurrPoint, vector<Coords> &aListOfPoints);
-	static bool IsNotBottleneck(Mat &aThresImage, Coords aCurrPoint);
 
 	static void FindContour(Mat &anObjectImage, Contour &aContour);
 	static Coords FindNextNeighbour(Mat &anObjectImage, Contour &aContour, Coords aCurrPoint);

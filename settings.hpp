@@ -17,8 +17,9 @@
 #define VISION_MODE		1	// 0 = normal, 1 = info
 
 //for calibration (pixel-coords to real-coords):
-#define REAL_WIDTH		186.0 //mm
-#define REAL_HEIGHT		141.0 //mm
+//(for developer tests: 186.0, 141.0)
+#define REAL_OBJ_WIDTH		186.0 //mm
+#define REAL_OBJ_HEIGHT		141.0 //mm
 #define GLOB_X_DIR		1 //global x-direction in relation to the cameras x-direction
 #define GLOB_Y_DIR		-1 //global y-direction in relation to the cameras y-direction
 
@@ -29,13 +30,22 @@
 
 //for grasping:
 #define GRASP_REG_WIDTH		30.0 //mm (width of a finger + a bit)
+#define GRASP_REG_MAX_DEV		1.75 //mm
 
-#define MIN_P1_ANG		0.17 //radians (~10 deg) (the minimum angle between finger a and c for a p1 grasp)
-#define MAX_P1_ANG		2.62 //radians (~150 deg) (the maximum angle between finger a and c for a p1 grasp)
+#define MAX_COM_FOCUS_DIST	50.0 //mm
+#define MIN_GRASP_POINT_DIST	67.0 //mm (the absolutely minimum distance between two grasp points)
 
-#define MAX_DEV_ANG		0.17 //radians (~10 deg)
-#define MAX_DIST_FROM_COM	50.0 //mm
-#define MIN_GRASP_POINT_DIST	66.0 //mm
+#define P1_MIN_ANG_AC		0.17 //radians (~10 deg) (the minimum angle between finger a and c for a p1 grasp)
+#define P1_MAX_ANG_AC		2.62 //radians (~150 deg) (the maximum angle between finger a and c for a p1 grasp)
+#define P1_MAX_ANG_AB_BC_DEV		0.17 //radians (~10 deg) (the maximum the angle between finger b and the others can deviate from the ideal in either direction)
+#define P1_MAX_FOCUS_ANG_DEV		0.17 //radians (~10 deg)
+
+#define P2_MAX_ANG_AC		0.17 //radians (~10 deg) (the maximum angle between finger a and c for a p2 grasp)
+#define P2_MAX_ANG_AB_BC_DEV		0.17 //radians (~10 deg) (the maximum the angle between finger b and the others can deviate from the ideal in either direction)
+#define P2_MAX_FOCUS_ANG_DEV		0.17 //radians (~10 deg)
+
+#define P3_MAX_ANG_AC_DEV	0.17 //radians (~10 deg) (the maximum the angle between finger a and c can deviate from 0 in either direction)
+#define P3_MAX_FOCUS_ANG_DEV		0.08 //radians (~5 deg)
 
 //-------
 // TIAFC
