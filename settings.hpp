@@ -30,19 +30,21 @@
 
 //for grasping:
 #define GRASP_REG_WIDTH		30.0 //mm (width of a finger + a bit)
-#define GRASP_REG_MAX_DEV		1.75 //mm
+#define GRASP_REG_MAX_DEV		1.9 //mm
 
 #define MAX_COM_FOCUS_DIST	50.0 //mm
-#define MIN_GRASP_POINT_DIST	67.0 //mm (the absolutely minimum distance between two grasp points)
+#define MIN_GRASP_POINT_DIST	60.0 //mm (the absolutely minimum distance between two grasp points)
 
 #define P1_MIN_ANG_AC		0.17 //radians (~10 deg) (the minimum angle between finger a and c for a p1 grasp)
-#define P1_MAX_ANG_AC		2.62 //radians (~150 deg) (the maximum angle between finger a and c for a p1 grasp)
+#define P1_MAX_ANG_AC		2.26 //radians (~130 deg) (the maximum angle between finger a and c for a p1 grasp)
 #define P1_MAX_ANG_AB_BC_DEV		0.17 //radians (~10 deg) (the maximum the angle between finger b and the others can deviate from the ideal in either direction)
 #define P1_MAX_FOCUS_ANG_DEV		0.17 //radians (~10 deg)
 
 #define P2_MAX_ANG_AC		0.17 //radians (~10 deg) (the maximum angle between finger a and c for a p2 grasp)
 #define P2_MAX_ANG_AB_BC_DEV		0.17 //radians (~10 deg) (the maximum the angle between finger b and the others can deviate from the ideal in either direction)
 #define P2_MAX_FOCUS_ANG_DEV		0.17 //radians (~10 deg)
+#define P2_DIST_AC				66.0 //mm
+#define P2_MAX_DIST_AC_DEV		1.0 //mm
 
 #define P3_MAX_ANG_AC_DEV	0.17 //radians (~10 deg) (the maximum the angle between finger a and c can deviate from 0 in either direction)
 #define P3_MAX_FOCUS_ANG_DEV		0.08 //radians (~5 deg)

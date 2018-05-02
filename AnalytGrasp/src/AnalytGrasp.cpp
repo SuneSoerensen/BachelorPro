@@ -33,9 +33,9 @@ Grasp AnalytGrasp::FindGrasp(Contour &aContour, double aScaleFactor)
 	}
 
 	//calc possible priority 2 grasps
-	///*INFO*/cout << "calculating p2 grasps..." << endl;
+	/*INFO*/cout << "calculating p2 grasps..." << endl;
 	vector<Grasp> p2GraspsList;
-	//CalcP2Grasps(p2GraspsList, graspRegsList, COM, aScaleFactor);
+	CalcP2Grasps(p2GraspsList, graspRegsList, COM, aScaleFactor);
 
 	if (p2GraspsList.size() > 0)
 	{
@@ -113,12 +113,10 @@ void AnalytGrasp::FindGraspRegs(vector<GraspReg> &aGraspRegsList, Contour &aCont
 			
 			//calc its deviation
 			Coords dirVec = (aContour.list[index]).Sub(aContour.list[startIndex]); //this points direction vector
-			double projLength = dirVec.Dot(newReg.normVec) / pow(newReg.normVec.Length(), 2); //the length of the direction vector projected onto the normal vector
-			Coords devVec = newReg.normVec.Mul(projLength * 1000); //projection of this points direction vector onto the normal vector of the region
-			devs[j] = (devVec.Length() * aScaleFactor) / 1000;
+			devs[j] = CalcProjLength(dirVec, newReg.normVec); //the length of the direction vector projected onto the normal vector
 		}
 
-		//find largest (longest) deviation
+		//find largest deviation
 		double largestDev = 0.0;
 		for (int j = 0; j < devs.size(); j++)
 			if (devs[j] > largestDev)
@@ -364,6 +362,22 @@ bool AnalytGrasp::P2PosCheck(GraspReg a, GraspReg b, GraspReg c, Coords aFocus, 
 	if (CalcAngle(bToFocus, (c.normVec).Mul(-1)) > P2_MAX_FOCUS_ANG_DEV)
 		return false;
 
+	Coords aToFocus = aFocus.Sub(a.point);
+	Coords cToFocus = aFocus.Sub(c.point);
+	Coords bToFocusHat(-bToFocus.y, bToFocus.x);
+
+	if (CalcProjLength(aToFocus, bToFocusHat) * aScaleFactor < (P2_DIST_AC / 2) - P2_MAX_DIST_AC_DEV)
+		return false;
+
+	if ((P2_DIST_AC / 2) + P2_MAX_DIST_AC_DEV < CalcProjLength(aToFocus, bToFocusHat) * aScaleFactor)
+		return false;
+
+	if (CalcProjLength(cToFocus, bToFocusHat) * aScaleFactor < (P2_DIST_AC / 2) - P2_MAX_DIST_AC_DEV)
+		return false;
+
+	if ((P2_DIST_AC / 2) + P2_MAX_DIST_AC_DEV < CalcProjLength(cToFocus, bToFocusHat) * aScaleFactor)
+		return false;
+
 	return true; //if we get to here, we have found a possible grasp!
 }
 
@@ -449,6 +463,13 @@ double AnalytGrasp::CalcAngle(Coords vecA, Coords vecB)
 	double num = vecA.Dot(vecB);
 	double den = vecA.Length() * vecB.Length();
 	return acos(num / den);
+}
+
+double AnalytGrasp::CalcProjLength(Coords vecA, Coords vecB)
+{
+	double projLength = vecA.Dot(vecB) / pow(vecB.Length(), 2);
+	Coords projVec = vecB.Mul(projLength * 1000);
+	return projVec.Length() / 1000.0;
 }
 
 AnalytGrasp::AnalytGrasp()

@@ -49,6 +49,7 @@ private:
 	static bool P3PosCheck(GraspReg a, GraspReg c, Coords aFocus, Coords aCOM, double aScaleFactor);
 
 	static double CalcAngle(Coords vecA, Coords vecB);
+	static double CalcProjLength(Coords vecA, Coords vecB);
 
 	AnalytGrasp();
 	~AnalytGrasp();
