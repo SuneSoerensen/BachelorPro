@@ -89,20 +89,19 @@ private:
     //Uses all above checks to verify if input angles are a valid configuration:
     bool checkSolution(vector<double> anglesA, vector<double> anglesB, vector<double> anglesC);
 
+    //Same as above, but for two-finger grasps:
+    bool checkSolution(vector<double> anglesA, vector<double> anglesC);
+
     //Kinematics for finger (seen as 2-joint "arm", from the side):
     vector<double> calcFingerDist(double angleBase, double angleTop);
 
     //Control if hand is grasping an object
-    //Output: true if the grasp is valid
     void controlGrasp(double goalDistA, double goalDistB, double goalDistC);
     void controlGrasp(double goalDistA, double goalDistC);
 
 
     //Control if grasp is the intended grasp, using the triangle calculated in grasp():
     void controlGraspPlacement(double angleAC, double currDistA, double currDistB, double currDistC);
-
-    //Same as above, but for two-finger grasps:
-    bool checkSolution(vector<double> anglesA, vector<double> anglesC);
 };
 
 

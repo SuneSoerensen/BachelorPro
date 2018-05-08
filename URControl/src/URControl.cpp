@@ -117,7 +117,7 @@ void URControl::moveRel(double anX, double aY, double aZ)
   //Calculate absolute coordinates:
   double absX = currToolPos[0] + rotX;
   double absY = currToolPos[1] + rotY;
-  double absZ = currToolPos[2] + aZ;
+  double absZ = currToolPos[2] + z;
 
   if(URCONTROL_MODE)
     cout << "\033[1;33m DEBUG: \033[0m" << "absX [mm] = " << absX*1000.0 << " absY [mm] = " << absY*1000.0 << endl;
@@ -189,6 +189,7 @@ void URControl::setWristAngle(double anAngle)
 
   //Send script to perform movement:
   sendScript("rotateWristScript.txt");
+  usleep(MOVTIME*1000000);
 }
 
 bool URControl::checkBounds(double x, double y, double z)
@@ -205,7 +206,7 @@ bool URControl::checkBounds(double x, double y, double z)
   {
     throw("[URControl::checkBounds]: New z-coordinates are out of bounds!");
   }
-  else if((x*x + y*y + z*z) <= R_SQUARED)
+  else if((x*x + y*y + z*z) >= R_SQUARED)
   {
     throw("[URControl::checkBounds]: Robot cannot reach so far!");
   }

@@ -110,7 +110,7 @@ double SDHControl::grasp(double fingerAX, double fingerAY, double fingerBX, doub
     throw("[SDHControl::grasp]: Angle between A and C is not correct!");
 
   if(SDHCONTROL_MODE)
-    cout << "\033[1;33m [SDHControl::grasp] DEBUG: \033[0m" << "Angle between finger A and C = angleAC (deg) = " << angleAC*rad2deg << endl;
+    cout << "\033[1;33m [SDHControl::grasp] DEBUG: \033[0m" << "Angle between finger A and C = fingerAngleAC (deg) = " << fingerAngleAC*rad2deg << endl;
 
   vector<double> fingertipPosA = calcFingertipPos(distA, angleAC);
   vector<double> fingertipPosC = calcFingertipPos(distC, angleAC);
@@ -187,7 +187,7 @@ double SDHControl::grasp(double fingerAX, double fingerAY, double fingerBX, doub
     if(isPreGrasp && SDHCONTROL_MODE)
       cout << "\033[1;33m [SDHControl::grasp] DEBUG: \033[0m" << "Found height is = " << y + WRIST_HEIGHT + TARGET_Z + SEPERATOR_HEIGHT << endl;
 
-    return y + WRIST_HEIGHT + TARGET_Z + SEPERATOR_HEIGHT; //Z-coordinate to give directly to URControl (moveAbs())
+    return y + WRIST_HEIGHT + TARGET_Z + SEPERATOR_HEIGHT;
 
 }
 
@@ -198,8 +198,8 @@ double SDHControl::grasp(double fingerAX, double fingerAY, double fingerCX, doub
    isExpectedGrasp = false;
 
    //calc finger dist
-   double distA = abs(fingerAX)-SDH_FINGER_BASE_OFF_X;
-   double distC = abs(fingerCX)-SDH_FINGER_BASE_OFF_X;
+   double distA = abs(fingerAX) - SDH_FINGER_BASE_OFF_X;
+   double distC = abs(fingerCX) + SDH_FINGER_BASE_OFF_X;
 
    if(isPreGrasp)
    {
@@ -339,6 +339,22 @@ bool SDHControl::checkSolution(vector<double> anglesA, vector<double> anglesB, v
     res = true;
 
   if(areThereInvalidAngles(anglesA, anglesB, anglesC))
+    res = true;
+
+  return res;
+}
+
+bool SDHControl::checkSolution(vector<double> anglesA, vector<double> anglesC)
+{
+  bool res = false;
+
+  if(abs(-(90*deg2rad-anglesA[0])+ anglesA[1]) > SDH_ANGLE_THRESH || abs(-(90*deg2rad-anglesC[0])+ anglesC[1]) > SDH_ANGLE_THRESH) //Check angle thresholds
+    res = true;
+
+  if(isnan(anglesA[0]) || isnan(anglesA[1]) || isnan(anglesC[0]) || isnan(anglesC[1])) //Check if any angles a nan
+    res = true;
+
+  if(abs(anglesA[0]) > SDH_MAX_ABS_ANGLE || abs(anglesA[0]) > SDH_MAX_ABS_ANGLE || abs(anglesC[0]) > SDH_MAX_ABS_ANGLE || abs(anglesC[1]) > SDH_MAX_ABS_ANGLE) // Are there invalid angles
     res = true;
 
   return res;
@@ -503,20 +519,4 @@ void SDHControl::controlGraspPlacement(double angleAC, double currDistA, double 
     }
 
   //TODO: Check if current grasp could be another valid grasp
-}
-
-bool SDHControl::checkSolution(vector<double> anglesA, vector<double> anglesC)
-{
-  bool res = false;
-
-  if(abs(-(90*deg2rad-anglesA[0])+ anglesA[1]) > SDH_ANGLE_THRESH || abs(-(90*deg2rad-anglesC[0])+ anglesC[1]) > SDH_ANGLE_THRESH) //Check angle thresholds
-    res = true;
-
-  if(isnan(anglesA[0]) || isnan(anglesA[1]) || isnan(anglesC[0]) || isnan(anglesC[1])) //Check if any angles a nan
-    res = true;
-
-  if(abs(anglesA[0]) > SDH_MAX_ABS_ANGLE || abs(anglesA[0]) > SDH_MAX_ABS_ANGLE || abs(anglesC[0]) > SDH_MAX_ABS_ANGLE || abs(anglesC[1]) > SDH_MAX_ABS_ANGLE) // Are there invalid angles
-    res = true;
-
-  return res;
 }
