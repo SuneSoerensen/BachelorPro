@@ -18,16 +18,16 @@ int main()
   double yC = yA;
 
 
-  cout << "Welcome to URControlTest.cpp" << endl;
+  cout << "Welcome to SDHControlTest.cpp" << endl;
   try
   {
-    SDHControl hand/*(0, 115200, 0.5)*/;
-    //cout << "Going to init." << endl;
-    //hand.goToInit();
+    SDHControl hand(0, 115200, 0.5);
+    cout << "Going to init." << endl;
+    hand.goToInit();
 
-    //cout << "Press any key and ENTER to continue" << endl;
-    //string dummy;
-    //cin >> dummy;
+    cout << "Press any key and ENTER to continue" << endl;
+    string dummy;
+    cin >> dummy;
 
     cout << "Grasping" << endl;
     hand.grasp(xA, yA, xB, yB, xC, yC, false);

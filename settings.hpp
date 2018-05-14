@@ -9,7 +9,7 @@
 //============
 //   Vision
 //============
-#define VISION_DEV_MODE	1	//developer mode for Vision and all of its dependencies (0 = false, 1 = true)
+#define VISION_DEV_MODE	0	//developer mode for Vision and all of its dependencies (0 = false, 1 = true)
 
 //--------
 // Vision
@@ -18,8 +18,8 @@
 
 //for calibration (pixel-coords to real-coords):
 //(for developer tests: 186.0, 141.0)
-#define REAL_OBJ_WIDTH		186.0 //mm
-#define REAL_OBJ_HEIGHT		141.0 //mm
+#define REAL_OBJ_WIDTH		125.5 //mm
+#define REAL_OBJ_HEIGHT		125.5 //mm
 #define GLOB_X_DIR		1 //global x-direction in relation to the cameras x-direction
 #define GLOB_Y_DIR		-1 //global y-direction in relation to the cameras y-direction
 
@@ -63,20 +63,21 @@
 #define TIAFC_MODE		1	// 0 = normal, 1 = info
 
 //camera settings:
-#define CAMERA			0	// 0 = default camera
+#define CAMERA			1	// 0 = default camera
 #define CAM_RES_WIDTH	1280
 #define CAM_RES_HEIGHT	720
 #define FRAMES_TO_GET	14	// min 7, according to initial tests
 
 //crop settings:
 //(for developer tests: 100, 500, 400, 1000)
-#define CROP_TOP		100
-#define CROP_BOTTOM		500
-#define CROP_LEFT		400
-#define CROP_RIGHT		1000
+//(for real-world tests: 40, 600, 150, 1000)
+#define CROP_TOP		  40
+#define CROP_BOTTOM	 600
+#define CROP_LEFT		 150
+#define CROP_RIGHT	1000
 
 //for thresholding:
-#define THRESHOLDING_THRES	110 //should be between the intensities of the background and the object
+#define THRESHOLDING_THRES	120//110 //should be between the intensities of the background and the object
 #define THRESHOLDING_MODE	0 //0 = light object on dark background, 1 = dark object on light background
 
 //===============
@@ -94,7 +95,7 @@
 #define UR_MAX_Y		-0.19335 //m
 #define UR_MIN_Y		-0.47619 //m
 #define UR_MAX_Z		 0.600 //m
-#define UR_MIN_Z		 0.300 //m
+#define UR_MIN_Z		 0.050 //m
 
 #define R_SQUARED		 0.8*0.8
 
@@ -119,7 +120,9 @@
 //===============
 //   SDHControl
 //===============
-#define SDHCONTROL_MODE 0 //0=standard 1=debug
+#define SDHCONTROL_MODE 1 //0=standard 1=debug
+#define POSTION_TEST 0 //0 = Standard 1 = To run test
+
 #define GRASPSTARTHEIGHT 160 //5mm further than range of fingers //TODO: delete if unused
 #define GRASPFINDSTEPSIZE 0.001 //Stepsize for finding finger-config. in grasp()
 #define GRASPDISTLIM 155.0 //Total length of a finger
@@ -130,7 +133,7 @@
 #define WRIST_HEIGHT 98.0 //mm
 #define SEPERATOR_HEIGHT 23 //mm
 
-#define TARGET_Z 70.0 //mm Defines at which height the target object should be grasped
+#define TARGET_Z 60.0 //mm Defines at which height the target object should be grasped
 
 #define SDH_ANGLE_THRESH 20.0*deg2rad //Max angle of fingertips in a grasp
 #define SDH_MAX_ABS_ANGLE 91.0*deg2rad //Max abs. angle of any SDH joint
@@ -138,13 +141,9 @@
 #define SDH_PRECISION 10.0 //mm Defines how far a grasp can be from the intended, and still be valid
 #define SDH_DIST_INTO_OBJECT 4 //mm for each finger
 
-#define FINGERAC_ANGLE_THRESH 10*deg2rad //How close the angle of finger A and C should be to each other
+#define FINGERAC_ANGLE_THRESH 22.0*deg2rad //How close the angle of finger A and C should be to each other
 
 #define SDH_FINGER_BASE_OFF_X 33.0 //mm
 #define SDH_FINGER_BASE_OFF_Y 19.0525 //mm
 
-//#define SDH_ANGLE_DIFF_FIRST 10.0 //deg //TODO: delete if still unused
-
 #define PREGRASP_SCALE 30.0 //mm How far from the grasp-position each finger should be, in a pre-grasp
-
-#define POSTION_TEST 1 //0 = Standard 1 = To run test
