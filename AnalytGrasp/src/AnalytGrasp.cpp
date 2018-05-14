@@ -9,73 +9,79 @@ Grasp AnalytGrasp::FindGrasp(Contour &aContour, double aScaleFactor)
 	//calc the objects center of mass
 	Coords COM = TIAFC::FindCOM(aContour);
 
-	//calc possible priority 1 grasps
-	/*INFO*/cout << "calculating p1 grasps..." << endl;
-	vector<Grasp> p1GraspsList;
-	CalcP1Grasps(p1GraspsList, graspRegsList, COM, aScaleFactor);
-
-	if (p1GraspsList.size() > 0)
+	if (ALLOW_P1_GRASPS) //calc possible priority 1 grasps
 	{
-		//find the best p1 grasp
-		double currShortestDist = INFINITY;
-		int currBestP1Grasp;
-		for (int i = 0; i < p1GraspsList.size(); i++)
-		{
-			double distFromCOM = (p1GraspsList[i].focus.Sub(p1GraspsList[i].COM)).Length();
-			if (distFromCOM < currShortestDist)
-			{
-				currShortestDist = distFromCOM;
-				currBestP1Grasp = i;
-			}
-		}
+		/*INFO*/cout << "calculating p1 grasps..." << endl;
+		vector<Grasp> p1GraspsList;
+		CalcP1Grasps(p1GraspsList, graspRegsList, COM, aScaleFactor);
 
-		return p1GraspsList[currBestP1Grasp];
+		if (p1GraspsList.size() > 0)
+		{
+			//find the best p1 grasp
+			double currShortestDist = INFINITY;
+			int currBestP1Grasp;
+			for (int i = 0; i < p1GraspsList.size(); i++)
+			{
+				double distFromCOM = (p1GraspsList[i].focus.Sub(p1GraspsList[i].COM)).Length();
+				if (distFromCOM < currShortestDist)
+				{
+					currShortestDist = distFromCOM;
+					currBestP1Grasp = i;
+				}
+			}
+
+			return p1GraspsList[currBestP1Grasp];
+		}
 	}
 
-	//calc possible priority 2 grasps
-	/*INFO*/cout << "calculating p2 grasps..." << endl;
-	vector<Grasp> p2GraspsList;
-	CalcP2Grasps(p2GraspsList, graspRegsList, COM, aScaleFactor);
-
-	if (p2GraspsList.size() > 0)
+	if (ALLOW_P2_GRASPS) //calc possible priority 2 grasps
 	{
-		//find the best p2 grasp
-		double currShortestDist = INFINITY;
-		int currBestP2Grasp;
-		for (int i = 0; i < p2GraspsList.size(); i++)
-		{
-			double distFromCOM = (p2GraspsList[i].focus.Sub(p2GraspsList[i].COM)).Length();
-			if (distFromCOM < currShortestDist)
-			{
-				currShortestDist = distFromCOM;
-				currBestP2Grasp = i;
-			}
-		}
+		/*INFO*/cout << "calculating p2 grasps..." << endl;
+		vector<Grasp> p2GraspsList;
+		CalcP2Grasps(p2GraspsList, graspRegsList, COM, aScaleFactor);
 
-		return p2GraspsList[currBestP2Grasp];
+		if (p2GraspsList.size() > 0)
+		{
+			//find the best p2 grasp
+			double currShortestDist = INFINITY;
+			int currBestP2Grasp;
+			for (int i = 0; i < p2GraspsList.size(); i++)
+			{
+				double distFromCOM = (p2GraspsList[i].focus.Sub(p2GraspsList[i].COM)).Length();
+				if (distFromCOM < currShortestDist)
+				{
+					currShortestDist = distFromCOM;
+					currBestP2Grasp = i;
+				}
+			}
+
+			return p2GraspsList[currBestP2Grasp];
+		}
 	}
 
-	//calc possible priority 3 grasps
-	/*INFO*/cout << "calculating p3 grasps..." << endl;
-	vector<Grasp> p3GraspsList;
-	CalcP3Grasps(p3GraspsList, graspRegsList, COM, aScaleFactor);
-
-	if (p3GraspsList.size() > 0)
+	if (ALLOW_P3_GRASPS) //calc possible priority 3 grasps
 	{
-		//find the best p1 grasp
-		double currShortestDist = INFINITY;
-		int currBestP3Grasp;
-		for (int i = 0; i < p3GraspsList.size(); i++)
-		{
-			double distFromCOM = (p3GraspsList[i].focus.Sub(p3GraspsList[i].COM)).Length();
-			if (distFromCOM < currShortestDist)
-			{
-				currShortestDist = distFromCOM;
-				currBestP3Grasp = i;
-			}
-		}
+		/*INFO*/cout << "calculating p3 grasps..." << endl;
+		vector<Grasp> p3GraspsList;
+		CalcP3Grasps(p3GraspsList, graspRegsList, COM, aScaleFactor);
 
-		return p3GraspsList[currBestP3Grasp];
+		if (p3GraspsList.size() > 0)
+		{
+			//find the best p1 grasp
+			double currShortestDist = INFINITY;
+			int currBestP3Grasp;
+			for (int i = 0; i < p3GraspsList.size(); i++)
+			{
+				double distFromCOM = (p3GraspsList[i].focus.Sub(p3GraspsList[i].COM)).Length();
+				if (distFromCOM < currShortestDist)
+				{
+					currShortestDist = distFromCOM;
+					currBestP3Grasp = i;
+				}
+			}
+
+			return p3GraspsList[currBestP3Grasp];
+		}
 	}
 
 	//if we get to here, we couldn't find any accetable grasps!
