@@ -93,6 +93,8 @@ void URControl::moveToHome()
     if(!fileTest.good())
       throw("[URControl::moveToInit]: goToHome-script does not exist!");
 
+    fileTest.close();
+
     sendScript(fileName);
     haveBeenToInit = 0;
     state = STATE_HOME;

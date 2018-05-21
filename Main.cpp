@@ -63,16 +63,19 @@ int main()
       {
         //Find angle to rotate with, such that x-coord. of finger B is ~0:
         wristRotation = 270.0*deg2rad - atan2(handLocalGraspPoints[1].y, handLocalGraspPoints[1].x); // -90[deg] - angleOfVectorB[deg] is how much to rotate vectors
-        absWristRotation = -74.0*deg2rad - atan2(handLocalGraspPoints[1].y, handLocalGraspPoints[1].x);
+        absWristRotation = acos(((double)handLocalGraspPoints[1].x*(-1.0)+(double)handLocalGraspPoints[1].y*(0.0))/(sqrt(pow((double)handLocalGraspPoints[1].x,2)+pow((double)handLocalGraspPoints[1].y,2))*1.0));
+        absWristRotation -= 16.0*deg2rad;
+
         cout << "Grasp points:";
         for(int i = 0; i < graspPoints.size(); i++)
           cout << " (" << graspPoints[i].x << ";" << graspPoints[i].y << ") ";
-        cout << " Rotation =" << absWristRotation << endl;
+        cout << " Rotation =" << absWristRotation*rad2deg << endl;
       }
       else if(handLocalGraspPoints.size() == 2)
       {
         //Find angle to rotate with, such that y-coord. of finger A is ~0:
-        wristRotation = - atan2(handLocalGraspPoints[0].y, handLocalGraspPoints[0].x);
+        wristRotation = - atan2(handLocalGraspPoints[1].y, handLocalGraspPoints[1].x);
+        absWristRotation = wristRotation - 16.0*deg2rad;
         /*cout << "handLocalGraspPoints:";
         for(int i = 0; i < handLocalGraspPoints.size(); i++)
           cout << " (" << handLocalGraspPoints[i].x << ";" << handLocalGraspPoints[i].y << ") ";
@@ -92,30 +95,27 @@ int main()
         handLocalGraspPoints[i].y = rotY;
       }
 
-      cout << "Ready to grasp. Press ENTER to move to position and pre-grasp." << endl;
-      cin.get();
+      //cout << "Ready to grasp. Press ENTER to move to position and pre-grasp." << endl;
+      //cin.get();
 
       ur.moveRel(objCoords.x, objCoords.y, 0.0); //Hand above object
-      ur.setWristAngle(absWristRotation); //Rotate wrist
-
-      /*DEBUG*/ cout << "Press ENTER TO CONTINUE." << endl;
-      /*DEBUG*/ cin.get();
+      ur.setWristAngle(-absWristRotation); //Rotate wrist
 
       if(handLocalGraspPoints.size() == 3) //If it is a three-finger-grasp
       {
         cout << "Going to pre-grasp configuration." << endl;
-        SDHheight = hand.grasp(handLocalGraspPoints[0].x , handLocalGraspPoints[0].y, handLocalGraspPoints[1].x, handLocalGraspPoints[1].y, handLocalGraspPoints[2].x, handLocalGraspPoints[2].y, true) - INIT_POS_Z*1000.0; //Pregrasp and save height
+        SDHheight = hand.grasp(handLocalGraspPoints[2].x , handLocalGraspPoints[2].y, handLocalGraspPoints[1].x, handLocalGraspPoints[1].y, handLocalGraspPoints[0].x, handLocalGraspPoints[0].y, true) - INIT_POS_Z*1000.0; //Pregrasp and save height
 
         cout << "Press ENTER to grasp object." << endl;
         cin.get();
         cout << "Grasping." << endl;
         ur.moveRel(0.0, 0.0, SDHheight);
-        hand.grasp(handLocalGraspPoints[0].x , handLocalGraspPoints[0].y, handLocalGraspPoints[1].x, handLocalGraspPoints[1].y, handLocalGraspPoints[2].x, handLocalGraspPoints[2].y, false);
+        hand.grasp(handLocalGraspPoints[2].x , handLocalGraspPoints[2].y, handLocalGraspPoints[1].x, handLocalGraspPoints[1].y, handLocalGraspPoints[0].x, handLocalGraspPoints[0].y, false);
       }
       else if(handLocalGraspPoints.size() == 2)
       {
         cout << "Going to pre-grasp configuration." << endl;
-        SDHheight = hand.grasp(handLocalGraspPoints[0].x , handLocalGraspPoints[0].y, handLocalGraspPoints[2].x, handLocalGraspPoints[2].y, true) - INIT_POS_Z*1000.0; //Pregrasp and save height
+        SDHheight = hand.grasp(handLocalGraspPoints[1].x , handLocalGraspPoints[1].y, handLocalGraspPoints[0].x, handLocalGraspPoints[0].y, true) - INIT_POS_Z*1000.0; //Pregrasp and save height
         cout << "Press ENTER to grasp object." << endl;
         cin.get();
         cout << "Grasping." << endl;
@@ -124,7 +124,7 @@ int main()
         rotY =   cos(wristRotation) * SDH_FINGER_BASE_OFF_Y;
 
         ur.moveRel(rotX, rotY, SDHheight);
-        hand.grasp(handLocalGraspPoints[0].x , handLocalGraspPoints[0].y, handLocalGraspPoints[2].x, handLocalGraspPoints[2].y, false);
+        hand.grasp(handLocalGraspPoints[1].x , handLocalGraspPoints[1].y, handLocalGraspPoints[0].x, handLocalGraspPoints[0].y, false);
       }
 
       if(hand.getIsValidGrasp())
