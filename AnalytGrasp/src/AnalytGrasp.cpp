@@ -116,7 +116,7 @@ void AnalytGrasp::FindGraspRegs(vector<GraspReg> &aGraspRegsList, Contour &aCont
 		for (int j = 0; j < (halfRegWidth * 2 + 1); j++) //for all points in the current region
 		{
 			index = (startIndex + j) % aContour.list.size();
-			
+
 			//calc its deviation
 			Coords dirVec = (aContour.list[index]).Sub(aContour.list[startIndex]); //this points direction vector
 			devs[j] = CalcProjLength(dirVec, newReg.normVec); //the length of the direction vector projected onto the normal vector
@@ -127,6 +127,8 @@ void AnalytGrasp::FindGraspRegs(vector<GraspReg> &aGraspRegsList, Contour &aCont
 		for (int j = 0; j < devs.size(); j++)
 			if (devs[j] > largestDev)
 				largestDev = devs[j];
+
+		largestDev *= aScaleFactor; //Scale to mm
 
 		//determine if this region is a valid grasp region
 		if (largestDev <= GRASP_REG_MAX_DEV)
@@ -485,4 +487,3 @@ AnalytGrasp::AnalytGrasp()
 AnalytGrasp::~AnalytGrasp()
 {
 }
-

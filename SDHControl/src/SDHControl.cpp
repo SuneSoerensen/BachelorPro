@@ -523,6 +523,4 @@ void SDHControl::controlGraspPlacement(double angleAC, double currDistA, double 
         isExpectedGrasp = false;
       }
     }
-
-  //TODO: Check if current grasp could be another valid grasp
 }
