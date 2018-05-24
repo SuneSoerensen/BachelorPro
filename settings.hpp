@@ -9,7 +9,7 @@
 //============
 //   Vision
 //============
-#define VISION_DEV_MODE	0	//developer mode for Vision and all of its dependencies (0 = false, 1 = true)
+#define VISION_DEV_MODE	1	//developer mode for Vision and all of its dependencies (0 = false, 1 = true)
 
 //--------
 // Vision
@@ -30,7 +30,7 @@
 
 //for grasping generaly:
 #define GRASP_REG_WIDTH		30.0 //mm (width of a finger + a bit)
-#define GRASP_REG_MAX_DEV		1.9 //mm
+#define GRASP_REG_MAX_DEV		2.5 //mm
 
 #define MAX_COM_FOCUS_DIST	50.0 //mm
 #define MIN_GRASP_POINT_DIST	60.0 //mm (the absolutely minimum distance between two grasp points)
@@ -63,7 +63,7 @@
 #define TIAFC_MODE		1	// 0 = normal, 1 = info
 
 //camera settings:
-#define CAMERA			1	// 0 = default camera
+#define CAMERA			0	// 0 = default camera
 #define CAM_RES_WIDTH	1280
 #define CAM_RES_HEIGHT	720
 #define FRAMES_TO_GET	14	// min 7, according to initial tests
@@ -71,13 +71,13 @@
 //crop settings:
 //(for developer tests: 100, 500, 400, 1000)
 //(for real-world tests: 40, 600, 150, 1000)
-#define CROP_TOP		  40
-#define CROP_BOTTOM	 600
-#define CROP_LEFT		 150
+#define CROP_TOP		  100
+#define CROP_BOTTOM	 500
+#define CROP_LEFT		 400
 #define CROP_RIGHT	1000
 
 //for thresholding:
-#define THRESHOLDING_THRES	120//110 //should be between the intensities of the background and the object
+#define THRESHOLDING_THRES	120 //should be between the intensities of the background and the object
 #define THRESHOLDING_MODE	0 //0 = light object on dark background, 1 = dark object on light background
 
 //===============

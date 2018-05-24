@@ -49,7 +49,7 @@ void TIAFC::TakeImage(Mat &aCropImage)
 		if (calls == 0)
 			frame = imread("TestImg/pot.jpg");
 		else if (calls == 1)
-			frame = imread("TestImg/pot.jpg");
+			frame = imread("TestImg/bowl.jpg");
 		else if (calls == 2)
 			frame = imread("TestImg/box.jpg");
 		else if (calls == 3)
