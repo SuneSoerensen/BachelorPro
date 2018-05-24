@@ -77,7 +77,7 @@
 #define CROP_RIGHT	1000
 
 //for thresholding:
-#define THRESHOLDING_THRES	120 //should be between the intensities of the background and the object
+#define THRESHOLDING_THRES	110 //should be between the intensities of the background and the object
 #define THRESHOLDING_MODE	0 //0 = light object on dark background, 1 = dark object on light background
 
 //===============
@@ -120,8 +120,8 @@
 //===============
 //   SDHControl
 //===============
-#define SDHCONTROL_MODE 1 //0=standard 1=debug
-#define POSTION_TEST 0 //0 = Standard 1 = To run test
+#define SDHCONTROL_MODE 0 //0=standard 1=debug
+#define POSTION_TEST 1 //0 = Standard 1 = To run test
 
 #define GRASPSTARTHEIGHT 160 //5mm further than range of fingers //TODO: delete if unused
 #define GRASPFINDSTEPSIZE 0.001 //Stepsize for finding finger-config. in grasp()
@@ -139,7 +139,7 @@
 #define SDH_MAX_ABS_ANGLE 91.0*deg2rad //Max abs. angle of any SDH joint
 
 #define SDH_PRECISION 10.0 //mm Defines how far a grasp can be from the intended, and still be valid
-#define SDH_DIST_INTO_OBJECT 4 //mm for each finger
+#define SDH_DIST_INTO_OBJECT 0.0 //4.0 //mm for each finger
 
 #define FINGERAC_ANGLE_THRESH 22.0*deg2rad //How close the angle of finger A and C should be to each other
 

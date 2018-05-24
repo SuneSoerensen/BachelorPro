@@ -71,6 +71,8 @@ bool SDHControl::isConnected()
 
 double SDHControl::grasp(double fingerAX, double fingerAY, double fingerBX, double fingerBY, double fingerCX, double fingerCY, bool isPreGrasp)
 {
+  if(SDHCONTROL_MODE)
+    cout << "\033[1;33m [SDHControl::grasp] DEBUG: \033[0m" << "Grasp points: (" << fingerAX << ";" << fingerAY << ") (" << fingerBX << ";" << fingerBY << ") (" << fingerCX << ";" << fingerCY << ")" << endl;
   //Check if coordinates of B are correct:
   if(fingerBY > 0.0)
     throw("[SDHControl::grasp]: y-coordinate for finger B should be negative!");
@@ -110,7 +112,11 @@ double SDHControl::grasp(double fingerAX, double fingerAY, double fingerBX, doub
     throw("[SDHControl::grasp]: Angle between A and C is not correct!");
 
   if(SDHCONTROL_MODE)
+  {
+    cout << "\033[1;33m [SDHControl::grasp] DEBUG: \033[0m" << "fingerAngleA = " << fingerAngleA << endl;
+    cout << "\033[1;33m [SDHControl::grasp] DEBUG: \033[0m" << "fingerAngleC = " << fingerAngleC << endl;
     cout << "\033[1;33m [SDHControl::grasp] DEBUG: \033[0m" << "Angle between finger A and C = fingerAngleAC (deg) = " << fingerAngleAC*rad2deg << endl;
+  }
 
   vector<double> fingertipPosA = calcFingertipPos(distA, angleAC);
   vector<double> fingertipPosC = calcFingertipPos(distC, angleAC);
@@ -517,6 +523,4 @@ void SDHControl::controlGraspPlacement(double angleAC, double currDistA, double 
         isExpectedGrasp = false;
       }
     }
-
-  //TODO: Check if current grasp could be another valid grasp
 }
