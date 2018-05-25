@@ -46,8 +46,9 @@ add_library(TIAFC $ENV{TIAFC_ROOT}/TIAFC.cpp)
 add_library(Coords $ENV{COORDS_ROOT}/Coords.cpp)
 add_library(AnalytGrasp $ENV{ANALYT_ROOT}/AnalytGrasp.cpp)
 
-#Add target executeable
-add_executable( Main Main.cpp $ENV{SDHCON_ROOT}/sdhoptions.cpp)
+#Add target executeable (Only have one un-commented!):
+#add_executable( Main Main.cpp $ENV{SDHCON_ROOT}/sdhoptions.cpp) #Original main!
+add_executable( Main Tests.cpp $ENV{SDHCON_ROOT}/sdhoptions.cpp) #ONLY for tests!
 
 #Link all libraries and classes
 target_link_libraries(AnalytGrasp ${OpenCV_LIBS})
