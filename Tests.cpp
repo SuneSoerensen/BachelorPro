@@ -4,7 +4,7 @@
 #include "URControl.hpp"
 #include "Vision.hpp"
 
-using namespace std;  
+using namespace std;
 
 int main()
 {
@@ -103,7 +103,7 @@ int main()
       {
         //Find angle to rotate with, such that x-coord. of finger B is ~0:
         wristRotation = 270.0*deg2rad - atan2(handLocalGraspPoints[1].y, handLocalGraspPoints[1].x); // -90[deg] - angleOfVectorB[deg] is how much to rotate vectors
-        absWristRotation = acos(((double)handLocalGraspPoints[1].x*(-1.0)+(double)handLocalGraspPoints[1].y*(0.0))/(sqrt(pow((double)handLocalGraspPoints[1].x,2)+pow((double)handLocalGraspPoints[1].y,2))*1.0));
+        absWristRotation = acos(((double)handLocalGraspPoints[1].x*(-1.0))/(sqrt(pow((double)handLocalGraspPoints[1].x,2)+pow((double)handLocalGraspPoints[1].y,2))*1.0));
         absWristRotation -= 16.0*deg2rad;
 
         cout << "Grasp points:";
@@ -115,7 +115,7 @@ int main()
       {
         //Find angle to rotate with, such that y-coord. of finger A is ~0:
         wristRotation = - atan2(handLocalGraspPoints[1].y, handLocalGraspPoints[1].x);
-        absWristRotation = acos(((double)handLocalGraspPoints[1].x*(0.0)+(double)handLocalGraspPoints[1].y*(-1.0))/(sqrt(pow((double)handLocalGraspPoints[1].x,2)+pow((double)handLocalGraspPoints[1].y,2))*1.0));
+        absWristRotation = acos(((double)handLocalGraspPoints[1].y*(-1.0))/(sqrt(pow((double)handLocalGraspPoints[1].x,2)+pow((double)handLocalGraspPoints[1].y,2))*1.0));
         absWristRotation -= 10.0*deg2rad;
 
         /*cout << "handLocalGraspPoints:";
@@ -185,7 +185,7 @@ int main()
       else
       {
         cout << "It was an invalid grasp" << endl;
-        hand.fullStop();
+        hand.goToInit();
         ur.moveRel(0.0,0.0,-SDHheight);
       }
 
