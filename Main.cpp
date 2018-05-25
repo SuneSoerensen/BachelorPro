@@ -75,7 +75,9 @@ int main()
       {
         //Find angle to rotate with, such that y-coord. of finger A is ~0:
         wristRotation = - atan2(handLocalGraspPoints[1].y, handLocalGraspPoints[1].x);
-        absWristRotation = wristRotation - 16.0*deg2rad;
+        absWristRotation = acos(((double)handLocalGraspPoints[1].x*(0.0)+(double)handLocalGraspPoints[1].y*(-1.0))/(sqrt(pow((double)handLocalGraspPoints[1].x,2)+pow((double)handLocalGraspPoints[1].y,2))*1.0));
+        absWristRotation -= 10.0*deg2rad;
+
         /*cout << "handLocalGraspPoints:";
         for(int i = 0; i < handLocalGraspPoints.size(); i++)
           cout << " (" << handLocalGraspPoints[i].x << ";" << handLocalGraspPoints[i].y << ") ";
@@ -122,6 +124,8 @@ int main()
 
         rotX = - sin(wristRotation) * SDH_FINGER_BASE_OFF_Y;
         rotY =   cos(wristRotation) * SDH_FINGER_BASE_OFF_Y;
+
+        /*DEBUG*/ cout << "\033[1;33m [SDHControl::grasp] DEBUG: \033[0m" << "rotX = " << rotX << "; rotY = " << rotY << endl;
 
         ur.moveRel(rotX, rotY, SDHheight);
         hand.grasp(handLocalGraspPoints[1].x , handLocalGraspPoints[1].y, handLocalGraspPoints[0].x, handLocalGraspPoints[0].y, false);
