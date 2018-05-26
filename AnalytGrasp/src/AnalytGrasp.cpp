@@ -86,6 +86,12 @@ Grasp AnalytGrasp::FindGrasp(Contour &aContour, double aScaleFactor)
 
 	//if we get to here, we couldn't find any accetable grasps!
 	throw("[AnalytGrasp::FindGrasP()]: Couldn't find any acceptable grasps!");
+	/*Grasp newGrasp;
+	newGrasp.type = p1;
+	newGrasp.points = {graspRegsList[0], graspRegsList[1], graspRegsList[2]};
+	newGrasp.focus = COM;
+	newGrasp.COM = COM;
+	return newGrasp;*/
 }
 
 void AnalytGrasp::FindGraspRegs(vector<GraspReg> &aGraspRegsList, Contour &aContour, double aScaleFactor)

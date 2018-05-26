@@ -29,7 +29,7 @@
 
 //for grasping generaly:
 #define GRASP_REG_WIDTH		34.0 //mm (width of a finger (24mm) + a bit)
-#define GRASP_REG_MAX_DEV		2.2 //mm
+#define GRASP_REG_MAX_DEV		2.0 //mm
 
 #define MAX_COM_FOCUS_DIST	50.0 //mm
 #define MIN_GRASP_POINT_DIST	60.0 //mm (the absolutely minimum distance between two grasp points)
@@ -40,21 +40,21 @@
 #define ALLOW_P3_GRASPS		1
 
 //p1 grasp settings:
-#define P1_MIN_ANG_AC		0.17 //radians (~10 deg) (the minimum angle between finger a and c for a p1 grasp)
+#define P1_MIN_ANG_AC		0.52 //radians (~30 deg) (the minimum angle between finger a and c for a p1 grasp)
 #define P1_MAX_ANG_AC		2.26 //radians (~130 deg) (the maximum angle between finger a and c for a p1 grasp)
-#define P1_MAX_ANG_AB_BC_DEV		0.17 //radians (~10 deg) (the maximum the angle between finger b and the others can deviate from the ideal in either direction)
-#define P1_MAX_FOCUS_ANG_DEV		0.17 //radians (~10 deg)
+#define P1_MAX_ANG_AB_BC_DEV		0.09 //radians (~5 deg) (the maximum the angle between finger b and the others can deviate from the ideal in either direction)
+#define P1_MAX_FOCUS_ANG_DEV		0.09 //radians (~5 deg)
 
 //p2 grasp settings:
-#define P2_MAX_ANG_AC		0.17 //radians (~10 deg) (the maximum angle between finger a and c for a p2 grasp)
-#define P2_MAX_ANG_AB_BC_DEV		0.17 //radians (~10 deg) (the maximum the angle between finger b and the others can deviate from the ideal in either direction)
-#define P2_MAX_FOCUS_ANG_DEV		0.17 //radians (~10 deg)
+#define P2_MAX_ANG_AC		0.09 //radians (~5 deg) (the maximum angle between finger a and c for a p2 grasp)
+#define P2_MAX_ANG_AB_BC_DEV		0.09 //radians (~5 deg) (the maximum the angle between finger b and the others can deviate from the ideal in either direction)
+#define P2_MAX_FOCUS_ANG_DEV		0.09 //radians (~5 deg)
 #define P2_DIST_AC				66.0 //mm
 #define P2_MAX_DIST_AC_DEV		1.0 //mm
 
 //p3 grasp settings:
-#define P3_MAX_ANG_AC_DEV	0.17 //radians (~10 deg) (the maximum the angle between finger a and c can deviate from 0 in either direction)
-#define P3_MAX_FOCUS_ANG_DEV		0.08 //radians (~5 deg)
+#define P3_MAX_ANG_AC_DEV	0.09 //radians (~5 deg) (the maximum the angle between finger a and c can deviate from 0 in either direction)
+#define P3_MAX_FOCUS_ANG_DEV		0.09 //radians (~5 deg)
 
 //-------
 // TIAFC
@@ -76,7 +76,7 @@
 #define CROP_RIGHT	900
 
 //for thresholding:
-#define THRESHOLDING_THRES	108 //should be between the intensities of the background and the object
+#define THRESHOLDING_THRES	110 //should be between the intensities of the background and the object
 #define THRESHOLDING_MODE	0 //0 = light object on dark background, 1 = dark object on light background
 
 //===============

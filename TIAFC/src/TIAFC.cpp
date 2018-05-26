@@ -101,7 +101,7 @@ void TIAFC::FindObject(Mat &aCropImage, Mat &anObjectImage)
 
 	//blur
 	Mat blurImage;
-	blur(greyscaleImage, blurImage, Size(3,3));
+	blur(greyscaleImage, blurImage, Size(7,7));
 	if (TIAFC_MODE) //INFO
 		imwrite("InfoFiles/TIAFC(img_proc_4)(blur).jpg", blurImage);
 
