@@ -142,6 +142,9 @@ vector<Coords> Vision::GetGraspPoints()
 
 Coords Vision::GetObjCoords()
 {
+	//get new data
+	TIAFC::DoItAll(cropImage, contour);
+
 	//return the objects COM in real coordinates
 	return GetRealCoords(TIAFC::FindCOM(contour));
 }

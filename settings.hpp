@@ -18,10 +18,10 @@
 
 //for calibration (pixel-coords to real-coords):
 //(for developer tests: 186.0, 141.0)
-#define REAL_OBJ_WIDTH		125.5 //mm
-#define REAL_OBJ_HEIGHT		125.5 //mm
+#define REAL_OBJ_WIDTH		19.0 //mm
+#define REAL_OBJ_HEIGHT		19.0 //mm
 #define GLOB_X_DIR		1 //global x-direction in relation to the cameras x-direction
-#define GLOB_Y_DIR		-1 //global y-direction in relation to the cameras y-direction
+#define GLOB_Y_DIR		1 //global y-direction in relation to the cameras y-direction
 
 //-------------
 // AnalytGrasp
@@ -72,13 +72,13 @@
 //(for developer tests: 100, 500, 400, 1000)
 //(for real-world tests: 40, 600, 150, 1000)
 #define CROP_TOP		  100
-#define CROP_BOTTOM	 500
-#define CROP_LEFT		 400
-#define CROP_RIGHT	1000
+#define CROP_BOTTOM	 700
+#define CROP_LEFT		 100
+#define CROP_RIGHT	900
 
 //for thresholding:
 #define THRESHOLDING_THRES	110 //should be between the intensities of the background and the object
-#define THRESHOLDING_MODE	0 //0 = light object on dark background, 1 = dark object on light background
+#define THRESHOLDING_MODE	1 //0 = light object on dark background, 1 = dark object on light background
 
 //===============
 //   URControl

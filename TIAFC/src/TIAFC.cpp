@@ -47,13 +47,21 @@ void TIAFC::TakeImage(Mat &aCropImage)
 	if (VISION_DEV_MODE)
 	{
 		if (calls == 0)
-			frame = imread("TestImg/pot.jpg");
+			frame = imread("TestImg/calib_test/45/calib.jpg");
 		else if (calls == 1)
-			frame = imread("TestImg/bowl.jpg");
+			frame = imread("TestImg/calib_test/45/h+1.jpg");
 		else if (calls == 2)
-			frame = imread("TestImg/box.jpg");
+			frame = imread("TestImg/calib_test/45/h-1.jpg");
 		else if (calls == 3)
-			frame = imread("TestImg/truck.jpg");
+			frame = imread("TestImg/calib_test/45/h-2.jpg");
+		else if (calls == 4)
+			frame = imread("TestImg/calib_test/45/w-1.jpg");
+		else if (calls == 5)
+			frame = imread("TestImg/calib_test/45/w-2.jpg");
+		else if (calls == 6)
+			frame = imread("TestImg/calib_test/45/w-3.jpg");
+		else if (calls == 7)
+			frame = imread("TestImg/calib_test/45/w-4.jpg");
 		else
 			frame = imread("TestImg/vandkande.jpg");
 
