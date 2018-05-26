@@ -11,6 +11,8 @@ int main()
   try
   {
     bool running = true;
+    bool hasCalibrated = false;
+    bool hasCalcGrasp = false;
 
     //Instatiate objects:
     SDHControl hand(0, 115200, 0.5);
@@ -28,22 +30,60 @@ int main()
     double rotX;
     double rotY;
 
-    cout << "Welcome to grasp-utility! Place calibration-marker and press ENTER to continue." << endl;
+    cout << "Welcome to grasp-utility TEST-EDITION! Place calibration-marker and press ENTER to continue." << endl;
     cin.get();
-    cout << "Homing arm and calibrating vision..." << endl;
+    cout << "Homing arm.." << endl;
     ur.moveToHome();
-    vis.Calib();
+    while(!hasCalibrated)
+    {
+      try
+      {
+        cout << "Calibrating vision..." << endl;
+          vis.Calib();
+          hasCalibrated = true;
+      }
+      catch(const char e[])
+      {
+        cout << "\033[1;31m ERROR: \033[0m" << e << endl;
+        cout << "Press enter to try again.." << endl;
+        cin.get();
+      }
+    }
+
+
     while(running)
     {
+      hasCalcGrasp = false;
       cout << "Done calibrating. Remove calibration-marker and place target-object. Then, press ENTER to compute grasp." << endl;
       cin.get();
       cin.get();
       ur.moveToHome();
-      cout << "Computing grasp.." << endl;
-      vis.CalcGrasp();
+
+      while(!hasCalcGrasp)
+      {
+        try
+        {
+          cout << "Computing grasp.." << endl;
+          vis.CalcGrasp();
+          hasCalcGrasp = true;
+        }
+        catch(const char e[])
+        {
+          cout << "\033[1;31m ERROR: \033[0m" << e << endl;
+          cout << "Press enter to try again.." << endl;
+          cin.get();
+        }
+      }
+
       objCoords = vis.GetGraspFocus();
       graspPoints = vis.GetGraspPoints();
       cout << "Found real-world coordinates for target-object: (" << objCoords.x << ";" <<  objCoords.y << ")." << "Press ENTER to initialize hand and arm.." << endl;
+      //Ubuntu pop-ups:
+      system("/usr/bin/notify-send CalcGrasp complete! \"Continue now!\"");
+      system("/usr/bin/notify-send CalcGrasp complete! \"Continue now!\"");
+      system("/usr/bin/notify-send CalcGrasp complete! \"Continue now!\"");
+      system("/usr/bin/notify-send CalcGrasp complete! \"Continue now!\"");
+
       cin.get();
       cout << "Initializing hand and arm..." << endl;
       ur.moveToInit();
@@ -63,7 +103,7 @@ int main()
       {
         //Find angle to rotate with, such that x-coord. of finger B is ~0:
         wristRotation = 270.0*deg2rad - atan2(handLocalGraspPoints[1].y, handLocalGraspPoints[1].x); // -90[deg] - angleOfVectorB[deg] is how much to rotate vectors
-        absWristRotation = acos(((double)handLocalGraspPoints[1].x*(-1.0)+(double)handLocalGraspPoints[1].y*(0.0))/(sqrt(pow((double)handLocalGraspPoints[1].x,2)+pow((double)handLocalGraspPoints[1].y,2))*1.0));
+        absWristRotation = acos(((double)handLocalGraspPoints[1].x*(-1.0))/(sqrt(pow((double)handLocalGraspPoints[1].x,2)+pow((double)handLocalGraspPoints[1].y,2))*1.0));
         absWristRotation -= 16.0*deg2rad;
 
         cout << "Grasp points:";
@@ -75,7 +115,7 @@ int main()
       {
         //Find angle to rotate with, such that y-coord. of finger A is ~0:
         wristRotation = - atan2(handLocalGraspPoints[1].y, handLocalGraspPoints[1].x);
-        absWristRotation = acos(((double)handLocalGraspPoints[1].x*(0.0)+(double)handLocalGraspPoints[1].y*(-1.0))/(sqrt(pow((double)handLocalGraspPoints[1].x,2)+pow((double)handLocalGraspPoints[1].y,2))*1.0));
+        absWristRotation = acos(((double)handLocalGraspPoints[1].y*(-1.0))/(sqrt(pow((double)handLocalGraspPoints[1].x,2)+pow((double)handLocalGraspPoints[1].y,2))*1.0));
         absWristRotation -= 10.0*deg2rad;
 
         /*cout << "handLocalGraspPoints:";
@@ -145,9 +185,12 @@ int main()
       else
       {
         cout << "It was an invalid grasp" << endl;
-        hand.fullStop();
+        hand.goToInit();
         ur.moveRel(0.0,0.0,-SDHheight);
       }
+
+      cout << "Invoking script to save images in /InfoFiles..." << endl;
+      system("./compressAndMove.sh");
 
       cout << "Do you wish to run again (1/0)?" << endl;
       cin >> running;
@@ -158,6 +201,8 @@ int main()
   {
     cout << "\033[1;31m ERROR: \033[0m" << e << endl;
   }
+
+  cout << "Please remember to save output!" << endl;
 
   return 0;
 }
