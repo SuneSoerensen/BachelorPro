@@ -17,9 +17,8 @@
 #define VISION_MODE		1	// 0 = normal, 1 = info
 
 //for calibration (pixel-coords to real-coords):
-//(for developer tests: 186.0, 141.0)
-#define REAL_OBJ_WIDTH		19.0 //mm
-#define REAL_OBJ_HEIGHT		19.0 //mm
+#define REAL_OBJ_WIDTH		125.5 //mm
+#define REAL_OBJ_HEIGHT		125.5 //mm
 #define GLOB_X_DIR		1 //global x-direction in relation to the cameras x-direction
 #define GLOB_Y_DIR		-1 //global y-direction in relation to the cameras y-direction
 
@@ -29,8 +28,8 @@
 #define ANALYT_GRASP_MODE	1	// 0 = normal, 1 = info
 
 //for grasping generaly:
-#define GRASP_REG_WIDTH		30.0 //mm (width of a finger + a bit)
-#define GRASP_REG_MAX_DEV		2.5 //mm
+#define GRASP_REG_WIDTH		34.0 //mm (width of a finger (24mm) + a bit)
+#define GRASP_REG_MAX_DEV		2.2 //mm
 
 #define MAX_COM_FOCUS_DIST	50.0 //mm
 #define MIN_GRASP_POINT_DIST	60.0 //mm (the absolutely minimum distance between two grasp points)
