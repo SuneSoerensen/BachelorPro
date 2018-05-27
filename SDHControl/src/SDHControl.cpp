@@ -129,7 +129,7 @@ double SDHControl::grasp(double fingerAX, double fingerAY, double fingerBX, doub
 
   //Distances from finger-bases to contact-points (in the plane):
   double fingerDistA = sqrt(pow((fingerAX - SDH_FINGER_BASE_OFF_X), 2) + pow((fingerAY - SDH_FINGER_BASE_OFF_Y), 2)) - SDH_DIST_INTO_OBJECT;
-  double fingerDistB = sqrt(pow((fingerBX - SDH_FINGER_BASE_OFF_X), 2) + pow((fingerBY + SDH_FINGER_BASE_OFF_Y), 2)) - SDH_DIST_INTO_OBJECT;
+  double fingerDistB = sqrt(pow((fingerBX), 2) + pow((fingerBY + FINGEROFFSET), 2)) - SDH_DIST_INTO_OBJECT;
   double fingerDistC = sqrt(pow((fingerCX + SDH_FINGER_BASE_OFF_X), 2) + pow((fingerCY - SDH_FINGER_BASE_OFF_Y), 2)) - SDH_DIST_INTO_OBJECT;
 
   if(isPreGrasp) //If it is a pre-grasp, move each finger outwards by PREGRASP_SCALE mm:
@@ -421,6 +421,11 @@ void SDHControl::controlGrasp(double goalDistA, double goalDistB, double goalDis
   currDistB = calcFingerDist(currQ[0],currQ[1]);
   currDistC = calcFingerDist(currQ[5],currQ[6]);
 
+  if(SDHCONTROL_MODE)
+  {
+    cout << "\033[1;33m [SDHControl::controlGrasp] DEBUG: \033[0m" << "currDistA = " << currDistA << " currDistB = " << currDistB << " currDistC = " << currDistC << endl;
+  }
+
 
   //Check if the grasp is a valid grasp:
   if(SDH_PRECISION < abs(goalDistA-currDistA[0]) || SDH_PRECISION < abs(goalDistB-currDistB[0]) || SDH_PRECISION < abs(goalDistC-currDistC[0]))
@@ -511,6 +516,7 @@ void SDHControl::controlGraspPlacement(double angleAC, double currDistA, double 
 
   if(POSTION_TEST)
   {
+    /*DEBUG*/ cout << "Results;";
     cout << xA << ";" << yA << ";";
     cout << xB << ";" << yB << ";";
     cout << xC << ";" << yC << endl;

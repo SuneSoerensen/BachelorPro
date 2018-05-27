@@ -38,6 +38,7 @@ int main()
 
             xC = -i;
             yC = k;
+            /*DEBUG*/ cout << "Input;";
             cout << xA << ";" << yA << ";";
             cout << xB << ";" << yB << ";";
             cout << xC << ";" << yC << endl;
