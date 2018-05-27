@@ -1,4 +1,5 @@
 #include <iostream>
+#include <time.h>
 
 #include "SDHControl.hpp"
 #include "URControl.hpp"
@@ -8,6 +9,8 @@ using namespace std;
 
 int main()
 {
+  //Get start timestamp:
+  clock_t t = clock();
   try
   {
     bool running = true;
@@ -39,8 +42,10 @@ int main()
       try
       {
         cout << "Calibrating vision..." << endl;
-          vis.Calib();
-          hasCalibrated = true;
+        cout << "Time: " << (clock() - t)/CLOCKS_PER_SEC << endl;
+        vis.Calib();
+        cout << "Time: " << (clock() - t)/CLOCKS_PER_SEC << endl;
+        hasCalibrated = true;
       }
       catch(const char e[])
       {
@@ -64,7 +69,9 @@ int main()
         try
         {
           cout << "Computing grasp.." << endl;
+          cout << "Time: " << (clock() - t)/CLOCKS_PER_SEC << endl;
           vis.CalcGrasp();
+          cout << "Time: " << (clock() - t)/CLOCKS_PER_SEC << endl;
           hasCalcGrasp = true;
         }
         catch(const char e[])
@@ -89,6 +96,8 @@ int main()
       ur.moveToInit();
       hand.goToInit();
 
+
+      cout << "Time: " << (clock() - t)/CLOCKS_PER_SEC << endl;
       //Compute handLocalGraspPoints from graspPoints and objCoords:
       handLocalGraspPoints.resize(0);
       for(int i = 0; i < graspPoints.size(); i++)
@@ -136,7 +145,7 @@ int main()
         handLocalGraspPoints[i].x = rotX;
         handLocalGraspPoints[i].y = rotY;
       }
-
+      cout << "Time: " << (clock() - t)/CLOCKS_PER_SEC << endl;
       //cout << "Ready to grasp. Press ENTER to move to position and pre-grasp." << endl;
       //cin.get();
 
@@ -146,13 +155,17 @@ int main()
       if(handLocalGraspPoints.size() == 3) //If it is a three-finger-grasp
       {
         cout << "Going to pre-grasp configuration." << endl;
+        cout << "Time: " << (clock() - t)/CLOCKS_PER_SEC << endl;
         SDHheight = hand.grasp(handLocalGraspPoints[2].x , handLocalGraspPoints[2].y, handLocalGraspPoints[1].x, handLocalGraspPoints[1].y, handLocalGraspPoints[0].x, handLocalGraspPoints[0].y, true) - INIT_POS_Z*1000.0; //Pregrasp and save height
+        cout << "Time: " << (clock() - t)/CLOCKS_PER_SEC << endl;
 
         cout << "Press ENTER to grasp object." << endl;
         cin.get();
         cout << "Grasping." << endl;
+        cout << "Time: " << (clock() - t)/CLOCKS_PER_SEC << endl;
         ur.moveRel(0.0, 0.0, SDHheight);
         hand.grasp(handLocalGraspPoints[2].x , handLocalGraspPoints[2].y, handLocalGraspPoints[1].x, handLocalGraspPoints[1].y, handLocalGraspPoints[0].x, handLocalGraspPoints[0].y, false);
+        cout << "Time: " << (clock() - t)/CLOCKS_PER_SEC << endl;
       }
       else if(handLocalGraspPoints.size() == 2)
       {
@@ -165,14 +178,16 @@ int main()
         rotX = - sin(wristRotation) * SDH_FINGER_BASE_OFF_Y;
         rotY =   cos(wristRotation) * SDH_FINGER_BASE_OFF_Y;
 
-        /*DEBUG*/ cout << "\033[1;33m [SDHControl::grasp] DEBUG: \033[0m" << "rotX = " << rotX << "; rotY = " << rotY << endl;
-
+        cout << "Time: " << (clock() - t)/CLOCKS_PER_SEC << endl;
         ur.moveRel(rotX, rotY, SDHheight);
         hand.grasp(handLocalGraspPoints[1].x , handLocalGraspPoints[1].y, handLocalGraspPoints[0].x, handLocalGraspPoints[0].y, false);
+        cout << "Time: " << (clock() - t)/CLOCKS_PER_SEC << endl;
       }
 
+      cout << "Time: " << (clock() - t)/CLOCKS_PER_SEC << endl;
       if(hand.getIsValidGrasp())
       {
+        cout << "Time: " << (clock() - t)/CLOCKS_PER_SEC << endl;
         cout << "It was a valid grasp" << endl;
         ur.moveToInit();
         //ur.moveRel(0.0, 0.0, 100.0);
@@ -190,7 +205,9 @@ int main()
       }
 
       cout << "Invoking script to save images in /InfoFiles..." << endl;
+      cout << "Time: " << (clock() - t)/CLOCKS_PER_SEC << endl;
       system("./compressAndMove.sh");
+      cout << "Time: " << (clock() - t)/CLOCKS_PER_SEC << endl;
 
       cout << "Do you wish to run again (1/0)?" << endl;
       cin >> running;
