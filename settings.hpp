@@ -70,10 +70,10 @@
 //crop settings:
 //(for developer tests: 100, 500, 400, 1000)
 //(for real-world tests: 40, 600, 150, 1000)
-#define CROP_TOP		  100
+#define CROP_TOP		  30
 #define CROP_BOTTOM	 700
-#define CROP_LEFT		 100
-#define CROP_RIGHT	900
+#define CROP_LEFT		 50
+#define CROP_RIGHT	1000
 
 //for thresholding:
 #define THRESHOLDING_THRES	110 //should be between the intensities of the background and the object

@@ -47,15 +47,27 @@ void TIAFC::TakeImage(Mat &aCropImage)
 	if (VISION_DEV_MODE)
 	{
 		if (calls == 0) //calibration run
-			frame = imread("TestImg/bowl.jpg");
+			frame = imread("TestImg/bowl1.jpg");
 		else if (calls == 1)
-			frame = imread("TestImg/pot.jpg");
+			frame = imread("TestImg/box1.jpg");
 		else if (calls == 2)
-			frame = imread("TestImg/bowl.jpg");
+			frame = imread("TestImg/bowl1.jpg");
 		else if (calls == 3)
-			frame = imread("TestImg/box.jpg");
+			frame = imread("TestImg/box1.jpg");
+		else if (calls == 4)
+			frame = imread("TestImg/pot1.jpg");
+		else if (calls == 5)
+			frame = imread("TestImg/pot2.jpg");
+		else if (calls == 6)
+			frame = imread("TestImg/pot3.jpg");
+		else if (calls == 7)
+			frame = imread("TestImg/box1.jpg");
+		else if (calls == 8)
+			frame = imread("TestImg/box2.jpg");
+		else if (calls == 9)
+			frame = imread("TestImg/box3.jpg");
 		else
-			frame = imread("TestImg/bowl.jpg");
+			frame = imread("TestImg/bowl1.jpg");
 
 		calls++;
 	}
