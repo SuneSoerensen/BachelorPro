@@ -2,7 +2,6 @@
 #include <fstream>
 #include <unistd.h>
 #include <rwhw/universalrobots/UniversalRobotsData.hpp>
-//#include <rw/math/Vector3D.hpp>
 #include <stdlib.h>
 #include <array>
 
@@ -54,10 +53,6 @@ void URControl::moveToInit()
 {
   if(state != STATE_INIT)
   {
-    /*string root(getenv("URCON_ROOT"));
-    string file = "goToInit.txt";
-    string fileName = root + file;*/
-
     string fileName = "goToInit.txt";
 
     //Check if fileName exists:
@@ -80,12 +75,6 @@ void URControl::moveToHome()
 {
   if(state != STATE_HOME)
   {
-    /*string root(getenv("BACH_ROOT"));
-    if(URCONTROL_MODE)
-        cout << "\033[1;33m DEBUG: \033[0m" << "Created fileName with success" << endl;
-    string file = "goToHome.txt";
-    string fileName = root + file;*/
-
     string fileName = "goToHome.txt";
 
     //Check if fileName exists:
