@@ -86,21 +86,6 @@ double SDHControl::grasp(double fingerAX, double fingerAY, double fingerBX, doub
   goalSides[1] = sqrt(pow((fingerBX-fingerCX),2) + pow((fingerBY-fingerCY),2));
   goalSides[2] = sqrt(pow((fingerCX-fingerAX),2) + pow((fingerCY-fingerAY),2));
 
-  //Calculate distances from hand-center to finger-contact-points (in the plane) and substract SDH_DIST_INTO_OBJECT to ensure that points are inside the object:
-  //double distA = sqrt(fingerAX*fingerAX + fingerAY*fingerAY) - SDH_DIST_INTO_OBJECT;
-  //double distB = sqrt(fingerBX*fingerBX + fingerBY*fingerBY) - SDH_DIST_INTO_OBJECT;
-  //double distC = sqrt(fingerCX*fingerCX + fingerCY*fingerCY) - SDH_DIST_INTO_OBJECT;
-
-
-
-  /*if(SDHCONTROL_MODE)
-  {
-    cout << "\033[1;33m [SDHControl::grasp] DEBUG: \033[0m" << "distA: " << distA << " ; " << "distB: " << distB << " ; distC: " << distC << endl;
-  }*/
-
-  //Angle of contact-point A:
-  //NOTE: Corrected from: double angleAC = abs(atan2((fingerAX), (fingerAY)));
-  //double angleAC = abs(atan2((fingerAY), (fingerAX)));
 
   //Angle for finger A and C to reach their points (approx. as they are not always equally distanced):
   double fingerAngleA = abs(atan2((fingerAX-SDH_FINGER_BASE_OFF_X), (fingerAY-SDH_FINGER_BASE_OFF_Y)));
@@ -117,15 +102,6 @@ double SDHControl::grasp(double fingerAX, double fingerAY, double fingerBX, doub
     cout << "\033[1;33m [SDHControl::grasp] DEBUG: \033[0m" << "fingerAngleC = " << fingerAngleC << endl;
     cout << "\033[1;33m [SDHControl::grasp] DEBUG: \033[0m" << "Angle between finger A and C = fingerAngleAC (deg) = " << fingerAngleAC*rad2deg << endl;
   }
-
-  //Calculate finger-positions in the plane (x,y) as polar coodinates (dist,angle):
-  /*vector<double> fingertipPosA = calcFingertipPos(distA, angleAC);
-  vector<double> fingertipPosC = calcFingertipPos(distC, angleAC);
-
-  //Calculate XXX for all fingertips:
-  double xA = fingertipPosA[0];
-  double xB = distB-FINGEROFFSET; //Distances are given relative to center of hand, so substract offset (dist. from center of hand)
-  double xC = fingertipPosC[0];*/
 
   //Distances from finger-bases to contact-points (in the plane):
   double fingerDistA = sqrt(pow((fingerAX - SDH_FINGER_BASE_OFF_X), 2) + pow((fingerAY - SDH_FINGER_BASE_OFF_Y), 2)) - SDH_DIST_INTO_OBJECT;
