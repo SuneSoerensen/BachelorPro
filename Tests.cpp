@@ -126,11 +126,7 @@ int main()
         wristRotation = - atan2(handLocalGraspPoints[1].y, handLocalGraspPoints[1].x);
         absWristRotation = acos(((double)handLocalGraspPoints[1].y*(-1.0))/(sqrt(pow((double)handLocalGraspPoints[1].x,2)+pow((double)handLocalGraspPoints[1].y,2))*1.0));
         absWristRotation -= 10.0*deg2rad;
-
-        /*cout << "handLocalGraspPoints:";
-        for(int i = 0; i < handLocalGraspPoints.size(); i++)
-          cout << " (" << handLocalGraspPoints[i].x << ";" << handLocalGraspPoints[i].y << ") ";
-        cout << " Rotation =" << absWristRotation*rad2deg << endl;*/
+        
       }
       else
       {
@@ -146,8 +142,6 @@ int main()
         handLocalGraspPoints[i].y = rotY;
       }
       cout << "Time: " << (clock() - t)/CLOCKS_PER_SEC << endl;
-      //cout << "Ready to grasp. Press ENTER to move to position and pre-grasp." << endl;
-      //cin.get();
 
       ur.moveRel(objCoords.x, objCoords.y, 0.0); //Hand above object
       ur.setWristAngle(-absWristRotation); //Rotate wrist
@@ -190,7 +184,6 @@ int main()
         cout << "Time: " << (clock() - t)/CLOCKS_PER_SEC << endl;
         cout << "It was a valid grasp" << endl;
         ur.moveToInit();
-        //ur.moveRel(0.0, 0.0, 100.0);
         cout << "Rotating wrist to 60 deg." << endl;
         ur.setWristAngle(60.0*deg2rad);
         cout << "Putting object back down." << endl;
